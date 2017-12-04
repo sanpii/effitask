@@ -13,9 +13,9 @@ pub enum Msg {
 #[widget]
 impl ::relm::Widget for Widget
 {
-    fn model() -> ()
+    fn model(tasks: ::tasks::List) -> ::tasks::List
     {
-        ()
+        tasks
     }
 
     fn update(&mut self, event: Msg)
@@ -29,7 +29,8 @@ impl ::relm::Widget for Widget
     {
         gtk::Window {
             gtk::Notebook {
-                ::inbox::Widget {
+                tab_pos: gtk::PositionType::Left,
+                ::inbox::Widget(self.model.clone()) {
                     tab: {
                         tab_label: Some("Inbox"),
                     },

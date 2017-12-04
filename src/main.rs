@@ -1,3 +1,19 @@
-fn main() {
-    println!("Hello, world!");
+#![feature(proc_macro)]
+
+extern crate gtk;
+#[macro_use]
+extern crate relm;
+extern crate relm_attributes;
+#[macro_use]
+extern crate relm_derive;
+extern crate todo_txt;
+
+use relm::Widget;
+
+mod application;
+
+fn main()
+{
+    application::Widget::run(())
+        .unwrap();
 }

@@ -40,4 +40,18 @@ impl List
 
         tasks
     }
+
+    pub fn projects(&self) -> Vec<String>
+    {
+        let mut projects = self.todo.iter().fold(Vec::new(), |mut acc, ref item| {
+            acc.append(&mut item.projects.clone());
+
+            acc
+        });
+
+        projects.sort();
+        projects.dedup();
+
+        projects
+    }
 }

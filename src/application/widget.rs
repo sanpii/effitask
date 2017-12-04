@@ -35,6 +35,11 @@ impl ::relm::Widget for Widget
                         tab_label: Some("Inbox"),
                     },
                 },
+                ::projects::Widget(self.model.clone()) {
+                    tab: {
+                        tab_label: Some("Projects"),
+                    },
+                },
             },
             delete_event(_, _) => (Msg::Quit, gtk::Inhibit(false)),
         }

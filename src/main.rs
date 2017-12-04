@@ -15,6 +15,7 @@ use relm::Widget;
 
 mod application;
 mod inbox;
+mod projects;
 mod tasks;
 
 fn main()

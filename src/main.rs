@@ -17,6 +17,7 @@ mod application;
 mod inbox;
 mod projects;
 mod tasks;
+mod widgets;
 
 fn main()
 {

@@ -2,7 +2,6 @@ use gtk::{
     self,
     CellLayoutExt,
     ListStoreExt,
-    ListStoreExtManual,
     OrientableExt,
     TreeSelectionExt,
     TreeModelExt,
@@ -40,15 +39,15 @@ impl Widget
     {
         self.model.tasks_store.clear();
 
-        let tasks = self.model.tasks.todo.iter()
-            .filter(|x| {
-                !x.projects.is_empty() && (filter.is_none() || x.projects.contains(&filter.clone().unwrap()))
-            });
+        let mut tasks = Vec::new();
 
-        for task in tasks {
-            let row = self.model.tasks_store.append();
-            self.model.tasks_store.set_value(&row, 0, &gtk::Value::from(&task.subject));
+        for task in self.model.tasks.todo.iter() {
+            if !task.projects.is_empty() && (filter.is_none() || task.projects.contains(&filter.clone().unwrap())) {
+                tasks.push(task.clone());
+            }
         }
+
+        self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
     }
 }
 
@@ -64,14 +63,6 @@ impl ::relm::Widget for Widget
         view_column.pack_start(&cell, true);
         view_column.add_attribute(&cell, "text", 0);
         self.projects_view.append_column(&view_column);
-
-        self.tasks_view.set_model(Some(&self.model.tasks_store));
-
-        let cell = gtk::CellRendererText::new();
-        let view_column = gtk::TreeViewColumn::new();
-        view_column.pack_start(&cell, true);
-        view_column.add_attribute(&cell, "text", 0);
-        self.tasks_view.append_column(&view_column);
 
         self.populate(None);
     }
@@ -114,11 +105,8 @@ impl ::relm::Widget for Widget
                     selection.changed(selection) => Msg::SelectionChanged(selection.clone()),
                 }
             },
-            gtk::ScrolledWindow {
-                #[name="tasks_view"]
-                gtk::TreeView {
-                    headers_visible: false,
-                }
+            #[name="tasks"]
+            ::widgets::Tasks {
             }
         }
     }

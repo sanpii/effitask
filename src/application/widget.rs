@@ -1,4 +1,8 @@
-use gtk::{self, WidgetExt};
+use gtk::{
+    self,
+    NotebookExt,
+    WidgetExt,
+};
 use relm_attributes::widget;
 
 #[derive(Msg)]
@@ -24,7 +28,14 @@ impl ::relm::Widget for Widget
     view!
     {
         gtk::Window {
-            delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),
+            gtk::Notebook {
+                ::inbox::Widget {
+                    tab: {
+                        tab_label: Some("Inbox"),
+                    },
+                },
+            },
+            delete_event(_, _) => (Msg::Quit, gtk::Inhibit(false)),
         }
     }
 }

@@ -11,6 +11,7 @@ extern crate todo_txt;
 use relm::Widget;
 
 mod application;
+mod inbox;
 
 fn main()
 {

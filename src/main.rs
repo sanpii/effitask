@@ -1,5 +1,8 @@
 #![feature(proc_macro)]
 
+extern crate env_logger;
+#[macro_use]
+extern crate log;
 extern crate gtk;
 #[macro_use]
 extern crate relm;
@@ -15,6 +18,9 @@ mod inbox;
 
 fn main()
 {
-    application::Widget::run(())
+    ::env_logger::init()
+        .unwrap();
+
+    application::Widget::run(tasks)
         .unwrap();
 }

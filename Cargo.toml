@@ -4,3 +4,11 @@ version = "0.1.0"
 authors = ["Sanpi <sanpi@homecomputing.fr>"]
 
 [dependencies]
+relm = "^0.11"
+relm-attributes = "^0.11"
+relm-derive = "^0.11"
+todo-txt = "^0.7"
+
+[dependencies.gtk]
+version = "0.3"
+features = ["v3_22"]

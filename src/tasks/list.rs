@@ -1,7 +1,7 @@
 #[derive(Clone)]
 pub struct List {
-    pub todo: Vec<::todo_txt::Task>,
-    pub done: Vec<::todo_txt::Task>,
+    pub todo: Vec<::tasks::Task>,
+    pub done: Vec<::tasks::Task>,
 }
 
 impl List
@@ -14,7 +14,7 @@ impl List
         }
     }
 
-    fn load_file(path: &::std::path::Path) -> Vec<::todo_txt::Task>
+    fn load_file(path: &::std::path::Path) -> Vec<::tasks::Task>
     {
         use std::io::BufRead;
         use std::str::FromStr;
@@ -32,7 +32,7 @@ impl List
         for line in ::std::io::BufReader::new(file).lines() {
             let line = line.unwrap();
 
-            match ::todo_txt::Task::from_str(line.as_str()) {
+            match ::tasks::Task::from_str(line.as_str()) {
                 Ok(task) => tasks.push(task),
                 Err(_) => error!("Invalid tasks: '{}'", line),
             };

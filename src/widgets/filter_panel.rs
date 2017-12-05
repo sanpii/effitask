@@ -16,7 +16,7 @@ use relm_attributes::widget;
 pub enum Msg {
     Filter(Option<String>),
     UpdateFilters(Vec<String>),
-    UpdateTasks(Vec<::todo_txt::Task>),
+    UpdateTasks(Vec<::tasks::Task>),
 }
 
 #[repr(u32)]

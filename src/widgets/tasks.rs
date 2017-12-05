@@ -10,7 +10,7 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
-    Update(Vec<::todo_txt::Task>),
+    Update(Vec<::tasks::Task>),
 }
 
 #[repr(u32)]
@@ -42,7 +42,7 @@ impl ::std::convert::Into<i32> for Column
 
 impl Tasks
 {
-    pub fn populate(&mut self, tasks: Vec<::todo_txt::Task>)
+    pub fn populate(&mut self, tasks: Vec<::tasks::Task>)
     {
         use ::gtk::ToValue;
 
@@ -58,7 +58,7 @@ impl Tasks
         }
     }
 
-    fn task_color(&self, task: &::todo_txt::Task) -> &str
+    fn task_color(&self, task: &::tasks::Task) -> &str
     {
         match task.priority {
             0 => "#F8D7DA",

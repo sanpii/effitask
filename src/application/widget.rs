@@ -1,11 +1,5 @@
-use gtk::{
-    self,
-    BoxExt,
-    CssProviderExt,
-    NotebookExt,
-    NotebookExtManual,
-    WidgetExt,
-};
+use gtk;
+use gtk::prelude::*;
 use relm_attributes::widget;
 
 #[derive(Msg)]
@@ -82,7 +76,7 @@ impl ::relm::Widget for Widget
     fn update(&mut self, event: Msg)
     {
         match event {
-            Msg::Quit => gtk::main_quit(),
+            Msg::Quit => ::gtk::main_quit(),
         }
     }
 
@@ -98,7 +92,7 @@ impl ::relm::Widget for Widget
                 ::contexts::Widget(self.model.clone()),
                 ::done::Widget(self.model.clone()),
             },
-            delete_event(_, _) => (Msg::Quit, gtk::Inhibit(false)),
+            delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),
         }
     }
 }

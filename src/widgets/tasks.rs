@@ -1,11 +1,5 @@
-use gtk::{
-    self,
-    CellLayoutExt,
-    ListStoreExt,
-    ListStoreExtManual,
-    TreeViewExt,
-    WidgetExt,
-};
+use gtk;
+use gtk::prelude::*;
 use relm_attributes::widget;
 
 #[derive(Msg)]
@@ -78,29 +72,29 @@ impl ::relm::Widget for Tasks
     {
         self.tree_view.set_model(Some(&self.model));
 
-        let column = gtk::TreeViewColumn::new();
+        let column = ::gtk::TreeViewColumn::new();
         self.tree_view.append_column(&column);
 
-        let cell = gtk::CellRendererToggle::new();
+        let cell = ::gtk::CellRendererToggle::new();
         column.pack_start(&cell, false);
         column.add_attribute(&cell, "active", Column::Finished.into());
         column.add_attribute(&cell, "cell-background", Column::Color.into());
 
-        let cell = gtk::CellRendererText::new();
+        let cell = ::gtk::CellRendererText::new();
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Subject.into());
         column.add_attribute(&cell, "background", Column::Color.into());
     }
 
-    fn model(_: ()) -> gtk::ListStore
+    fn model(_: ()) -> ::gtk::ListStore
     {
         let columns = vec![
-            gtk::Type::Bool,
-            gtk::Type::String,
-            gtk::Type::String,
+            ::gtk::Type::Bool,
+            ::gtk::Type::String,
+            ::gtk::Type::String,
         ];
 
-        gtk::ListStore::new(&columns)
+        ::gtk::ListStore::new(&columns)
     }
 
     fn update(&mut self, event: Msg)

@@ -1,15 +1,5 @@
-use gtk::{
-    self,
-    CellLayoutExt,
-    OrientableExt,
-    ScrolledWindowExt,
-    TreeSelectionExt,
-    TreeModelExt,
-    TreeStoreExt,
-    TreeStoreExtManual,
-    TreeViewExt,
-    WidgetExt,
-};
+use gtk;
+use gtk::prelude::*;
 use relm_attributes::widget;
 
 #[derive(Msg)]
@@ -90,25 +80,25 @@ impl ::relm::Widget for FilterPanel
     fn init_view(&mut self)
     {
         self.filters.set_size_request(200, -1);
-        self.scroll.set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
+        self.scroll.set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
         self.filters.set_model(Some(&self.model));
 
-        let column = gtk::TreeViewColumn::new();
+        let column = ::gtk::TreeViewColumn::new();
         self.filters.append_column(&column);
 
-        let cell = gtk::CellRendererText::new();
+        let cell = ::gtk::CellRendererText::new();
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Title.into());
     }
 
-    fn model(_: ()) -> gtk::TreeStore
+    fn model(_: ()) -> ::gtk::TreeStore
     {
         let columns = vec![
-            gtk::Type::String,
-            gtk::Type::String,
+            ::gtk::Type::String,
+            ::gtk::Type::String,
         ];
 
-        gtk::TreeStore::new(&columns)
+        ::gtk::TreeStore::new(&columns)
     }
 
     fn update(&mut self, event: Msg)
@@ -125,7 +115,7 @@ impl ::relm::Widget for FilterPanel
     view!
     {
         gtk::Paned {
-            orientation: gtk::Orientation::Horizontal,
+            orientation: ::gtk::Orientation::Horizontal,
             #[name="scroll"]
             gtk::ScrolledWindow {
                 #[name="filters"]

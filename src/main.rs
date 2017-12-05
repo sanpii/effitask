@@ -1,4 +1,5 @@
 #![feature(proc_macro)]
+#![feature(slice_concat_ext)]
 
 extern crate env_logger;
 #[macro_use]

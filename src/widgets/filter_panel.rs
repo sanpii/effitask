@@ -19,16 +19,68 @@ pub enum Msg {
     UpdateTasks(Vec<::todo_txt::Task>),
 }
 
+#[repr(u32)]
+enum Column {
+    Title = 0,
+    Raw = 1,
+}
+
+impl ::std::convert::Into<u32> for Column
+{
+    fn into(self) -> u32
+    {
+        unsafe {
+            ::std::mem::transmute(self)
+        }
+    }
+}
+
+impl ::std::convert::Into<i32> for Column
+{
+    fn into(self) -> i32
+    {
+        unsafe {
+            ::std::mem::transmute(self)
+        }
+    }
+}
+
 impl FilterPanel
 {
     fn populate_filters(&mut self, filters: Vec<String>)
     {
         self.model.clear();
+        let mut root = ::std::collections::HashMap::new();
 
         for filter in filters {
-            let row = self.model.append(None);
-            self.model.set_value(&row, 0, &::gtk::Value::from(&filter));
+            self.append(&mut root, filter);
         }
+
+        self.filters.expand_all();
+    }
+
+    fn append(&self, root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>, filter: String)
+    {
+        use ::std::slice::SliceConcatExt;
+
+        let f = filter.clone();
+        let mut levels: Vec<_> = f.split("-")
+            .collect();
+        let title = levels.pop()
+            .unwrap();
+
+        let parent = levels.join("-");
+
+        if parent.len() > 0 && root.get(&parent).is_none() {
+            self.append(root, parent.clone());
+        }
+
+        let row = self.model.append(root.get(&parent));
+
+        self.model.set_value(&row, Column::Title.into(), &::gtk::Value::from(&title));
+        self.model.set_value(&row, Column::Raw.into(), &::gtk::Value::from(&filter));
+
+        root.insert(filter, row);
     }
 }
 
@@ -46,12 +98,15 @@ impl ::relm::Widget for FilterPanel
 
         let cell = gtk::CellRendererText::new();
         column.pack_start(&cell, true);
-        column.add_attribute(&cell, "text", 0);
+        column.add_attribute(&cell, "text", Column::Title.into());
     }
 
     fn model(_: ()) -> gtk::TreeStore
     {
-        let columns = vec![gtk::Type::String];
+        let columns = vec![
+            gtk::Type::String,
+            gtk::Type::String,
+        ];
 
         gtk::TreeStore::new(&columns)
     }
@@ -78,7 +133,7 @@ impl ::relm::Widget for FilterPanel
                     headers_visible: false,
                     selection.changed(selection) => {
                         if let Some((list_model, iter)) = selection.get_selected() {
-                            let filter = list_model.get_value(&iter, 0)
+                            let filter = list_model.get_value(&iter, Column::Raw.into())
                                 .get();
 
                             Msg::Filter(filter)

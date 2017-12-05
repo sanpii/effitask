@@ -17,6 +17,7 @@ pub enum Msg {
 enum Column {
     Finished = 0,
     Subject = 1,
+    Color = 2,
 }
 
 impl ::std::convert::Into<u32> for Column
@@ -49,8 +50,23 @@ impl Tasks
 
         for task in tasks.iter() {
             let row = self.model.append();
+            let color = self.task_color(task);
+
             self.model.set_value(&row, Column::Finished.into(), &task.finished.to_value());
             self.model.set_value(&row, Column::Subject.into(), &task.subject.to_value());
+            self.model.set_value(&row, Column::Color.into(), &color.to_value());
+        }
+    }
+
+    fn task_color(&self, task: &::todo_txt::Task) -> &str
+    {
+        match task.priority {
+            0 => "#F8D7DA",
+            1 => "#FFF3CD",
+            2 => "#D1ECF1",
+            3 => "#D4EDDA",
+            4 => "#E7E8EA",
+            _ => "#FFFFFF",
         }
     }
 }
@@ -68,15 +84,21 @@ impl ::relm::Widget for Tasks
         let cell = gtk::CellRendererToggle::new();
         column.pack_start(&cell, false);
         column.add_attribute(&cell, "active", Column::Finished.into());
+        column.add_attribute(&cell, "cell-background", Column::Color.into());
 
         let cell = gtk::CellRendererText::new();
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Subject.into());
+        column.add_attribute(&cell, "background", Column::Color.into());
     }
 
     fn model(_: ()) -> gtk::ListStore
     {
-        let columns = vec![gtk::Type::Bool, gtk::Type::String];
+        let columns = vec![
+            gtk::Type::Bool,
+            gtk::Type::String,
+            gtk::Type::String,
+        ];
 
         gtk::ListStore::new(&columns)
     }

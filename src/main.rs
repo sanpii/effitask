@@ -15,6 +15,7 @@ use relm::Widget;
 
 mod application;
 mod contexts;
+mod done;
 mod inbox;
 mod projects;
 mod tasks;

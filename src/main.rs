@@ -14,6 +14,7 @@ extern crate todo_txt;
 use relm::Widget;
 
 mod application;
+mod contexts;
 mod inbox;
 mod projects;
 mod tasks;

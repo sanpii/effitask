@@ -40,6 +40,11 @@ impl ::relm::Widget for Widget
                         tab_label: Some("Projects"),
                     },
                 },
+                ::contexts::Widget(self.model.clone()) {
+                    tab: {
+                        tab_label: Some("Contexts"),
+                    },
+                },
             },
             delete_event(_, _) => (Msg::Quit, gtk::Inhibit(false)),
         }

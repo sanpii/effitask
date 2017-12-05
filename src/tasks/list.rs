@@ -54,4 +54,18 @@ impl List
 
         projects
     }
+
+    pub fn contexts(&self) -> Vec<String>
+    {
+        let mut contexts = self.todo.iter().fold(Vec::new(), |mut acc, ref item| {
+            acc.append(&mut item.contexts.clone());
+
+            acc
+        });
+
+        contexts.sort();
+        contexts.dedup();
+
+        contexts
+    }
 }

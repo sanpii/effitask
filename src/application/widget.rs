@@ -1,5 +1,6 @@
 use gtk::{
     self,
+    CssProviderExt,
     NotebookExt,
     WidgetExt,
 };
@@ -10,9 +11,28 @@ pub enum Msg {
     Quit,
 }
 
+impl Widget
+{
+    fn load_style(&self)
+    {
+        let screen = self.window.get_screen()
+            .unwrap();
+        let css = ::gtk::CssProvider::new();
+        css.load_from_data(b"treeview { font-size: 20px; }")
+            .unwrap_or(error!("Invalid CSS"));
+
+        ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
+    }
+}
+
 #[widget]
 impl ::relm::Widget for Widget
 {
+    fn init_view(&mut self)
+    {
+        self.load_style();
+    }
+
     fn model(tasks: ::tasks::List) -> ::tasks::List
     {
         tasks
@@ -27,6 +47,7 @@ impl ::relm::Widget for Widget
 
     view!
     {
+        #[name="window"]
         gtk::Window {
             gtk::Notebook {
                 tab_pos: gtk::PositionType::Left,

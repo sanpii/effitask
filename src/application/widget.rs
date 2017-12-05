@@ -1,7 +1,9 @@
 use gtk::{
     self,
+    BoxExt,
     CssProviderExt,
     NotebookExt,
+    NotebookExtManual,
     WidgetExt,
 };
 use relm_attributes::widget;
@@ -23,6 +25,44 @@ impl Widget
 
         ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
     }
+
+    fn replace_tab_widgets(&self)
+    {
+        let n = self.notebook.get_n_pages();
+
+        for x in 0..n {
+            let page = self.notebook.get_nth_page(Some(x))
+                .unwrap();
+            let widget = self.get_tab_widget(x);
+
+            self.notebook.set_tab_label(&page, Some(&widget));
+        }
+    }
+
+    fn get_tab_widget(&self, n: u32) -> ::gtk::Box
+    {
+        let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
+        let title = match n {
+            0 => "inbox",
+            1 => "projects",
+            2 => "contexts",
+            3 => "done",
+            _ => {
+                error!("Invalid tab n°{}", n);
+
+                ""
+            },
+        };
+        let image = ::gtk::Image::new_from_file(format!("resources/{}.png", title));
+        vbox.pack_start(&image, false, false, 0);
+
+        let label = ::gtk::Label::new(Some(title));
+        vbox.pack_start(&label, false, false, 0);
+
+        vbox.show_all();
+
+        vbox
+    }
 }
 
 #[widget]
@@ -31,6 +71,7 @@ impl ::relm::Widget for Widget
     fn init_view(&mut self)
     {
         self.load_style();
+        self.replace_tab_widgets();
     }
 
     fn model(tasks: ::tasks::List) -> ::tasks::List
@@ -49,28 +90,13 @@ impl ::relm::Widget for Widget
     {
         #[name="window"]
         gtk::Window {
+            #[name="notebook"]
             gtk::Notebook {
-                tab_pos: gtk::PositionType::Left,
-                ::inbox::Widget(self.model.clone()) {
-                    tab: {
-                        tab_label: Some("Inbox"),
-                    },
-                },
-                ::projects::Widget(self.model.clone()) {
-                    tab: {
-                        tab_label: Some("Projects"),
-                    },
-                },
-                ::contexts::Widget(self.model.clone()) {
-                    tab: {
-                        tab_label: Some("Contexts"),
-                    },
-                },
-                ::done::Widget(self.model.clone()) {
-                    tab: {
-                        tab_label: Some("Done"),
-                    },
-                },
+                tab_pos: ::gtk::PositionType::Left,
+                ::inbox::Widget(self.model.clone()),
+                ::projects::Widget(self.model.clone()),
+                ::contexts::Widget(self.model.clone()),
+                ::done::Widget(self.model.clone()),
             },
             delete_event(_, _) => (Msg::Quit, gtk::Inhibit(false)),
         }

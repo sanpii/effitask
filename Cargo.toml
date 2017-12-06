@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Sanpi <sanpi@homecomputing.fr>"]
 
 [dependencies]
+chrono = "^0.4"
 env_logger = "^0.4"
 log = "^0.3"
 relm = "^0.11"

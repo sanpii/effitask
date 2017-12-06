@@ -134,8 +134,9 @@ impl ::relm::Widget for FilterPanel
                     },
                 }
             },
-            #[name="tasks"]
-            ::widgets::Tasks {
+            gtk::ScrolledWindow {
+                #[name="tasks"]
+                ::widgets::Tasks,
             }
         }
     }

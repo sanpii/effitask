@@ -14,8 +14,20 @@ impl Widget
         let screen = self.window.get_screen()
             .unwrap();
         let css = ::gtk::CssProvider::new();
-        css.load_from_data(b"treeview { font-size: 20px; }")
-            .unwrap_or(error!("Invalid CSS"));
+        css.load_from_data(b"
+treeview {
+    font-size: 20px;
+}
+
+expander {
+    font-size: 30px;
+}
+
+arrow {
+    min-width: 32px;
+    min-height: 32px;
+}
+").unwrap_or(error!("Invalid CSS"));
 
         ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
     }
@@ -40,7 +52,8 @@ impl Widget
             0 => "inbox",
             1 => "projects",
             2 => "contexts",
-            3 => "done",
+            3 => "agenda",
+            4 => "done",
             _ => {
                 error!("Invalid tab n°{}", n);
 
@@ -90,6 +103,7 @@ impl ::relm::Widget for Widget
                 ::inbox::Widget(self.model.clone()),
                 ::projects::Widget(self.model.clone()),
                 ::contexts::Widget(self.model.clone()),
+                ::agenda::Widget(self.model.clone()),
                 ::done::Widget(self.model.clone()),
             },
             delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),

@@ -1,6 +1,7 @@
 #![feature(proc_macro)]
 #![feature(slice_concat_ext)]
 
+extern crate chrono;
 extern crate env_logger;
 #[macro_use]
 extern crate log;
@@ -14,6 +15,7 @@ extern crate todo_txt;
 
 use relm::Widget;
 
+mod agenda;
 mod application;
 mod contexts;
 mod done;

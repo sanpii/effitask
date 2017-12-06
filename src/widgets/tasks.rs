@@ -108,11 +108,9 @@ impl ::relm::Widget for Tasks
 
     view!
     {
-        gtk::ScrolledWindow {
-            #[name="tree_view"]
-            gtk::TreeView {
-                headers_visible: false,
-            }
+        #[name="tree_view"]
+        gtk::TreeView {
+            headers_visible: false,
         }
     }
 }

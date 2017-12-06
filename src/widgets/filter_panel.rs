@@ -13,6 +13,7 @@ pub enum Msg {
 enum Column {
     Title = 0,
     Raw = 1,
+    Progress = 2,
 }
 
 impl ::std::convert::Into<u32> for Column
@@ -51,7 +52,8 @@ impl FilterPanel
 
     fn append(&self, root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>, filter: String)
     {
-        use ::std::slice::SliceConcatExt;
+        use gtk::ToValue;
+        use std::slice::SliceConcatExt;
 
         let f = filter.clone();
         let mut levels: Vec<_> = f.split("-")
@@ -67,8 +69,9 @@ impl FilterPanel
 
         let row = self.model.append(root.get(&parent));
 
-        self.model.set_value(&row, Column::Title.into(), &::gtk::Value::from(&title));
-        self.model.set_value(&row, Column::Raw.into(), &::gtk::Value::from(&filter));
+        self.model.set_value(&row, Column::Title.into(), &title.to_value());
+        self.model.set_value(&row, Column::Raw.into(), &filter.to_value());
+        self.model.set_value(&row, Column::Progress.into(), &50.to_value());
 
         root.insert(filter, row);
     }
@@ -86,9 +89,10 @@ impl ::relm::Widget for FilterPanel
         let column = ::gtk::TreeViewColumn::new();
         self.filters.append_column(&column);
 
-        let cell = ::gtk::CellRendererText::new();
+        let cell = ::gtk::CellRendererProgress::new();
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Title.into());
+        column.add_attribute(&cell, "value", Column::Progress.into());
     }
 
     fn model(_: ()) -> ::gtk::TreeStore
@@ -96,6 +100,7 @@ impl ::relm::Widget for FilterPanel
         let columns = vec![
             ::gtk::Type::String,
             ::gtk::Type::String,
+            ::gtk::Type::U32,
         ];
 
         ::gtk::TreeStore::new(&columns)

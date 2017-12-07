@@ -101,8 +101,8 @@ impl ::relm::Widget for Widget
             gtk::Notebook {
                 tab_pos: ::gtk::PositionType::Left,
                 ::inbox::Widget(self.model.clone()),
-                ::projects::Widget(self.model.clone()),
-                ::contexts::Widget(self.model.clone()),
+                ::widgets::Tags((self.model.clone(), ::widgets::tags::Type::Projects)),
+                ::widgets::Tags((self.model.clone(), ::widgets::tags::Type::Contexts)),
                 ::agenda::Widget(self.model.clone()),
                 ::done::Widget(self.model.clone()),
             },

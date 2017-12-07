@@ -17,10 +17,8 @@ use relm::Widget;
 
 mod agenda;
 mod application;
-mod contexts;
 mod done;
 mod inbox;
-mod projects;
 mod tasks;
 mod widgets;
 

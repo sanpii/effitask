@@ -36,7 +36,7 @@ impl ::std::convert::Into<i32> for Column
     }
 }
 
-impl FilterPanel
+impl Filter
 {
     fn populate_filters(&mut self, filters: Vec<(String, u32)>)
     {
@@ -80,7 +80,7 @@ impl FilterPanel
 }
 
 #[widget]
-impl ::relm::Widget for FilterPanel
+impl ::relm::Widget for Filter
 {
     fn init_view(&mut self)
     {

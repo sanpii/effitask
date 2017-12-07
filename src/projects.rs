@@ -1,5 +1,5 @@
 use relm_attributes::widget;
-use widgets::filter_panel::Msg::Filter;
+use widgets::filter::Msg::Filter;
 
 #[derive(Msg)]
 pub enum Msg {
@@ -16,7 +16,7 @@ impl Widget
             .filter(|&(_, progress)| progress < 100)
             .collect();
 
-        self.filter_panel.emit(::widgets::filter_panel::Msg::UpdateFilters(projects));
+        self.filter.emit(::widgets::filter::Msg::UpdateFilters(projects));
     }
 
     fn populate_tasks(&mut self, filter: Option<String>)
@@ -30,7 +30,7 @@ impl Widget
             .map(|x| x.clone())
             .collect();
 
-        self.filter_panel.emit(::widgets::filter_panel::Msg::UpdateTasks(tasks));
+        self.filter.emit(::widgets::filter::Msg::UpdateTasks(tasks));
     }
 
     fn get_progress(&self, project: &String) -> u32
@@ -74,8 +74,8 @@ impl ::relm::Widget for Widget
 
     view!
     {
-        #[name="filter_panel"]
-        ::widgets::FilterPanel {
+        #[name="filter"]
+        ::widgets::Filter {
             Filter(ref filter) => Msg::UpdateFilter(filter.clone()),
         }
     }

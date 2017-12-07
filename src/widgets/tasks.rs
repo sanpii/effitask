@@ -82,6 +82,7 @@ impl ::relm::Widget for Tasks
 
         let cell = ::gtk::CellRendererText::new();
         column.pack_start(&cell, true);
+        column.add_attribute(&cell, "strikethrough", Column::Finished.into());
         column.add_attribute(&cell, "text", Column::Subject.into());
         column.add_attribute(&cell, "background", Column::Color.into());
     }

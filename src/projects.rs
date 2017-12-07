@@ -13,6 +13,7 @@ impl Widget
         let projects = self.model.projects()
             .iter()
             .map(|x| (x.clone(), self.get_progress(x)))
+            .filter(|&(_, progress)| progress < 100)
             .collect();
 
         self.filter_panel.emit(::widgets::filter_panel::Msg::UpdateFilters(projects));

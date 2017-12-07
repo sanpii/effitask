@@ -6,7 +6,7 @@ impl ::relm::Widget for Widget
     fn init_view(&mut self)
     {
         let tasks = self.model.tasks.iter()
-            .filter(|x| !x.finished)
+            .filter(|x| !x.finished && x.projects.is_empty())
             .map(|x| x.clone())
             .collect();
 

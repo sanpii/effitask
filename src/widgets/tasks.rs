@@ -36,19 +36,28 @@ impl ::std::convert::Into<i32> for Column
 
 impl Tasks
 {
-    pub fn populate(&mut self, tasks: Vec<::tasks::Task>)
+    pub fn update(&mut self, tasks: Vec<::tasks::Task>)
     {
         use ::gtk::ToValue;
 
         self.model.clear();
 
-        for task in tasks.iter() {
-            let row = self.model.append();
-            let color = self.task_color(task);
+        if tasks.is_empty() {
+            self.tree_view.hide();
+            self.label.show();
+        }
+        else {
+            self.tree_view.show();
+            self.label.hide();
 
-            self.model.set_value(&row, Column::Finished.into(), &task.finished.to_value());
-            self.model.set_value(&row, Column::Subject.into(), &task.subject.to_value());
-            self.model.set_value(&row, Column::Color.into(), &color.to_value());
+            for task in tasks.iter() {
+                let row = self.model.append();
+                let color = self.task_color(task);
+
+                self.model.set_value(&row, Column::Finished.into(), &task.finished.to_value());
+                self.model.set_value(&row, Column::Subject.into(), &task.subject.to_value());
+                self.model.set_value(&row, Column::Color.into(), &color.to_value());
+            }
         }
     }
 
@@ -103,15 +112,29 @@ impl ::relm::Widget for Tasks
         use self::Msg::*;
 
         match event {
-            Update(tasks) => self.populate(tasks),
+            Update(tasks) => self.update(tasks),
         }
     }
 
     view!
     {
-        #[name="tree_view"]
-        gtk::TreeView {
-            headers_visible: false,
+        gtk::Box {
+            #[name="tree_view"]
+            gtk::TreeView {
+                padding: {
+                    fill: true,
+                    expand: true,
+                },
+                headers_visible: false,
+            },
+            #[name="label"]
+            gtk::Label {
+                padding: {
+                    fill: true,
+                    expand: true,
+                },
+                text: "Nothing to do :)",
+            },
         }
     }
 }

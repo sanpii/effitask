@@ -14,20 +14,8 @@ impl Widget
         let screen = self.window.get_screen()
             .unwrap();
         let css = ::gtk::CssProvider::new();
-        css.load_from_data(b"
-treeview {
-    font-size: 20px;
-}
-
-expander {
-    font-size: 30px;
-}
-
-arrow {
-    min-width: 32px;
-    min-height: 32px;
-}
-").unwrap_or(error!("Invalid CSS"));
+        css.load_from_path("resources/style.css")
+            .unwrap_or(error!("Invalid CSS"));
 
         ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
     }

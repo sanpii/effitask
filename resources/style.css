@@ -1,0 +1,12 @@
+treeview {
+    font-size: 20px;
+}
+
+expander {
+    font-size: 30px;
+}
+
+arrow {
+    min-width: 32px;
+    min-height: 32px;
+}

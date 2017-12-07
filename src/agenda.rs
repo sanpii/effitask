@@ -4,7 +4,8 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
-    DaySelected,
+    Selected,
+    Select(::chrono::DateTime<::chrono::Local>),
 }
 
 macro_rules! update {
@@ -108,7 +109,13 @@ impl ::relm::Widget for Widget
         use self::Msg::*;
 
         match event {
-            DaySelected => self.populate(),
+            Selected => self.populate(),
+            Select(date) => {
+                use chrono::Datelike;
+
+                self.calendar.select_month(date.month0(), date.year() as u32);
+                self.calendar.select_day(date.day());
+            },
         }
     }
 
@@ -116,11 +123,19 @@ impl ::relm::Widget for Widget
     {
         gtk::Box {
             orientation: ::gtk::Orientation::Horizontal,
+            spacing: 10,
             gtk::Box {
                 orientation: ::gtk::Orientation::Vertical,
                 #[name="calendar"]
                 gtk::Calendar {
-                    day_selected => Msg::DaySelected,
+                    day_selected => Msg::Selected,
+                },
+                gtk::Button {
+                    packing: {
+                        padding: 5,
+                    },
+                    label: "Today",
+                    clicked => Msg::Select(::chrono::Local::now()),
                 },
             },
             gtk::ScrolledWindow {

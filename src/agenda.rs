@@ -67,6 +67,7 @@ impl Widget
             .filter(|x| {
                 if let Some(due_date) = x.due_date {
                     !x.finished
+                        && (x.threshold_date.is_none() || start.is_none() || x.threshold_date.unwrap() <= start.unwrap())
                         && (start.is_none() || due_date >= start.unwrap())
                         && (end.is_none() || due_date < end.unwrap())
                 }

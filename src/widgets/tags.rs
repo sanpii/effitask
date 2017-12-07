@@ -35,6 +35,10 @@ impl Tags
 
     fn populate_tasks(&mut self, filter: Option<String>)
     {
+        let today = ::chrono::Local::now()
+            .date()
+            .naive_local();
+
         let tasks = self.model.list.tasks.iter()
             .filter(|x| {
                 let tags = self.get_tags(x);
@@ -42,6 +46,7 @@ impl Tags
                 !x.finished
                     && !tags.is_empty()
                     && (filter.is_none() || tags.contains(&filter.clone().unwrap()))
+                    && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
             .map(|x| x.clone())
             .collect();

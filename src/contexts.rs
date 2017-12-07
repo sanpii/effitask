@@ -17,13 +17,14 @@ impl Widget
 
     fn populate_tasks(&mut self, filter: Option<String>)
     {
-        let mut tasks = Vec::new();
-
-        for task in self.model.todo.iter() {
-            if !task.contexts.is_empty() && (filter.is_none() || task.contexts.contains(&filter.clone().unwrap())) {
-                tasks.push(task.clone());
-            }
-        }
+        let tasks = self.model.tasks.iter()
+            .filter(|x| {
+                !x.finished
+                    && !x.contexts.is_empty()
+                    && (filter.is_none() || x.contexts.contains(&filter.clone().unwrap()))
+            })
+            .map(|x| x.clone())
+            .collect();
 
         self.filter_panel.emit(::widgets::filter_panel::Msg::UpdateTasks(tasks));
     }

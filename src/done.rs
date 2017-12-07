@@ -4,7 +4,12 @@ impl Widget
 {
     fn populate(&mut self)
     {
-        self.tasks.emit(::widgets::tasks::Msg::Update(self.model.done.clone()));
+        let tasks = self.model.tasks.iter()
+            .filter(|x| x.finished)
+            .map(|x| x.clone())
+            .collect();
+
+        self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
     }
 }
 

@@ -1,16 +1,18 @@
 #[derive(Clone)]
 pub struct List {
-    pub todo: Vec<::tasks::Task>,
-    pub done: Vec<::tasks::Task>,
+    pub tasks: Vec<::tasks::Task>,
 }
 
 impl List
 {
     pub fn from_files(todo: &::std::path::Path, done: &::std::path::Path) -> Self
     {
+        let mut tasks = Vec::new();
+        tasks.extend(Self::load_file(todo));
+        tasks.extend(Self::load_file(done));
+
         Self {
-            todo: Self::load_file(todo),
-            done: Self::load_file(done),
+            tasks,
         }
     }
 
@@ -43,7 +45,7 @@ impl List
 
     pub fn projects(&self) -> Vec<String>
     {
-        let mut projects = self.todo.iter().fold(Vec::new(), |mut acc, ref item| {
+        let mut projects = self.tasks.iter().fold(Vec::new(), |mut acc, ref item| {
             acc.append(&mut item.projects.clone());
 
             acc
@@ -57,7 +59,7 @@ impl List
 
     pub fn contexts(&self) -> Vec<String>
     {
-        let mut contexts = self.todo.iter().fold(Vec::new(), |mut acc, ref item| {
+        let mut contexts = self.tasks.iter().fold(Vec::new(), |mut acc, ref item| {
             acc.append(&mut item.contexts.clone());
 
             acc

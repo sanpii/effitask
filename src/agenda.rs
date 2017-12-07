@@ -62,7 +62,7 @@ impl Widget
     {
         let (_, month, _) = self.calendar.get_date();
 
-        let tasks: Vec<::tasks::Task> = self.model.todo.iter()
+        let tasks: Vec<::tasks::Task> = self.model.tasks.iter()
             .filter(|x| {
                 if let Some(due_date) = x.due_date {
                     !x.finished

@@ -13,7 +13,6 @@ pub enum Msg {
 enum Column {
     Title = 0,
     Raw = 1,
-    Progress = 2,
 }
 
 impl ::std::convert::Into<u32> for Column
@@ -71,7 +70,6 @@ impl FilterPanel
 
         self.model.set_value(&row, Column::Title.into(), &title.to_value());
         self.model.set_value(&row, Column::Raw.into(), &filter.to_value());
-        self.model.set_value(&row, Column::Progress.into(), &50.to_value());
 
         root.insert(filter, row);
     }
@@ -89,10 +87,9 @@ impl ::relm::Widget for FilterPanel
         let column = ::gtk::TreeViewColumn::new();
         self.filters.append_column(&column);
 
-        let cell = ::gtk::CellRendererProgress::new();
+        let cell = ::gtk::CellRendererText::new();
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Title.into());
-        column.add_attribute(&cell, "value", Column::Progress.into());
     }
 
     fn model(_: ()) -> ::gtk::TreeStore

@@ -5,7 +5,12 @@ impl ::relm::Widget for Widget
 {
     fn init_view(&mut self)
     {
-        self.tasks.emit(::widgets::tasks::Msg::Update(self.model.todo.clone()));
+        let tasks = self.model.tasks.iter()
+            .filter(|x| !x.finished)
+            .map(|x| x.clone())
+            .collect();
+
+        self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
     }
 
     fn model(tasks: ::tasks::List) -> ::tasks::List

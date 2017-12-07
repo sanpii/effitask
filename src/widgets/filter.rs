@@ -92,6 +92,7 @@ impl ::relm::Widget for Filter
         self.filters.append_column(&column);
 
         let cell = ::gtk::CellRendererProgress::new();
+        cell.set_property_text_xalign(0.);
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Title.into());
         column.add_attribute(&cell, "value", Column::Progress.into());

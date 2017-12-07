@@ -10,7 +10,10 @@ impl Widget
 {
     fn populate_projects(&mut self)
     {
-        let projects = self.model.projects();
+        let projects = self.model.projects()
+            .iter()
+            .map(|x| (x.clone(), self.get_progress(x)))
+            .collect();
 
         self.filter_panel.emit(::widgets::filter_panel::Msg::UpdateFilters(projects));
     }
@@ -27,6 +30,21 @@ impl Widget
             .collect();
 
         self.filter_panel.emit(::widgets::filter_panel::Msg::UpdateTasks(tasks));
+    }
+
+    fn get_progress(&self, project: &String) -> u32
+    {
+        let (done, total) = self.model.tasks.iter()
+            .filter(|x| x.projects.contains(project))
+            .fold((0., 0.), |(mut done, total), x| {
+                if x.finished {
+                    done += 1.;
+                }
+
+                (done, total + 1.)
+            });
+
+        (done / total * 100.) as u32
     }
 }
 

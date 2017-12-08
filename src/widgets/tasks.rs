@@ -1,5 +1,6 @@
 use gtk;
 use gtk::prelude::*;
+use relm::ContainerWidget;
 use relm_attributes::widget;
 
 #[derive(Msg)]
@@ -7,104 +8,51 @@ pub enum Msg {
     Update(Vec<::tasks::Task>),
 }
 
-#[repr(u32)]
-enum Column {
-    Finished = 0,
-    Subject = 1,
-    Color = 2,
-}
-
-impl ::std::convert::Into<u32> for Column
-{
-    fn into(self) -> u32
-    {
-        unsafe {
-            ::std::mem::transmute(self)
-        }
-    }
-}
-
-impl ::std::convert::Into<i32> for Column
-{
-    fn into(self) -> i32
-    {
-        unsafe {
-            ::std::mem::transmute(self)
-        }
-    }
+pub struct Model {
+    children: Vec<::relm::Component<super::Task>>,
+    relm: ::relm::Relm<Tasks>,
 }
 
 impl Tasks
 {
-    pub fn update(&mut self, tasks: Vec<::tasks::Task>)
+    fn update(&mut self, tasks: Vec<::tasks::Task>)
     {
-        use ::gtk::ToValue;
-
-        self.model.clear();
+        self.clear();
 
         if tasks.is_empty() {
-            self.tree_view.hide();
+            self.list_box.hide();
             self.label.show();
         }
         else {
-            self.tree_view.show();
+            self.list_box.show();
             self.label.hide();
 
             for task in tasks.iter() {
-                let row = self.model.append();
-                let color = self.task_color(task);
+                let child = self.list_box.add_widget::<super::Task, _>(&self.model.relm, task.clone());
 
-                self.model.set_value(&row, Column::Finished.into(), &task.finished.to_value());
-                self.model.set_value(&row, Column::Subject.into(), &task.subject.to_value());
-                self.model.set_value(&row, Column::Color.into(), &color.to_value());
+                self.model.children.push(child);
             }
         }
     }
 
-    fn task_color(&self, task: &::tasks::Task) -> &str
+    fn clear(&mut self)
     {
-        match task.priority {
-            0 => "#F8D7DA",
-            1 => "#FFF3CD",
-            2 => "#D1ECF1",
-            3 => "#D4EDDA",
-            4 => "#E7E8EA",
-            _ => "#FFFFFF",
+        for child in self.list_box.get_children() {
+            self.list_box.remove(&child);
         }
+        self.model.children = Vec::new();
     }
 }
 
 #[widget]
 impl ::relm::Widget for Tasks
 {
-    fn init_view(&mut self)
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model
     {
-        self.tree_view.set_model(Some(&self.model));
-
-        let column = ::gtk::TreeViewColumn::new();
-        self.tree_view.append_column(&column);
-
-        let cell = ::gtk::CellRendererToggle::new();
-        column.pack_start(&cell, false);
-        column.add_attribute(&cell, "active", Column::Finished.into());
-        column.add_attribute(&cell, "cell-background", Column::Color.into());
-
-        let cell = ::gtk::CellRendererText::new();
-        column.pack_start(&cell, true);
-        column.add_attribute(&cell, "strikethrough", Column::Finished.into());
-        column.add_attribute(&cell, "text", Column::Subject.into());
-        column.add_attribute(&cell, "background", Column::Color.into());
-    }
-
-    fn model(_: ()) -> ::gtk::ListStore
-    {
-        let columns = vec![
-            ::gtk::Type::Bool,
-            ::gtk::Type::String,
-            ::gtk::Type::String,
-        ];
-
-        ::gtk::ListStore::new(&columns)
+        Model {
+            children: Vec::new(),
+            relm: relm.clone()
+        }
     }
 
     fn update(&mut self, event: Msg)
@@ -119,13 +67,12 @@ impl ::relm::Widget for Tasks
     view!
     {
         gtk::Box {
-            #[name="tree_view"]
-            gtk::TreeView {
+            #[name="list_box"]
+            gtk::ListBox {
                 padding: {
                     fill: true,
                     expand: true,
                 },
-                headers_visible: false,
             },
             #[name="label"]
             gtk::Label {

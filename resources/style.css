@@ -1,7 +1,3 @@
-treeview {
-    font-size: 20px;
-}
-
 expander {
     font-size: 30px;
 }
@@ -9,4 +5,32 @@ expander {
 arrow {
     min-width: 32px;
     min-height: 32px;
+}
+
+.task {
+    font-size: 20px;
+}
+
+.finished label {
+    text-decoration: line-through;
+}
+
+.pri_a {
+    background-color: #F8D7DA;
+}
+
+.pri_b {
+    background-color: #FFF3CD;
+}
+
+.pri_c {
+    background-color: #D1ECF1;
+}
+
+.pri_d {
+    background-color: #D4EDDA;
+}
+
+.pri_e {
+    background-color: #E7E8EA;
 }

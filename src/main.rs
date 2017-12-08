@@ -27,6 +27,12 @@ fn main()
     ::env_logger::init()
         .unwrap();
 
+    if ::std::env::args().nth(1) == Some("usage".to_owned()) {
+        usage(::std::env::args().nth(0).unwrap());
+
+        ::std::process::exit(0);
+    }
+
     let todo_file = match ::std::env::var("TODO_FILE") {
         Ok(todo_file) => todo_file,
         Err(_) => panic!("Launch this program via todo.sh"),
@@ -44,4 +50,12 @@ fn main()
 
     application::Widget::run(tasks)
         .unwrap();
+}
+
+fn usage(program: String)
+{
+    let path = ::std::path::Path::new(&program);
+
+    println!("    {}", path.file_name().unwrap().to_str().unwrap());
+    println!("      Launch focus graphical interface");
 }

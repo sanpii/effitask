@@ -33,22 +33,7 @@ fn main()
         ::std::process::exit(0);
     }
 
-    let todo_file = match ::std::env::var("TODO_FILE") {
-        Ok(todo_file) => todo_file,
-        Err(_) => panic!("Launch this program via todo.sh"),
-    };
-
-    let done_file = match ::std::env::var("DONE_FILE") {
-        Ok(done_file) => done_file,
-        Err(_) => panic!("Launch this program via todo.sh"),
-    };
-
-    let tasks = ::tasks::List::from_files(
-        ::std::path::Path::new(&todo_file),
-        ::std::path::Path::new(&done_file)
-    );
-
-    application::Widget::run(tasks)
+    application::Widget::run(())
         .unwrap();
 }
 

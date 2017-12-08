@@ -4,6 +4,7 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
+    Refresh,
     Quit,
 }
 
@@ -59,8 +60,23 @@ impl Widget
         vbox
     }
 
-    fn update_tasks(&self, list: &::tasks::List)
+    fn update_tasks(&self)
     {
+        let todo_file = match ::std::env::var("TODO_FILE") {
+            Ok(todo_file) => todo_file,
+            Err(_) => panic!("Launch this program via todo.sh"),
+        };
+
+        let done_file = match ::std::env::var("DONE_FILE") {
+            Ok(done_file) => done_file,
+            Err(_) => panic!("Launch this program via todo.sh"),
+        };
+
+        let list = ::tasks::List::from_files(
+            ::std::path::Path::new(&todo_file),
+            ::std::path::Path::new(&done_file)
+        );
+
         self.inbox.emit(::inbox::Msg::Update(list.clone()));
         self.projects.emit(::widgets::tags::Msg::Update(list.clone()));
         self.contexts.emit(::widgets::tags::Msg::Update(list.clone()));
@@ -76,18 +92,20 @@ impl ::relm::Widget for Widget
     {
         self.load_style();
         self.replace_tab_widgets();
-        self.update_tasks(&self.model);
+        self.update_tasks();
     }
 
-    fn model(tasks: ::tasks::List) -> ::tasks::List
+    fn model(_: ()) -> ()
     {
-        tasks
     }
 
     fn update(&mut self, event: Msg)
     {
+        use self::Msg::*;
+
         match event {
-            Msg::Quit => ::gtk::main_quit(),
+            Refresh => self.update_tasks(),
+            Quit => ::gtk::main_quit(),
         }
     }
 
@@ -95,19 +113,34 @@ impl ::relm::Widget for Widget
     {
         #[name="window"]
         gtk::Window {
-            #[name="notebook"]
-            gtk::Notebook {
-                tab_pos: ::gtk::PositionType::Left,
-                #[name="inbox"]
-                ::inbox::Widget,
-                #[name="projects"]
-                ::widgets::Tags(::widgets::tags::Type::Projects),
-                #[name="contexts"]
-                ::widgets::Tags(::widgets::tags::Type::Contexts),
-                #[name="agenda"]
-                ::agenda::Widget,
-                #[name="done"]
-                ::done::Widget,
+            gtk::Box {
+                orientation: ::gtk::Orientation::Vertical,
+                gtk::Toolbar {
+                    style: ::gtk::ToolbarStyle::Both,
+                    gtk::ToolButton {
+                        icon_name: "view-refresh",
+                        label: "Refresh",
+                        clicked => Msg::Refresh,
+                    },
+                },
+                #[name="notebook"]
+                gtk::Notebook {
+                    packing: {
+                        expand: true,
+                        fill: true,
+                    },
+                    tab_pos: ::gtk::PositionType::Left,
+                    #[name="inbox"]
+                    ::inbox::Widget,
+                    #[name="projects"]
+                    ::widgets::Tags(::widgets::tags::Type::Projects),
+                    #[name="contexts"]
+                    ::widgets::Tags(::widgets::tags::Type::Contexts),
+                    #[name="agenda"]
+                    ::agenda::Widget,
+                    #[name="done"]
+                    ::done::Widget,
+                },
             },
             delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),
         }

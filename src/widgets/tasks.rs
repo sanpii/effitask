@@ -15,7 +15,7 @@ pub struct Model {
 
 impl Tasks
 {
-    fn update(&mut self, tasks: Vec<::tasks::Task>)
+    fn update_tasks(&mut self, tasks: Vec<::tasks::Task>)
     {
         self.clear();
 
@@ -60,7 +60,7 @@ impl ::relm::Widget for Tasks
         use self::Msg::*;
 
         match event {
-            Update(tasks) => self.update(tasks),
+            Update(tasks) => self.update_tasks(tasks),
         }
     }
 

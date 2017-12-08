@@ -5,15 +5,20 @@ pub struct List {
 
 impl List
 {
+    pub fn new() -> Self
+    {
+        Self {
+            tasks: Vec::new(),
+        }
+    }
+
     pub fn from_files(todo: &::std::path::Path, done: &::std::path::Path) -> Self
     {
-        let mut tasks = Vec::new();
-        tasks.extend(Self::load_file(todo));
-        tasks.extend(Self::load_file(done));
+        let mut list = Self::new();
+        list.tasks.extend(Self::load_file(todo));
+        list.tasks.extend(Self::load_file(done));
 
-        Self {
-            tasks,
-        }
+        list
     }
 
     fn load_file(path: &::std::path::Path) -> Vec<::tasks::Task>

@@ -38,7 +38,7 @@ impl ::std::convert::Into<i32> for Column
 
 impl Filter
 {
-    fn populate_filters(&mut self, filters: Vec<(String, u32)>)
+    fn update_filters(&mut self, filters: Vec<(String, u32)>)
     {
         self.model.clear();
         let mut root = ::std::collections::HashMap::new();
@@ -114,7 +114,7 @@ impl ::relm::Widget for Filter
         use self::Msg::*;
 
         match event {
-            UpdateFilters(filters) => self.populate_filters(filters),
+            UpdateFilters(filters) => self.update_filters(filters),
             UpdateTasks(tasks) => self.tasks.emit(::widgets::tasks::Msg::Update(tasks)),
             Filter(_) => (),
         }

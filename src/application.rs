@@ -58,6 +58,15 @@ impl Widget
 
         vbox
     }
+
+    fn update_tasks(&self, list: &::tasks::List)
+    {
+        self.inbox.emit(::inbox::Msg::Update(list.clone()));
+        self.projects.emit(::widgets::tags::Msg::Update(list.clone()));
+        self.contexts.emit(::widgets::tags::Msg::Update(list.clone()));
+        self.agenda.emit(::agenda::Msg::Update(list.clone()));
+        self.done.emit(::done::Msg::Update(list.clone()));
+    }
 }
 
 #[widget]
@@ -67,6 +76,7 @@ impl ::relm::Widget for Widget
     {
         self.load_style();
         self.replace_tab_widgets();
+        self.update_tasks(&self.model);
     }
 
     fn model(tasks: ::tasks::List) -> ::tasks::List
@@ -88,11 +98,16 @@ impl ::relm::Widget for Widget
             #[name="notebook"]
             gtk::Notebook {
                 tab_pos: ::gtk::PositionType::Left,
-                ::inbox::Widget(self.model.clone()),
-                ::widgets::Tags((self.model.clone(), ::widgets::tags::Type::Projects)),
-                ::widgets::Tags((self.model.clone(), ::widgets::tags::Type::Contexts)),
-                ::agenda::Widget(self.model.clone()),
-                ::done::Widget(self.model.clone()),
+                #[name="inbox"]
+                ::inbox::Widget,
+                #[name="projects"]
+                ::widgets::Tags(::widgets::tags::Type::Projects),
+                #[name="contexts"]
+                ::widgets::Tags(::widgets::tags::Type::Contexts),
+                #[name="agenda"]
+                ::agenda::Widget,
+                #[name="done"]
+                ::done::Widget,
             },
             delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),
         }

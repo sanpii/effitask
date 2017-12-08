@@ -1,10 +1,15 @@
 use relm_attributes::widget;
 
+#[derive(Msg)]
+pub enum Msg {
+    Update(::tasks::List),
+}
+
 impl Widget
 {
-    fn populate(&mut self)
+    fn update_tasks(&mut self, list: ::tasks::List)
     {
-        let tasks = self.model.tasks.iter()
+        let tasks = list.tasks.iter()
             .filter(|x| x.finished)
             .map(|x| x.clone())
             .collect();
@@ -16,18 +21,17 @@ impl Widget
 #[widget]
 impl ::relm::Widget for Widget
 {
-    fn init_view(&mut self)
+    fn model(_: ()) -> ()
     {
-        self.populate();
     }
 
-    fn model(tasks: ::tasks::List) -> ::tasks::List
+    fn update(&mut self, event: Msg)
     {
-        tasks
-    }
+        use self::Msg::*;
 
-    fn update(&mut self, _: ())
-    {
+        match event {
+            Update(list) => self.update_tasks(list),
+        }
     }
 
     view!

@@ -6,11 +6,12 @@ use relm_attributes::widget;
 pub enum Msg {
     Selected,
     Select(::chrono::DateTime<::chrono::Local>),
+    Update(::tasks::List),
 }
 
 macro_rules! update {
-    ($self:ident, $exp:ident, $task:ident, $get:ident, $date:ident) => {
-        let tasks = $self.$get($date);
+    ($self:ident, $exp:ident, $task:ident, $get:ident, $list:ident, $date:ident) => {
+        let tasks = $self.$get($list, $date);
 
         $self.$exp.set_expanded(!tasks.is_empty());
         $self.$exp.set_sensitive(!tasks.is_empty());
@@ -20,50 +21,50 @@ macro_rules! update {
 
 impl Widget
 {
-    fn populate(&mut self)
+    fn update_tasks(&self, list: &::tasks::List)
     {
         self.calendar.clear_marks();
 
         let (y, m, d) = self.calendar.get_date();
         let date = ::chrono::naive::NaiveDate::from_ymd(y as i32, m + 1, d);
 
-        update!(self, past_exp, past, get_past_tasks, date);
-        update!(self, today_exp, today, get_today_tasks, date);
-        update!(self, tomorrow_exp, tomorrow, get_tomorrow_tasks, date);
-        update!(self, week_exp, week, get_week_tasks, date);
-        update!(self, month_exp, month, get_month_tasks, date);
+        update!(self, past_exp, past, get_past_tasks, list, date);
+        update!(self, today_exp, today, get_today_tasks, list, date);
+        update!(self, tomorrow_exp, tomorrow, get_tomorrow_tasks, list, date);
+        update!(self, week_exp, week, get_week_tasks, list, date);
+        update!(self, month_exp, month, get_month_tasks, list, date);
     }
 
-    fn get_past_tasks(&self, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
+    fn get_past_tasks(&self, list: &::tasks::List, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
     {
-        self.get_tasks(None, Some(date))
+        self.get_tasks(list, None, Some(date))
     }
 
-    fn get_today_tasks(&self, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
+    fn get_today_tasks(&self, list: &::tasks::List, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
     {
-        self.get_tasks(Some(date), Some(date.succ()))
+        self.get_tasks(list, Some(date), Some(date.succ()))
     }
 
-    fn get_tomorrow_tasks(&self, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
+    fn get_tomorrow_tasks(&self, list: &::tasks::List, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
     {
-        self.get_tasks(Some(date.succ()), Some(date + ::chrono::Duration::days(2)))
+        self.get_tasks(list, Some(date.succ()), Some(date + ::chrono::Duration::days(2)))
     }
 
-    fn get_week_tasks(&self, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
+    fn get_week_tasks(&self, list: &::tasks::List, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
     {
-        self.get_tasks(Some(date + ::chrono::Duration::days(2)), Some(date + ::chrono::Duration::weeks(1)))
+        self.get_tasks(list, Some(date + ::chrono::Duration::days(2)), Some(date + ::chrono::Duration::weeks(1)))
     }
 
-    fn get_month_tasks(&self, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
+    fn get_month_tasks(&self, list: &::tasks::List, date: ::chrono::naive::NaiveDate) -> Vec<::tasks::Task>
     {
-        self.get_tasks(Some(date + ::chrono::Duration::weeks(1)), Some(date + ::chrono::Duration::weeks(4)))
+        self.get_tasks(list, Some(date + ::chrono::Duration::weeks(1)), Some(date + ::chrono::Duration::weeks(4)))
     }
 
-    fn get_tasks(&self, start: Option<::chrono::naive::NaiveDate>, end: Option<::chrono::naive::NaiveDate>) -> Vec<::tasks::Task>
+    fn get_tasks(&self, list: &::tasks::List, start: Option<::chrono::naive::NaiveDate>, end: Option<::chrono::naive::NaiveDate>) -> Vec<::tasks::Task>
     {
         let (_, month, _) = self.calendar.get_date();
 
-        let tasks: Vec<::tasks::Task> = self.model.tasks.iter()
+        let tasks: Vec<::tasks::Task> = list.tasks.iter()
             .filter(|x| {
                 if let Some(due_date) = x.due_date {
                     !x.finished
@@ -95,14 +96,9 @@ impl Widget
 #[widget]
 impl ::relm::Widget for Widget
 {
-    fn init_view(&mut self)
+    fn model(_: ()) -> ::tasks::List
     {
-        self.populate();
-    }
-
-    fn model(tasks: ::tasks::List) -> ::tasks::List
-    {
-        tasks
+        ::tasks::List::new()
     }
 
     fn update(&mut self, event: Msg)
@@ -110,12 +106,16 @@ impl ::relm::Widget for Widget
         use self::Msg::*;
 
         match event {
-            Selected => self.populate(),
+            Selected => self.update_tasks(&self.model),
             Select(date) => {
                 use chrono::Datelike;
 
                 self.calendar.select_month(date.month0(), date.year() as u32);
                 self.calendar.select_day(date.day());
+            },
+            Update(list) => {
+                self.model = list.clone();
+                self.update_tasks(&list);
             },
         }
     }

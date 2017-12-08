@@ -1,15 +1,19 @@
 use relm_attributes::widget;
 
-#[widget]
-impl ::relm::Widget for Widget
+#[derive(Msg)]
+pub enum Msg {
+    Update(::tasks::List),
+}
+
+impl Widget
 {
-    fn init_view(&mut self)
+    fn update_tasks(&self, list: ::tasks::List)
     {
         let today = ::chrono::Local::now()
             .date()
             .naive_local();
 
-        let tasks = self.model.tasks.iter()
+        let tasks = list.tasks.iter()
             .filter(|x| {
                 !x.finished
                     && x.projects.is_empty()
@@ -20,14 +24,22 @@ impl ::relm::Widget for Widget
 
         self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
     }
+}
 
-    fn model(tasks: ::tasks::List) -> ::tasks::List
+#[widget]
+impl ::relm::Widget for Widget
+{
+    fn model() -> ()
     {
-        tasks
     }
 
-    fn update(&mut self, _: ())
+    fn update(&mut self, event: Msg)
     {
+        use self::Msg::*;
+
+        match event {
+            Update(list) => self.update_tasks(list),
+        }
     }
 
     view!

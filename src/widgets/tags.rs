@@ -1,6 +1,7 @@
 use relm_attributes::widget;
 use widgets::filter::Msg::Filter;
 
+#[derive(Clone, Copy)]
 pub enum Type {
     Projects,
     Contexts,
@@ -9,39 +10,55 @@ pub enum Type {
 #[derive(Msg)]
 pub enum Msg {
     UpdateFilter(Option<String>),
+    Update(::tasks::List),
 }
 
 pub struct Model {
     list: ::tasks::List,
-    tags: Type,
+    tag: Type,
 }
 
 impl Tags
 {
-    fn populate_tags(&mut self)
+    fn update_tags(&self, tag: Type, list: &::tasks::List)
     {
-        let tags = match self.model.tags {
-            Type::Projects => self.model.list.projects(),
-            Type::Contexts => self.model.list.contexts(),
+        let tags = match tag {
+            Type::Projects => list.projects(),
+            Type::Contexts => list.contexts(),
         };
 
         let tags = tags.iter()
-            .map(|x| (x.clone(), self.get_progress(x)))
+            .map(|x| (x.clone(), self.get_progress(tag, list, x)))
             .filter(|&(_, progress)| progress < 100)
             .collect();
 
         self.filter.emit(::widgets::filter::Msg::UpdateFilters(tags));
     }
 
-    fn populate_tasks(&mut self, filter: Option<String>)
+    fn get_progress(&self, tag: Type, list: &::tasks::List, current: &String) -> u32
+    {
+        let (done, total) = list.tasks.iter()
+            .filter(|x| self.get_tags(tag, x).contains(current))
+            .fold((0., 0.), |(mut done, total), x| {
+                if x.finished {
+                    done += 1.;
+                }
+
+                (done, total + 1.)
+            });
+
+        (done / total * 100.) as u32
+    }
+
+    fn update_tasks(&self, tag: Type, list: &::tasks::List, filter: Option<String>)
     {
         let today = ::chrono::Local::now()
             .date()
             .naive_local();
 
-        let tasks = self.model.list.tasks.iter()
+        let tasks = list.tasks.iter()
             .filter(|x| {
-                let tags = self.get_tags(x);
+                let tags = self.get_tags(tag, x);
 
                 !x.finished
                     && !tags.is_empty()
@@ -54,24 +71,9 @@ impl Tags
         self.filter.emit(::widgets::filter::Msg::UpdateTasks(tasks));
     }
 
-    fn get_progress(&self, tag: &String) -> u32
+    fn get_tags<'a>(&self, tag: Type, task: &'a ::tasks::Task) -> &'a Vec<String>
     {
-        let (done, total) = self.model.list.tasks.iter()
-            .filter(|x| self.get_tags(x).contains(tag))
-            .fold((0., 0.), |(mut done, total), x| {
-                if x.finished {
-                    done += 1.;
-                }
-
-                (done, total + 1.)
-            });
-
-        (done / total * 100.) as u32
-    }
-
-    fn get_tags<'a>(&self, task: &'a ::tasks::Task) -> &'a Vec<String>
-    {
-        match self.model.tags {
+        match tag {
             Type::Projects => &task.projects,
             Type::Contexts => &task.contexts,
         }
@@ -81,17 +83,11 @@ impl Tags
 #[widget]
 impl ::relm::Widget for Tags
 {
-    fn init_view(&mut self)
-    {
-        self.populate_tags();
-        self.populate_tasks(None);
-    }
-
-    fn model((list, tags): (::tasks::List, Type)) -> Model
+    fn model(tag: Type) -> Model
     {
         Model {
-            list,
-            tags,
+            list: ::tasks::List::new(),
+            tag: tag,
         }
     }
 
@@ -100,7 +96,13 @@ impl ::relm::Widget for Tags
         use self::Msg::*;
 
         match event {
-            UpdateFilter(filter) =>  self.populate_tasks(filter),
+            Update(list) =>  {
+                self.model.list = list.clone();
+
+                self.update_tags(self.model.tag, &self.model.list);
+                self.update_tasks(self.model.tag, &self.model.list, None);
+            },
+            UpdateFilter(filter) =>  self.update_tasks(self.model.tag, &self.model.list, filter),
         }
     }
 

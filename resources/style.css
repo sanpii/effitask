@@ -7,7 +7,7 @@ arrow {
     min-height: 32px;
 }
 
-.task {
+treeview, .task {
     font-size: 20px;
 }
 

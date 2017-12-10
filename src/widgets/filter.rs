@@ -40,6 +40,9 @@ impl Filter
 {
     fn update_filters(&mut self, filters: Vec<(String, u32)>)
     {
+        let selection = self.filters.get_selection();
+        let (paths, _) = selection.get_selected_rows();
+
         self.model.clear();
         let mut root = ::std::collections::HashMap::new();
 
@@ -48,6 +51,10 @@ impl Filter
         }
 
         self.filters.expand_all();
+
+        for path in paths {
+            self.filters.set_cursor(&path, None, false);
+        }
     }
 
     fn append(&self, root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>, filter: (String, u32))
@@ -76,6 +83,11 @@ impl Filter
         self.model.set_value(&row, Column::Progress.into(), &progress.to_value());
 
         root.insert(filter, row);
+    }
+
+    fn update_tasks(&self, tasks: Vec<::tasks::Task>)
+    {
+        self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
     }
 }
 
@@ -115,7 +127,7 @@ impl ::relm::Widget for Filter
 
         match event {
             UpdateFilters(filters) => self.update_filters(filters),
-            UpdateTasks(tasks) => self.tasks.emit(::widgets::tasks::Msg::Update(tasks)),
+            UpdateTasks(tasks) => self.update_tasks(tasks),
             Filter(_) => (),
         }
     }

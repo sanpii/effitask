@@ -91,6 +91,28 @@ impl Filter
     {
         self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
     }
+
+    fn select_range(treeview: &::gtk::TreeView, path: &::gtk::TreePath)
+    {
+        let model = treeview.get_model()
+            .unwrap();
+
+        let start = path;
+        let start_iter = model.get_iter(&path)
+            .unwrap();
+
+        let n_child = model.iter_n_children(Some(&start_iter));
+
+        if n_child > 0 {
+            let end_iter = model.iter_nth_child(Some(&start_iter), n_child - 1)
+                .unwrap();
+            let end = model.get_path(&end_iter)
+                .unwrap();
+
+            treeview.get_selection()
+                .select_range(start, &end);
+        }
+    }
 }
 
 #[widget]
@@ -145,6 +167,7 @@ impl ::relm::Widget for Filter
                 #[name="filters"]
                 gtk::TreeView {
                     headers_visible: false,
+                    row_activated(treeview, path, _) => Self::select_range(treeview, path),
                     selection.changed(ref mut selection) => {
                         let mut filters = Vec::new();
                         let (paths, list_model) = selection.get_selected_rows();

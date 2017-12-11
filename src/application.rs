@@ -30,10 +30,25 @@ impl Widget
         let screen = self.window.get_screen()
             .unwrap();
         let css = ::gtk::CssProvider::new();
-        css.load_from_path("resources/style.css")
+        css.load_from_path(self.get_stylesheet())
             .unwrap_or(error!("Invalid CSS"));
 
         ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
+    }
+
+    fn get_stylesheet(&self) -> &str
+    {
+        let setting = match ::gtk::Settings::get_default() {
+            Some(setting) => setting,
+            None => return "resources/style_light.css",
+        };
+
+        if setting.get_property_gtk_application_prefer_dark_theme() {
+            "resources/style_dark.css"
+        }
+        else {
+            "resources/style_light.css"
+        }
     }
 
     fn create_popover(&self)

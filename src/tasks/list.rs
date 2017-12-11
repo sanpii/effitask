@@ -153,4 +153,19 @@ impl List
             Err(_) => Err(format!("Unable to backup {}", file)),
         }
     }
+
+    pub fn add(&mut self, text: &String) -> Result<(), String>
+    {
+        use std::str::FromStr;
+
+        let task = match ::tasks::Task::from_str(text.as_str()) {
+            Ok(task) => task,
+            Err(_) => return Err(format!("Unable to convert task: '{}'", text)),
+        };
+
+        self.tasks.push(task);
+        self.write()?;
+
+        Ok(())
+    }
 }

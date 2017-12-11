@@ -7,8 +7,17 @@ use done::Msg::Complete as DoneComplete;
 use inbox::Msg::Complete as InboxComplete;
 use widgets::tags::Msg::Complete as TagsComplete;
 
+pub struct Model {
+    relm: ::relm::Relm<Widget>,
+    list: ::tasks::List,
+    popover: ::gtk::Popover,
+    entry: ::gtk::Entry,
+}
+
 #[derive(Msg)]
 pub enum Msg {
+    Add,
+    Create(Option<String>),
     Complete(::tasks::Task),
     Refresh,
     Quit,
@@ -25,6 +34,24 @@ impl Widget
             .unwrap_or(error!("Invalid CSS"));
 
         ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
+    }
+
+    fn create_popover(&self)
+    {
+        let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
+
+        vbox.add(&self.model.entry);
+        self.model.entry.set_size_request(500, -1);
+        connect!(self.model.relm, self.model.entry, connect_activate(entry), Msg::Create(entry.get_text()));
+
+        let label = ::gtk::Label::new("Create a new task +project @context due:2042-01-01");
+        vbox.add(&label);
+
+        vbox.show_all();
+
+        self.model.popover.set_relative_to(&self.add_button);
+        self.model.popover.add(&vbox);
+        self.model.popover.hide();
     }
 
     fn replace_tab_widgets(&self)
@@ -66,10 +93,27 @@ impl Widget
         vbox
     }
 
+    fn add(&self)
+    {
+        self.model.entry.set_text("");
+        self.model.popover.popup();
+    }
+
+    fn create(&mut self, text: Option<String>)
+    {
+        if let Some(text) = text {
+            match self.model.list.add(&text) {
+                Ok(_) => self.update_tasks(),
+                Err(err) => error!("Unable to create task: '{}'", err),
+            }
+        }
+        self.model.popover.popdown();
+    }
+
     fn complete(&mut self, task: &::tasks::Task)
     {
         let id = task.id;
-        let mut list = self.model.clone();
+        let mut list = self.model.list.clone();
 
         if let Some(ref mut t) = list.tasks.get_mut(id) {
             if !t.finished {
@@ -108,7 +152,7 @@ impl Widget
         self.agenda.emit(::agenda::Msg::Update(list.clone()));
         self.done.emit(::done::Msg::Update(list.clone()));
 
-        self.model = list;
+        self.model.list = list;
     }
 }
 
@@ -118,13 +162,19 @@ impl ::relm::Widget for Widget
     fn init_view(&mut self)
     {
         self.load_style();
+        self.create_popover();
         self.replace_tab_widgets();
         self.update_tasks();
     }
 
-    fn model(_: ()) -> ::tasks::List
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model
     {
-        ::tasks::List::new()
+        Model {
+            relm: relm.clone(),
+            list: ::tasks::List::new(),
+            popover: ::gtk::Popover::new(None::<&::gtk::Button>),
+            entry: ::gtk::Entry::new(),
+        }
     }
 
     fn update(&mut self, event: Msg)
@@ -132,6 +182,8 @@ impl ::relm::Widget for Widget
         use self::Msg::*;
 
         match event {
+            Add => self.add(),
+            Create(text) => self.create(text),
             Complete(task) => self.complete(&task),
             Refresh => self.update_tasks(),
             Quit => ::gtk::main_quit(),
@@ -150,6 +202,12 @@ impl ::relm::Widget for Widget
                         icon_name: "view-refresh",
                         label: "Refresh",
                         clicked => Msg::Refresh,
+                    },
+                    #[name="add_button"]
+                    gtk::ToolButton {
+                        icon_name: "list-add",
+                        label: "Add",
+                        clicked => Msg::Add,
                     },
                 },
                 #[name="notebook"]

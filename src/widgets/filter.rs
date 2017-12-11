@@ -6,7 +6,7 @@ use widgets::tasks::Msg::Complete;
 #[derive(Msg)]
 pub enum Msg {
     Complete(::tasks::Task),
-    Filter(Option<String>),
+    Filters(Vec<String>),
     UpdateFilters(Vec<(String, u32)>),
     UpdateTasks(Vec<::tasks::Task>),
 }
@@ -101,6 +101,7 @@ impl ::relm::Widget for Filter
         self.filters.set_size_request(200, -1);
         self.scroll.set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
         self.filters.set_model(Some(&self.model));
+        self.filters.get_selection().set_mode(::gtk::SelectionMode::Multiple);
 
         let column = ::gtk::TreeViewColumn::new();
         self.filters.append_column(&column);
@@ -129,7 +130,7 @@ impl ::relm::Widget for Filter
 
         match event {
             Complete(_) => (),
-            Filter(_) => (),
+            Filters(_) => (),
             UpdateFilters(filters) => self.update_filters(filters),
             UpdateTasks(tasks) => self.update_tasks(tasks),
         }
@@ -144,16 +145,23 @@ impl ::relm::Widget for Filter
                 #[name="filters"]
                 gtk::TreeView {
                     headers_visible: false,
-                    selection.changed(selection) => {
-                        if let Some((list_model, iter)) = selection.get_selected() {
-                            let filter = list_model.get_value(&iter, Column::Raw.into())
-                                .get();
+                    selection.changed(ref mut selection) => {
+                        let mut filters = Vec::new();
+                        let (paths, list_model) = selection.get_selected_rows();
 
-                            Msg::Filter(filter)
+                        for path in paths {
+                            let iter = match list_model.get_iter(&path) {
+                                Some(iter) => iter,
+                                None => continue,
+                            };
+
+                            match list_model.get_value(&iter, Column::Raw.into()).get() {
+                                Some(value) => filters.push(value),
+                                None => continue,
+                            };
                         }
-                        else {
-                            Msg::Filter(None)
-                        }
+
+                        Msg::Filters(filters)
                     },
                 }
             },

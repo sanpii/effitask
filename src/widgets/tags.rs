@@ -1,5 +1,5 @@
 use relm_attributes::widget;
-use widgets::filter::Msg::{Complete, Filter};
+use widgets::filter::Msg::{Complete, Filters};
 
 #[derive(Clone, Copy)]
 pub enum Type {
@@ -10,7 +10,7 @@ pub enum Type {
 #[derive(Msg)]
 pub enum Msg {
     Complete(::tasks::Task),
-    UpdateFilter(Option<String>),
+    UpdateFilters(Vec<String>),
     Update(::tasks::List),
 }
 
@@ -51,7 +51,7 @@ impl Tags
         (done / total * 100.) as u32
     }
 
-    fn update_tasks(&self, tag: Type, list: &::tasks::List, filter: Option<String>)
+    fn update_tasks(&self, tag: Type, list: &::tasks::List, filters: Vec<String>)
     {
         let today = ::chrono::Local::now()
             .date()
@@ -63,7 +63,7 @@ impl Tags
 
                 !x.finished
                     && !tags.is_empty()
-                    && (filter.is_none() || tags.contains(&filter.clone().unwrap()))
+                    && Self::has_filter(tags, &filters)
                     && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
             .map(|x| x.clone())
@@ -78,6 +78,17 @@ impl Tags
             Type::Projects => &task.projects,
             Type::Contexts => &task.contexts,
         }
+    }
+
+    fn has_filter(tags: &Vec<String>, filters: &Vec<String>) -> bool
+    {
+        for filter in filters {
+            if tags.contains(filter) {
+                return true;
+            }
+        }
+
+        false
     }
 }
 
@@ -102,9 +113,9 @@ impl ::relm::Widget for Tags
                 self.model.list = list.clone();
 
                 self.update_tags(self.model.tag, &self.model.list);
-                self.update_tasks(self.model.tag, &self.model.list, None);
+                self.update_tasks(self.model.tag, &self.model.list, Vec::new());
             },
-            UpdateFilter(filter) =>  self.update_tasks(self.model.tag, &self.model.list, filter),
+            UpdateFilters(filters) =>  self.update_tasks(self.model.tag, &self.model.list, filters),
         }
     }
 
@@ -113,7 +124,7 @@ impl ::relm::Widget for Tags
         #[name="filter"]
         ::widgets::Filter {
             Complete(ref task) => Msg::Complete(task.clone()),
-            Filter(ref filter) => Msg::UpdateFilter(filter.clone()),
+            Filters(ref filter) => Msg::UpdateFilters(filter.clone()),
         }
     }
 }

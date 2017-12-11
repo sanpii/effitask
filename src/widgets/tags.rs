@@ -30,25 +30,23 @@ impl Tags
 
         let tags = tags.iter()
             .map(|x| (x.clone(), self.get_progress(tag, list, x)))
-            .filter(|&(_, progress)| progress < 100)
+            .filter(|&(_, (done, total))| done != total)
             .collect();
 
         self.filter.emit(::widgets::filter::Msg::UpdateFilters(tags));
     }
 
-    fn get_progress(&self, tag: Type, list: &::tasks::List, current: &String) -> u32
+    fn get_progress(&self, tag: Type, list: &::tasks::List, current: &String) -> (u32, u32)
     {
-        let (done, total) = list.tasks.iter()
+        list.tasks.iter()
             .filter(|x| self.get_tags(tag, x).contains(current))
-            .fold((0., 0.), |(mut done, total), x| {
+            .fold((0, 0), |(mut done, total), x| {
                 if x.finished {
-                    done += 1.;
+                    done += 1;
                 }
 
-                (done, total + 1.)
-            });
-
-        (done / total * 100.) as u32
+                (done, total + 1)
+            })
     }
 
     fn update_tasks(&self, tag: Type, list: &::tasks::List, filters: Vec<String>)

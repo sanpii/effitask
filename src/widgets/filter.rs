@@ -7,7 +7,7 @@ use widgets::tasks::Msg::Complete;
 pub enum Msg {
     Complete(::tasks::Task),
     Filters(Vec<String>),
-    UpdateFilters(Vec<(String, u32)>),
+    UpdateFilters(Vec<(String, (u32, u32))>),
     UpdateTasks(Vec<::tasks::Task>),
 }
 
@@ -16,6 +16,7 @@ enum Column {
     Title = 0,
     Raw = 1,
     Progress = 2,
+    Tooltip = 3,
 }
 
 impl ::std::convert::Into<u32> for Column
@@ -40,7 +41,7 @@ impl ::std::convert::Into<i32> for Column
 
 impl Filter
 {
-    fn update_filters(&mut self, filters: Vec<(String, u32)>)
+    fn update_filters(&mut self, filters: Vec<(String, (u32, u32))>)
     {
         let selection = self.filters.get_selection();
         let (paths, _) = selection.get_selected_rows();
@@ -59,12 +60,13 @@ impl Filter
         }
     }
 
-    fn append(&self, root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>, filter: (String, u32))
+    fn append(&self, root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>, filter: (String, (u32, u32)))
     {
         use gtk::ToValue;
         use std::slice::SliceConcatExt;
 
-        let (filter, progress) = filter;
+        let (filter, (done, total)) = filter;
+        let progress = (done as f32 / total as f32) * 100.;
         let f = filter.clone();
 
         let mut levels: Vec<_> = f.split("-")
@@ -75,7 +77,7 @@ impl Filter
         let parent = levels.join("-");
 
         if parent.len() > 0 && root.get(&parent).is_none() {
-            self.append(root, (parent.clone(), 0));
+            self.append(root, (parent.clone(), (0, 0)));
         }
 
         let row = self.model.append(root.get(&parent));
@@ -83,6 +85,9 @@ impl Filter
         self.model.set_value(&row, Column::Title.into(), &title.to_value());
         self.model.set_value(&row, Column::Raw.into(), &filter.to_value());
         self.model.set_value(&row, Column::Progress.into(), &progress.to_value());
+
+        let tooltip = format!("{}/{}", done, total);
+        self.model.set_value(&row, Column::Tooltip.into(), &tooltip.to_value());
 
         root.insert(filter, row);
     }
@@ -133,6 +138,8 @@ impl ::relm::Widget for Filter
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Title.into());
         column.add_attribute(&cell, "value", Column::Progress.into());
+
+        self.filters.set_tooltip_column(Column::Tooltip.into());
     }
 
     fn model(_: ()) -> ::gtk::TreeStore
@@ -141,6 +148,7 @@ impl ::relm::Widget for Filter
             ::gtk::Type::String,
             ::gtk::Type::String,
             ::gtk::Type::U32,
+            ::gtk::Type::String,
         ];
 
         ::gtk::TreeStore::new(&columns)

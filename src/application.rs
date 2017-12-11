@@ -2,8 +2,14 @@ use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
+use agenda::Msg::Complete as AgendaComplete;
+use done::Msg::Complete as DoneComplete;
+use inbox::Msg::Complete as InboxComplete;
+use widgets::tags::Msg::Complete as TagsComplete;
+
 #[derive(Msg)]
 pub enum Msg {
+    Complete(::tasks::Task),
     Refresh,
     Quit,
 }
@@ -60,7 +66,29 @@ impl Widget
         vbox
     }
 
-    fn update_tasks(&self)
+    fn complete(&mut self, task: &::tasks::Task)
+    {
+        let id = task.id;
+        let mut list = self.model.clone();
+
+        if let Some(ref mut t) = list.tasks.get_mut(id) {
+            if !t.finished {
+                t.complete();
+            }
+            else {
+                t.uncomplete();
+            }
+        }
+
+        match list.write() {
+            Ok(_) => (),
+            Err(err) => error!("Unable to save tasks: {}", err),
+        };
+
+        self.update_tasks();
+    }
+
+    fn update_tasks(&mut self)
     {
         let todo_file = match ::std::env::var("TODO_FILE") {
             Ok(todo_file) => todo_file,
@@ -72,16 +100,15 @@ impl Widget
             Err(_) => panic!("Launch this program via todo.sh"),
         };
 
-        let list = ::tasks::List::from_files(
-            ::std::path::Path::new(&todo_file),
-            ::std::path::Path::new(&done_file)
-        );
+        let list = ::tasks::List::from_files(&todo_file, &done_file);
 
         self.inbox.emit(::inbox::Msg::Update(list.clone()));
         self.projects.emit(::widgets::tags::Msg::Update(list.clone()));
         self.contexts.emit(::widgets::tags::Msg::Update(list.clone()));
         self.agenda.emit(::agenda::Msg::Update(list.clone()));
         self.done.emit(::done::Msg::Update(list.clone()));
+
+        self.model = list;
     }
 }
 
@@ -95,8 +122,9 @@ impl ::relm::Widget for Widget
         self.update_tasks();
     }
 
-    fn model(_: ()) -> ()
+    fn model(_: ()) -> ::tasks::List
     {
+        ::tasks::List::new()
     }
 
     fn update(&mut self, event: Msg)
@@ -104,6 +132,7 @@ impl ::relm::Widget for Widget
         use self::Msg::*;
 
         match event {
+            Complete(task) => self.complete(&task),
             Refresh => self.update_tasks(),
             Quit => ::gtk::main_quit(),
         }
@@ -131,15 +160,25 @@ impl ::relm::Widget for Widget
                     },
                     tab_pos: ::gtk::PositionType::Left,
                     #[name="inbox"]
-                    ::inbox::Widget,
+                    ::inbox::Widget {
+                        InboxComplete(ref task) => Msg::Complete(task.clone()),
+                    },
                     #[name="projects"]
-                    ::widgets::Tags(::widgets::tags::Type::Projects),
+                    ::widgets::Tags(::widgets::tags::Type::Projects) {
+                        TagsComplete(ref task) => Msg::Complete(task.clone()),
+                    },
                     #[name="contexts"]
-                    ::widgets::Tags(::widgets::tags::Type::Contexts),
+                    ::widgets::Tags(::widgets::tags::Type::Contexts) {
+                        TagsComplete(ref task) => Msg::Complete(task.clone()),
+                    },
                     #[name="agenda"]
-                    ::agenda::Widget,
+                    ::agenda::Widget {
+                        AgendaComplete(ref task) => Msg::Complete(task.clone()),
+                    },
                     #[name="done"]
-                    ::done::Widget,
+                    ::done::Widget {
+                        DoneComplete(ref task) => Msg::Complete(task.clone()),
+                    },
                 },
             },
             delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),

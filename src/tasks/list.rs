@@ -1,6 +1,8 @@
 #[derive(Clone)]
 pub struct List {
     pub tasks: Vec<::tasks::Task>,
+    todo: String,
+    done: String,
 }
 
 impl List
@@ -9,19 +11,38 @@ impl List
     {
         Self {
             tasks: Vec::new(),
+            todo: String::new(),
+            done: String::new(),
         }
     }
 
-    pub fn from_files(todo: &::std::path::Path, done: &::std::path::Path) -> Self
+    pub fn from_files(todo: &String, done: &String) -> Self
     {
         let mut list = Self::new();
-        list.tasks.extend(Self::load_file(todo));
-        list.tasks.extend(Self::load_file(done));
+
+        list.load_todo(todo);
+        list.load_done(done);
 
         list
     }
 
-    fn load_file(path: &::std::path::Path) -> Vec<::tasks::Task>
+    fn load_todo(&mut self, todo: &String)
+    {
+        let tasks = self.load_file(todo);
+
+        self.todo = todo.clone();
+        self.tasks.extend(tasks);
+    }
+
+    fn load_done(&mut self, done: &String)
+    {
+        let tasks = self.load_file(done);
+
+        self.done = done.clone();
+        self.tasks.extend(tasks);
+    }
+
+    fn load_file(&self, path: &String) -> Vec<::tasks::Task>
     {
         use std::io::BufRead;
         use std::str::FromStr;
@@ -36,11 +57,16 @@ impl List
             },
         };
 
-        for line in ::std::io::BufReader::new(file).lines() {
+        let last_id = self.tasks.len();
+
+        for (id, line) in ::std::io::BufReader::new(file).lines().enumerate() {
             let line = line.unwrap();
 
             match ::tasks::Task::from_str(line.as_str()) {
-                Ok(task) => tasks.push(task),
+                Ok(mut task) => {
+                    task.id = last_id + id;
+                    tasks.push(task);
+                },
                 Err(_) => error!("Invalid tasks: '{}'", line),
             };
         }
@@ -50,8 +76,10 @@ impl List
 
     pub fn projects(&self) -> Vec<String>
     {
-        let mut projects = self.tasks.iter().fold(Vec::new(), |mut acc, ref item| {
-            acc.append(&mut item.projects.clone());
+        let mut projects = self.tasks.iter().fold(Vec::new(), |mut acc, item| {
+            let mut projects = item.projects.clone();
+
+            acc.append(&mut projects);
 
             acc
         });
@@ -64,8 +92,10 @@ impl List
 
     pub fn contexts(&self) -> Vec<String>
     {
-        let mut contexts = self.tasks.iter().fold(Vec::new(), |mut acc, ref item| {
-            acc.append(&mut item.contexts.clone());
+        let mut contexts = self.tasks.iter().fold(Vec::new(), |mut acc, item| {
+            let mut contexts = item.contexts.clone();
+
+            acc.append(&mut contexts);
 
             acc
         });
@@ -74,5 +104,53 @@ impl List
         contexts.dedup();
 
         contexts
+    }
+
+    pub fn write(&self) -> Result<(), String>
+    {
+        let todo = self.tasks.iter()
+            .filter(|x| !x.finished)
+            .map(|x| x.clone())
+            .collect();
+        self.write_tasks(&self.todo, todo)?;
+
+        let done = self.tasks.iter()
+            .filter(|x| x.finished)
+            .map(|x| x.clone())
+            .collect();
+        self.write_tasks(&self.done, done)?;
+
+        Ok(())
+    }
+
+    fn write_tasks(&self, file: &String, tasks: Vec<::tasks::Task>) -> Result<(), String>
+    {
+        use std::io::Write;
+
+        self.backup(&file)?;
+
+        let mut f = match ::std::fs::File::create(file) {
+            Ok(f) => f,
+            Err(err) => return Err(format!("Unable to write tasks: {}", err)),
+        };
+
+        for task in tasks {
+            match f.write(format!("{}\n", task).as_bytes()) {
+                Ok(_) => (),
+                Err(err) => return Err(format!("Unable to write tasks: {}", err)),
+            };
+        }
+
+        Ok(())
+    }
+
+    fn backup(&self, file: &String) -> Result<(), String>
+    {
+        let bak = format!("{}.bak", file);
+
+        match ::std::fs::copy(file, bak) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(format!("Unable to backup {}", file)),
+        }
     }
 }

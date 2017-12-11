@@ -1,5 +1,5 @@
 use relm_attributes::widget;
-use widgets::filter::Msg::Filter;
+use widgets::filter::Msg::{Complete, Filter};
 
 #[derive(Clone, Copy)]
 pub enum Type {
@@ -9,6 +9,7 @@ pub enum Type {
 
 #[derive(Msg)]
 pub enum Msg {
+    Complete(::tasks::Task),
     UpdateFilter(Option<String>),
     Update(::tasks::List),
 }
@@ -96,6 +97,7 @@ impl ::relm::Widget for Tags
         use self::Msg::*;
 
         match event {
+            Complete(_) => (),
             Update(list) =>  {
                 self.model.list = list.clone();
 
@@ -110,6 +112,7 @@ impl ::relm::Widget for Tags
     {
         #[name="filter"]
         ::widgets::Filter {
+            Complete(ref task) => Msg::Complete(task.clone()),
             Filter(ref filter) => Msg::UpdateFilter(filter.clone()),
         }
     }

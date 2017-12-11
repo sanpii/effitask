@@ -1,6 +1,7 @@
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Task {
     inner: ::todo_txt::Task,
+    pub id: usize,
     pub note: Option<String>,
 }
 
@@ -62,6 +63,22 @@ impl Task
 
         note
     }
+
+    pub fn complete(&mut self)
+    {
+        let today = ::chrono::Local::now()
+            .date()
+            .naive_local();
+
+        self.finished = true;
+        self.finish_date = Some(today);
+    }
+
+    pub fn uncomplete(&mut self)
+    {
+        self.finished = false;
+        self.finish_date = None;
+    }
 }
 
 impl ::std::str::FromStr for Task
@@ -76,6 +93,7 @@ impl ::std::str::FromStr for Task
         task.tags.remove(&"note".to_owned());
 
         Ok(Self {
+            id: 0,
             note: note,
             inner: task,
         })
@@ -89,5 +107,23 @@ impl ::std::ops::Deref for Task
     fn deref(&self) -> &Self::Target
     {
         &self.inner
+    }
+}
+
+impl ::std::ops::DerefMut for Task
+{
+    fn deref_mut(&mut self) -> &mut Self::Target
+    {
+        &mut self.inner
+    }
+}
+
+impl ::std::fmt::Display for Task
+{
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result
+    {
+        use std::ops::Deref;
+
+        f.write_str(format!("{}", self.deref()).as_str())
     }
 }

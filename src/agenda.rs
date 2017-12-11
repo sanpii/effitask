@@ -1,9 +1,11 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
+use widgets::tasks::Msg::Complete;
 
 #[derive(Msg)]
 pub enum Msg {
+    Complete(::tasks::Task),
     Selected,
     Select(::chrono::DateTime<::chrono::Local>),
     Update(::tasks::List),
@@ -106,6 +108,7 @@ impl ::relm::Widget for Widget
         use self::Msg::*;
 
         match event {
+            Complete(_) => (),
             Selected => self.update_tasks(&self.model),
             Select(date) => {
                 use chrono::Datelike;
@@ -149,31 +152,40 @@ impl ::relm::Widget for Widget
                     gtk::Expander {
                         label: "Past due",
                         #[name="past"]
-                        ::widgets::Tasks,
+                        ::widgets::Tasks {
+                            Complete(ref task) => Msg::Complete(task.clone()),
+                        },
                     },
                     #[name="today_exp"]
                     gtk::Expander {
                         label: "Today",
                         #[name="today"]
-                        ::widgets::Tasks,
+                        ::widgets::Tasks {
+                            Complete(ref task) => Msg::Complete(task.clone()),
+                        },
                     },
                     #[name="tomorrow_exp"]
                     gtk::Expander {
                         label: "Tomorrow",
                         #[name="tomorrow"]
-                        ::widgets::Tasks,
+                        ::widgets::Tasks {
+                            Complete(ref task) => Msg::Complete(task.clone()),
+                        },
                     },
                     #[name="week_exp"]
                     gtk::Expander {
                         label: "This week",
                         #[name="week"]
-                        ::widgets::Tasks,
+                        ::widgets::Tasks {
+                            Complete(ref task) => Msg::Complete(task.clone()),
+                        },
                     },
                     #[name="month_exp"]
                     gtk::Expander {
                         label: "This month",
                         #[name="month"]
                         ::widgets::Tasks {
+                            Complete(ref task) => Msg::Complete(task.clone()),
                         }
                     },
                 },

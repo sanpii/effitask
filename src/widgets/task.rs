@@ -4,6 +4,8 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
+    Toggle,
+    Complete(::tasks::Task),
     ShowNote,
 }
 
@@ -11,6 +13,7 @@ pub struct Model {
     note_label: ::gtk::Label,
     note: ::gtk::Popover,
     task: ::tasks::Task,
+    relm: ::relm::Relm<Task>,
 }
 
 #[widget]
@@ -44,7 +47,7 @@ impl ::relm::Widget for Task
         }
     }
 
-    fn model(task: ::tasks::Task) -> Model
+    fn model(relm: &::relm::Relm<Self>, task: ::tasks::Task) -> Model
     {
         let note_label = ::gtk::Label::new(None);
         note_label.show();
@@ -60,6 +63,7 @@ impl ::relm::Widget for Task
             note_label,
             note,
             task,
+            relm: relm.clone(),
         }
     }
 
@@ -68,7 +72,9 @@ impl ::relm::Widget for Task
         use self::Msg::*;
 
         match event {
+            Complete(_) => (),
             ShowNote => self.model.note.popup(),
+            Toggle => self.model.relm.stream().emit(Complete(self.model.task.clone())),
         }
     }
 
@@ -78,7 +84,7 @@ impl ::relm::Widget for Task
             spacing: 5,
             gtk::CheckButton {
                 active: self.model.task.finished,
-                sensitive: false,
+                toggled => Msg::Toggle,
             },
             gtk::Label {
                 packing: {

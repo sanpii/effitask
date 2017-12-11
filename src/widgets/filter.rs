@@ -1,9 +1,11 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
+use widgets::tasks::Msg::Complete;
 
 #[derive(Msg)]
 pub enum Msg {
+    Complete(::tasks::Task),
     Filter(Option<String>),
     UpdateFilters(Vec<(String, u32)>),
     UpdateTasks(Vec<::tasks::Task>),
@@ -126,9 +128,10 @@ impl ::relm::Widget for Filter
         use self::Msg::*;
 
         match event {
+            Complete(_) => (),
+            Filter(_) => (),
             UpdateFilters(filters) => self.update_filters(filters),
             UpdateTasks(tasks) => self.update_tasks(tasks),
-            Filter(_) => (),
         }
     }
 
@@ -156,7 +159,9 @@ impl ::relm::Widget for Filter
             },
             gtk::ScrolledWindow {
                 #[name="tasks"]
-                ::widgets::Tasks,
+                ::widgets::Tasks {
+                    Complete(ref task) => Msg::Complete(task.clone()),
+                },
             }
         }
     }

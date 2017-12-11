@@ -62,6 +62,10 @@ impl List
         for (id, line) in ::std::io::BufReader::new(file).lines().enumerate() {
             let line = line.unwrap();
 
+            if line.is_empty() {
+                continue;
+            }
+
             match ::tasks::Task::from_str(line.as_str()) {
                 Ok(mut task) => {
                     task.id = last_id + id;

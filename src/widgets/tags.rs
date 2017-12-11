@@ -39,7 +39,18 @@ impl Tags
     fn get_progress(&self, tag: Type, list: &::tasks::List, current: &String) -> (u32, u32)
     {
         list.tasks.iter()
-            .filter(|x| self.get_tags(tag, x).contains(current))
+            .filter(|x| {
+                for tag in self.get_tags(tag, x) {
+                    if tag == current {
+                        return true;
+                    }
+                    else if tag.starts_with(format!("{}-", current).as_str()) {
+                        return true;
+                    }
+                }
+
+                false
+            })
             .fold((0, 0), |(mut done, total), x| {
                 if x.finished {
                     done += 1;

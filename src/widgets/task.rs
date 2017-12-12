@@ -38,7 +38,8 @@ impl ::relm::Widget for Task
             context.add_class(format!("pri_{}", priority).as_str());
         }
 
-        if task.note.is_some() {
+        let note = task.note.content();
+        if note.is_some() {
             self.model.note.set_relative_to(Some(&self.note_button));
             self.model.note.add(&self.model.note_label);
         }
@@ -52,7 +53,7 @@ impl ::relm::Widget for Task
         let note_label = ::gtk::Label::new(None);
         note_label.show();
 
-        if let Some(ref note) = task.note {
+        if let Some(ref note) = task.note.content() {
             note_label.set_text(note);
         }
 

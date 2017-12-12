@@ -2,12 +2,12 @@
 pub struct Task {
     inner: ::todo_txt::Task,
     pub id: usize,
-    pub note: Option<String>,
+    pub note: super::Note,
 }
 
 impl Task
 {
-    fn get_note(task: &::todo_txt::Task) -> Option<String>
+    fn get_note(task: &::todo_txt::Task) -> super::Note
     {
         let tag = match ::std::env::var("TODO_NOTE_TAG") {
             Ok(tag) => tag,
@@ -15,53 +15,11 @@ impl Task
         };
 
         if let Some(file) = task.tags.get(&tag) {
-            Some(Self::load_note(file))
+            super::Note::from_file(file)
         }
         else {
-            None
+            super::Note::None
         }
-    }
-
-    fn load_note(file: &String) -> String
-    {
-        use std::io::Read;
-
-        let mut note = String::new();
-
-        let todo_dir = match ::std::env::var("TODO_DIR") {
-            Ok(todo_dir) => todo_dir,
-            Err(_) => {
-                error!("Launch this program via todo.sh");
-                return note;
-            },
-        };
-
-        let note_dir = match ::std::env::var("TODO_NOTES_DIR") {
-            Ok(todo_dir) => todo_dir,
-            Err(_) => format!("{}/notes", todo_dir),
-        };
-
-        let note_file = format!("{}/{}", note_dir, file);
-
-        let file = match ::std::fs::File::open(note_file.clone()) {
-            Ok(file) => file,
-            Err(_) => {
-                error!("Unable to open {:?}", note_file);
-                return note;
-            },
-        };
-
-        let mut buffer = ::std::io::BufReader::new(file);
-
-        match buffer.read_to_string(&mut note) {
-            Ok(_) => (),
-            Err(_) => {
-                error!("Unable to read {:?}", note_file);
-                return note;
-            },
-        };
-
-        note
     }
 
     pub fn complete(&mut self)
@@ -124,6 +82,6 @@ impl ::std::fmt::Display for Task
     {
         use std::ops::Deref;
 
-        f.write_str(format!("{}", self.deref()).as_str())
+        f.write_str(format!("{} {}", self.deref(), self.note).as_str())
     }
 }

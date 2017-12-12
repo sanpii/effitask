@@ -5,6 +5,7 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
+    Edit(::tasks::Task),
     Complete(::tasks::Task),
     Update(Vec<::tasks::Task>),
 }
@@ -31,6 +32,7 @@ impl Tasks
             for task in tasks.iter() {
                 let child = self.list_box.add_widget::<super::Task, _>(&self.model.relm, task.clone());
                 connect!(child@::widgets::task::Msg::Complete(ref task), self.model.relm, Msg::Complete(task.clone()));
+                connect!(child@::widgets::task::Msg::Edit(ref task), self.model.relm, Msg::Edit(task.clone()));
 
                 self.model.children.push(child);
             }
@@ -63,6 +65,7 @@ impl ::relm::Widget for Tasks
 
         match event {
             Complete(_) => (),
+            Edit(_) => (),
             Update(tasks) => self.update_tasks(tasks),
         }
     }

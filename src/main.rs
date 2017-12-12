@@ -5,7 +5,9 @@ extern crate chrono;
 extern crate env_logger;
 #[macro_use]
 extern crate log;
+extern crate gdk;
 extern crate gtk;
+extern crate rand;
 #[macro_use]
 extern crate relm;
 extern crate relm_attributes;
@@ -18,6 +20,7 @@ use relm::Widget;
 mod agenda;
 mod application;
 mod done;
+mod edit;
 mod inbox;
 mod tasks;
 mod widgets;

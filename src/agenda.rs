@@ -1,11 +1,12 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::tasks::Msg::Complete;
+use widgets::tasks::Msg::{Complete, Edit};
 
 #[derive(Msg)]
 pub enum Msg {
     Complete(::tasks::Task),
+    Edit(::tasks::Task),
     Selected,
     Select(::chrono::DateTime<::chrono::Local>),
     Update(::tasks::List),
@@ -109,6 +110,7 @@ impl ::relm::Widget for Widget
 
         match event {
             Complete(_) => (),
+            Edit(_) => (),
             Selected => self.update_tasks(&self.model),
             Select(date) => {
                 use chrono::Datelike;
@@ -154,6 +156,7 @@ impl ::relm::Widget for Widget
                         #[name="past"]
                         ::widgets::Tasks {
                             Complete(ref task) => Msg::Complete(task.clone()),
+                            Edit(ref task) => Msg::Edit(task.clone()),
                         },
                     },
                     #[name="today_exp"]
@@ -162,6 +165,7 @@ impl ::relm::Widget for Widget
                         #[name="today"]
                         ::widgets::Tasks {
                             Complete(ref task) => Msg::Complete(task.clone()),
+                            Edit(ref task) => Msg::Edit(task.clone()),
                         },
                     },
                     #[name="tomorrow_exp"]
@@ -170,6 +174,7 @@ impl ::relm::Widget for Widget
                         #[name="tomorrow"]
                         ::widgets::Tasks {
                             Complete(ref task) => Msg::Complete(task.clone()),
+                            Edit(ref task) => Msg::Edit(task.clone()),
                         },
                     },
                     #[name="week_exp"]
@@ -178,6 +183,7 @@ impl ::relm::Widget for Widget
                         #[name="week"]
                         ::widgets::Tasks {
                             Complete(ref task) => Msg::Complete(task.clone()),
+                            Edit(ref task) => Msg::Edit(task.clone()),
                         },
                     },
                     #[name="month_exp"]
@@ -186,6 +192,7 @@ impl ::relm::Widget for Widget
                         #[name="month"]
                         ::widgets::Tasks {
                             Complete(ref task) => Msg::Complete(task.clone()),
+                            Edit(ref task) => Msg::Edit(task.clone()),
                         }
                     },
                 },

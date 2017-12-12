@@ -4,9 +4,11 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
-    Toggle,
+    Click(::gdk::EventButton),
     Complete(::tasks::Task),
+    Edit(::tasks::Task),
     ShowNote,
+    Toggle,
 }
 
 pub struct Model {
@@ -73,7 +75,11 @@ impl ::relm::Widget for Task
         use self::Msg::*;
 
         match event {
+            Click(event) => if event.get_event_type() == ::gdk::EventType::DoubleButtonPress {
+                self.model.relm.stream().emit(Edit(self.model.task.clone()))
+            },
             Complete(_) => (),
+            Edit(_) => (),
             ShowNote => self.model.note.popup(),
             Toggle => self.model.relm.stream().emit(Complete(self.model.task.clone())),
         }
@@ -81,24 +87,27 @@ impl ::relm::Widget for Task
 
     view!
     {
-        gtk::Box {
-            spacing: 5,
-            gtk::CheckButton {
-                active: self.model.task.finished,
-                toggled => Msg::Toggle,
-            },
-            gtk::Label {
-                packing: {
-                    expand: true,
-                    fill: true,
+        gtk::EventBox {
+            button_press_event(_, event) => (Msg::Click(event.clone()), ::gtk::Inhibit(false)),
+            gtk::Box {
+                spacing: 5,
+                gtk::CheckButton {
+                    active: self.model.task.finished,
+                    toggled => Msg::Toggle,
                 },
-                label: self.model.task.subject.as_str(),
-                xalign: 0.,
-            },
-            #[name="note_button"]
-            gtk::Button {
-                image: &::gtk::Image::new_from_icon_name("text-x-generic", ::gtk::IconSize::LargeToolbar.into()),
-                clicked => Msg::ShowNote,
+                gtk::Label {
+                    packing: {
+                        expand: true,
+                        fill: true,
+                    },
+                    label: self.model.task.subject.as_str(),
+                    xalign: 0.,
+                },
+                #[name="note_button"]
+                gtk::Button {
+                    image: &::gtk::Image::new_from_icon_name("text-x-generic", ::gtk::IconSize::LargeToolbar.into()),
+                    clicked => Msg::ShowNote,
+                },
             },
         }
     }

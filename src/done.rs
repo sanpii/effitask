@@ -1,9 +1,10 @@
 use relm_attributes::widget;
-use widgets::tasks::Msg::Complete;
+use widgets::tasks::Msg::{Complete, Edit};
 
 #[derive(Msg)]
 pub enum Msg {
     Complete(::tasks::Task),
+    Edit(::tasks::Task),
     Update(::tasks::List),
 }
 
@@ -33,6 +34,7 @@ impl ::relm::Widget for Widget
 
         match event {
             Complete(_) => (),
+            Edit(_) => (),
             Update(list) => self.update_tasks(list),
         }
     }
@@ -42,6 +44,7 @@ impl ::relm::Widget for Widget
         #[name="tasks"]
         ::widgets::Tasks {
             Complete(ref task) => Msg::Complete(task.clone()),
+            Edit(ref task) => Msg::Edit(task.clone()),
         }
     }
 }

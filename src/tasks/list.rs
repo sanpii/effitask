@@ -138,7 +138,9 @@ impl List
             Err(err) => return Err(format!("Unable to write tasks: {}", err)),
         };
 
-        for task in tasks {
+        for mut task in tasks {
+            task.note = task.note.write()?;
+
             match f.write(format!("{}\n", task).as_bytes()) {
                 Ok(_) => (),
                 Err(err) => return Err(format!("Unable to write tasks: {}", err)),

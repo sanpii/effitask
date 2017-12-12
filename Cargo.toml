@@ -6,7 +6,9 @@ authors = ["Sanpi <sanpi@homecomputing.fr>"]
 [dependencies]
 chrono = "^0.4"
 env_logger = "^0.4"
+gdk = "^0.7"
 log = "^0.3"
+rand = "^0.3"
 relm = "^0.11"
 relm-attributes = "^0.11"
 relm-derive = "^0.11"

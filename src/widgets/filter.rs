@@ -1,11 +1,12 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::tasks::Msg::Complete;
+use widgets::tasks::Msg::{Complete, Edit};
 
 #[derive(Msg)]
 pub enum Msg {
     Complete(::tasks::Task),
+    Edit(::tasks::Task),
     Filters(Vec<String>),
     UpdateFilters(Vec<(String, (u32, u32))>),
     UpdateTasks(Vec<::tasks::Task>),
@@ -160,6 +161,7 @@ impl ::relm::Widget for Filter
 
         match event {
             Complete(_) => (),
+            Edit(_) => (),
             Filters(_) => (),
             UpdateFilters(filters) => self.update_filters(filters),
             UpdateTasks(tasks) => self.update_tasks(tasks),
@@ -170,11 +172,13 @@ impl ::relm::Widget for Filter
     {
         gtk::Paned {
             orientation: ::gtk::Orientation::Horizontal,
+            wide_handle: true,
             #[name="scroll"]
             gtk::ScrolledWindow {
                 #[name="filters"]
                 gtk::TreeView {
                     headers_visible: false,
+                    enable_tree_lines: true,
                     row_activated(treeview, path, _) => Self::select_range(treeview, path),
                     selection.changed(ref mut selection) => {
                         let mut filters = Vec::new();
@@ -200,6 +204,7 @@ impl ::relm::Widget for Filter
                 #[name="tasks"]
                 ::widgets::Tasks {
                     Complete(ref task) => Msg::Complete(task.clone()),
+                    Edit(ref task) => Msg::Edit(task.clone()),
                 },
             }
         }

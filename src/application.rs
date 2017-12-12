@@ -3,9 +3,14 @@ use gtk::prelude::*;
 use relm_attributes::widget;
 
 use agenda::Msg::Complete as AgendaComplete;
+use agenda::Msg::Edit as AgendaEdit;
 use done::Msg::Complete as DoneComplete;
+use done::Msg::Edit as DoneEdit;
+use edit::Msg::{Cancel, Done};
 use inbox::Msg::Complete as InboxComplete;
+use inbox::Msg::Edit as InboxEdit;
 use widgets::tags::Msg::Complete as TagsComplete;
+use widgets::tags::Msg::Edit as TagsEdit;
 
 pub struct Model {
     relm: ::relm::Relm<Widget>,
@@ -19,7 +24,12 @@ pub enum Msg {
     Add,
     Create(Option<String>),
     Complete(::tasks::Task),
+    Edit(::tasks::Task),
+    EditCancel,
+    EditDone(::tasks::Task),
     Refresh,
+    Show,
+    SwitchPage,
     Quit,
 }
 
@@ -147,6 +157,31 @@ impl Widget
         self.update_tasks();
     }
 
+    fn edit(&mut self, task: &::tasks::Task)
+    {
+        self.edit.emit(::edit::Msg::Set(task.clone()));
+        self.edit.widget()
+            .show();
+    }
+
+    fn save(&mut self, task: &::tasks::Task)
+    {
+        let id = task.id;
+        let mut list = self.model.list.clone();
+
+        if list.tasks.get_mut(id).is_some() {
+            ::std::mem::replace(&mut list.tasks[id], task.clone());
+        }
+
+        match list.write() {
+            Ok(_) => (),
+            Err(err) => error!("Unable to save tasks: {}", err),
+        };
+
+        self.update_tasks();
+        self.edit.widget().hide();
+    }
+
     fn update_tasks(&mut self)
     {
         let todo_file = match ::std::env::var("TODO_FILE") {
@@ -169,6 +204,12 @@ impl Widget
 
         self.model.list = list;
     }
+
+    fn on_show(&self)
+    {
+        let width = self.window.get_allocated_width();
+        self.paned.set_position(width - 400);
+    }
 }
 
 #[widget]
@@ -176,6 +217,9 @@ impl ::relm::Widget for Widget
 {
     fn init_view(&mut self)
     {
+        self.edit.widget()
+            .hide();
+
         self.load_style();
         self.create_popover();
         self.replace_tab_widgets();
@@ -200,7 +244,12 @@ impl ::relm::Widget for Widget
             Add => self.add(),
             Create(text) => self.create(text),
             Complete(task) => self.complete(&task),
+            Edit(task) => self.edit(&task),
+            EditDone(task) => self.save(&task),
+            EditCancel => self.edit.widget().hide(),
             Refresh => self.update_tasks(),
+            Show => self.on_show(),
+            SwitchPage => self.edit.widget().hide(),
             Quit => ::gtk::main_quit(),
         }
     }
@@ -225,35 +274,52 @@ impl ::relm::Widget for Widget
                         clicked => Msg::Add,
                     },
                 },
-                #[name="notebook"]
-                gtk::Notebook {
+                #[name="paned"]
+                gtk::Paned {
                     packing: {
                         expand: true,
                         fill: true,
                     },
-                    tab_pos: ::gtk::PositionType::Left,
-                    #[name="inbox"]
-                    ::inbox::Widget {
-                        InboxComplete(ref task) => Msg::Complete(task.clone()),
+                    orientation: ::gtk::Orientation::Horizontal,
+                    wide_handle: true,
+                    #[name="notebook"]
+                    gtk::Notebook {
+                        tab_pos: ::gtk::PositionType::Left,
+                        #[name="inbox"]
+                        ::inbox::Widget {
+                            InboxComplete(ref task) => Msg::Complete(task.clone()),
+                            InboxEdit(ref task) => Msg::Edit(task.clone()),
+                        },
+                        #[name="projects"]
+                        ::widgets::Tags(::widgets::tags::Type::Projects) {
+                            TagsComplete(ref task) => Msg::Complete(task.clone()),
+                            TagsEdit(ref task) => Msg::Edit(task.clone()),
+                        },
+                        #[name="contexts"]
+                        ::widgets::Tags(::widgets::tags::Type::Contexts) {
+                            TagsComplete(ref task) => Msg::Complete(task.clone()),
+                            TagsEdit(ref task) => Msg::Edit(task.clone()),
+                        },
+                        #[name="agenda"]
+                        ::agenda::Widget {
+                            AgendaComplete(ref task) => Msg::Complete(task.clone()),
+                            AgendaEdit(ref task) => Msg::Edit(task.clone()),
+                        },
+                        #[name="done"]
+                        ::done::Widget {
+                            DoneComplete(ref task) => Msg::Complete(task.clone()),
+                            DoneEdit(ref task) => Msg::Edit(task.clone()),
+                        },
+                        switch_page(_, _, _) => Msg::SwitchPage,
                     },
-                    #[name="projects"]
-                    ::widgets::Tags(::widgets::tags::Type::Projects) {
-                        TagsComplete(ref task) => Msg::Complete(task.clone()),
-                    },
-                    #[name="contexts"]
-                    ::widgets::Tags(::widgets::tags::Type::Contexts) {
-                        TagsComplete(ref task) => Msg::Complete(task.clone()),
-                    },
-                    #[name="agenda"]
-                    ::agenda::Widget {
-                        AgendaComplete(ref task) => Msg::Complete(task.clone()),
-                    },
-                    #[name="done"]
-                    ::done::Widget {
-                        DoneComplete(ref task) => Msg::Complete(task.clone()),
+                    #[name="edit"]
+                    ::edit::Widget {
+                        Cancel => Msg::EditCancel,
+                        Done(ref task) => Msg::EditDone(task.clone()),
                     },
                 },
             },
+            size_allocate(_, _) => Msg::Show,
             delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),
         }
     }

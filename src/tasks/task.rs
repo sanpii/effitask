@@ -7,6 +7,15 @@ pub struct Task {
 
 impl Task
 {
+    pub fn new() -> Self
+    {
+        Self {
+            inner: Default::default(),
+            id: 0,
+            note: super::Note::None,
+        }
+    }
+
     fn get_note(task: &::todo_txt::Task) -> super::Note
     {
         let tag = match ::std::env::var("TODO_NOTE_TAG") {
@@ -82,6 +91,13 @@ impl ::std::fmt::Display for Task
     {
         use std::ops::Deref;
 
-        f.write_str(format!("{} {}", self.deref(), self.note).as_str())
+        f.write_str(format!("{}", self.deref()).as_str())?;
+
+        let note = format!(" {}", self.note);
+        if note != String::from(" ") {
+            f.write_str(note.as_str())?;
+        }
+
+        Ok(())
     }
 }

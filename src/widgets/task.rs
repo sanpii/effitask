@@ -48,6 +48,18 @@ impl ::relm::Widget for Task
         else {
             self.note_button.hide();
         }
+
+        if task.tags.len() > 0 {
+            let text = task.tags.iter()
+                .map(|(k, v)| format!("{}: {}", k, v))
+                .collect::<Vec<String>>()
+                .join(" · ");
+
+            self.keywords_label.set_text(&text);
+        }
+        else {
+            self.keywords.hide();
+        }
     }
 
     fn model(relm: &::relm::Relm<Self>, task: ::tasks::Task) -> Model
@@ -90,23 +102,40 @@ impl ::relm::Widget for Task
         gtk::EventBox {
             button_press_event(_, event) => (Msg::Click(event.clone()), ::gtk::Inhibit(false)),
             gtk::Box {
-                spacing: 5,
-                gtk::CheckButton {
-                    active: self.model.task.finished,
-                    toggled => Msg::Toggle,
-                },
-                gtk::Label {
-                    packing: {
-                        expand: true,
-                        fill: true,
+                orientation: ::gtk::Orientation::Vertical,
+                gtk::Box {
+                    spacing: 5,
+                    orientation: ::gtk::Orientation::Horizontal,
+                    gtk::CheckButton {
+                        active: self.model.task.finished,
+                        toggled => Msg::Toggle,
                     },
-                    label: self.model.task.subject.as_str(),
-                    xalign: 0.,
+                    gtk::Label {
+                        packing: {
+                            expand: true,
+                            fill: true,
+                        },
+                        label: self.model.task.subject.as_str(),
+                        xalign: 0.,
+                    },
+                    #[name="note_button"]
+                    gtk::Button {
+                        image: &::gtk::Image::new_from_icon_name("text-x-generic", ::gtk::IconSize::LargeToolbar.into()),
+                        clicked => Msg::ShowNote,
+                    },
                 },
-                #[name="note_button"]
-                gtk::Button {
-                    image: &::gtk::Image::new_from_icon_name("text-x-generic", ::gtk::IconSize::LargeToolbar.into()),
-                    clicked => Msg::ShowNote,
+                gtk::Box {
+                    spacing: 5,
+                    orientation: ::gtk::Orientation::Horizontal,
+                    #[name="keywords"]
+                    gtk::Box {
+                        gtk::Image {
+                            property_icon_name: Some("mail-attachment"),
+                        },
+                        #[name="keywords_label"]
+                        gtk::Label {
+                        },
+                    },
                 },
             },
         }

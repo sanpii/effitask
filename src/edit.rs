@@ -8,10 +8,11 @@ use widgets::calendar::Msg::Updated as CalendarUpdated;
 pub enum Msg {
     Cancel,
     EditKeyword(::std::collections::BTreeMap<String, String>),
-    UpdateDate(DateType, Option<::chrono::NaiveDate>),
     Done(::tasks::Task),
     Ok,
     Set(::tasks::Task),
+    UpdateDate(DateType, Option<::chrono::NaiveDate>),
+    UpdatePriority,
 }
 
 pub struct Model {
@@ -33,6 +34,7 @@ impl Widget
         self.model.task = task.clone();
 
         self.subject.set_text(task.subject.as_str());
+        self.priority.set_value(task.priority as f64);
         self.due.emit(::widgets::calendar::Msg::Set(task.due_date));
         self.threshold.emit(::widgets::calendar::Msg::Set(task.threshold_date));
         self.finish.emit(::widgets::calendar::Msg::Set(task.finish_date));
@@ -100,6 +102,11 @@ impl Widget
             },
         }
     }
+
+    fn update_priority(&mut self)
+    {
+        self.model.task.priority = self.priority.get_value() as u8;
+    }
 }
 
 #[widget]
@@ -108,6 +115,7 @@ impl ::relm::Widget for Widget
     fn init_view(&mut self)
     {
         self.note.set_property_height_request(250);
+        self.priority.set_adjustment(&::gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
     }
 
     fn model(relm: &::relm::Relm<Self>,_: ()) -> Model
@@ -129,6 +137,7 @@ impl ::relm::Widget for Widget
             Ok => self.model.relm.stream().emit(Msg::Done(self.get_task())),
             Set(task) => self.set_task(task),
             UpdateDate(ref date_type, ref date) => self.update_date(date_type, &date),
+            UpdatePriority => self.update_priority(),
         }
     }
 
@@ -141,6 +150,13 @@ impl ::relm::Widget for Widget
                 label: "Subject",
                 #[name="subject"]
                 gtk::Entry {
+                },
+            },
+            gtk::Frame {
+                label: "Priority",
+                #[name="priority"]
+                gtk::SpinButton {
+                    focus_out_event(_, _) => (Msg::UpdatePriority, ::gtk::Inhibit(false)),
                 },
             },
             gtk::Frame {

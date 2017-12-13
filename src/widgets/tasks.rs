@@ -29,7 +29,11 @@ impl Tasks
             self.list_box.show();
             self.label.hide();
 
-            for task in tasks.iter() {
+            let mut sorted_tasks = tasks.clone();
+            sorted_tasks.sort();
+            sorted_tasks.reverse();
+
+            for task in sorted_tasks.iter() {
                 let child = self.list_box.add_widget::<super::Task, _>(&self.model.relm, task.clone());
                 connect!(child@::widgets::task::Msg::Complete(ref task), self.model.relm, Msg::Complete(task.clone()));
                 connect!(child@::widgets::task::Msg::Edit(ref task), self.model.relm, Msg::Edit(task.clone()));

@@ -12,6 +12,8 @@ use inbox::Msg::Edit as InboxEdit;
 use widgets::tags::Msg::Complete as TagsComplete;
 use widgets::tags::Msg::Edit as TagsEdit;
 
+const NAME: &str = "Effitask";
+
 pub struct Model {
     relm: ::relm::Relm<Widget>,
     list: ::tasks::List,
@@ -258,10 +260,12 @@ impl ::relm::Widget for Widget
     {
         #[name="window"]
         gtk::Window {
+            title: NAME,
             gtk::Box {
                 orientation: ::gtk::Orientation::Vertical,
-                gtk::Toolbar {
-                    style: ::gtk::ToolbarStyle::Both,
+                gtk::HeaderBar {
+                    title: NAME,
+                    show_close_button: true,
                     gtk::ToolButton {
                         icon_name: "view-refresh",
                         label: "Refresh",

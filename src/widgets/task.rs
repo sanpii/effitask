@@ -60,6 +60,31 @@ impl ::relm::Widget for Task
         else {
             self.keywords.hide();
         }
+
+        if let Some(due) = task.due_date {
+            let today = ::chrono::Local::now()
+                .date()
+                .naive_local();
+
+            let date = if due == today {
+                String::from("today")
+            }
+            else if due == today.pred() {
+                String::from("yesterday")
+            }
+            else if due == today.succ() {
+                String::from("tomorrow")
+            }
+            else {
+                due.format("%Y-%m-%d")
+                    .to_string()
+            };
+
+            self.date_label.set_text(format!("due: {}", date).as_str());
+        }
+        else {
+            self.date.hide();
+        }
     }
 
     fn model(relm: &::relm::Relm<Self>, task: ::tasks::Task) -> Model
@@ -133,6 +158,15 @@ impl ::relm::Widget for Task
                             property_icon_name: Some("mail-attachment"),
                         },
                         #[name="keywords_label"]
+                        gtk::Label {
+                        },
+                    },
+                    #[name="date"]
+                    gtk::Box {
+                        packing: {
+                            pack_type: ::gtk::PackType::End,
+                        },
+                        #[name="date_label"]
                         gtk::Label {
                         },
                     },

@@ -24,7 +24,7 @@ impl Calendar
     {
         let (y, m, d) = self.model.calendar.get_date();
 
-        self.entry.set_text(format!("{}-{}-{}", y, m, d).as_str());
+        self.entry.set_text(format!("{}-{}-{}", y, m + 1, d).as_str());
         self.model.popover.popdown();
 
         self.date_updated();

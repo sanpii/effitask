@@ -57,12 +57,24 @@ impl Keywords
 
     fn delete(&mut self)
     {
-        if let Some((_, iter)) = self.tree_view.get_selection().get_selected() {
-            self.model.store.remove(&iter);
+        let selection = self.tree_view.get_selection();
+        let (rows, _) = selection.get_selected_rows();
+        let references: Vec<_> = rows.iter()
+            .map(|x| ::gtk::TreeRowReference::new(&self.model.store, x))
+            .collect();
 
-            self.model.relm.stream()
-                .emit(Msg::Updated(self.keywords()));
+        for reference in references {
+            if let Some(reference) = reference {
+                if let Some(path) = reference.get_path() {
+                    if let Some(iter) = self.model.store.get_iter(&path) {
+                        self.model.store.remove(&iter);
+                    }
+                }
+            }
         }
+
+        self.model.relm.stream()
+            .emit(Msg::Updated(self.keywords()));
     }
 
     fn edit(&mut self, column: Column, path: &::gtk::TreePath, new_text: &str)
@@ -125,6 +137,8 @@ impl ::relm::Widget for Keywords
         self.scroll.set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
         self.scroll.set_property_height_request(250);
         self.tree_view.set_model(Some(&self.model.store));
+        self.tree_view.get_selection()
+            .set_mode(::gtk::SelectionMode::Multiple);
 
         let column = ::gtk::TreeViewColumn::new();
         column.set_title("name");

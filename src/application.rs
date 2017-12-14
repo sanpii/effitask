@@ -44,8 +44,10 @@ impl Widget
             .unwrap();
         let css = ::gtk::CssProvider::new();
         if let Some(stylesheet) = self.get_stylesheet() {
-            css.load_from_path(stylesheet.to_str().unwrap())
-                .unwrap_or(error!("Invalid CSS"));
+            match css.load_from_path(stylesheet.to_str().unwrap()) {
+                Ok(_) => (),
+                Err(err) => error!("Invalid CSS: {}", err),
+            }
 
             ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
         }

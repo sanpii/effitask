@@ -1,3 +1,7 @@
+calendar *:active {
+    color: #3C92CA;
+}
+
 expander {
     font-size: 30px;
 }

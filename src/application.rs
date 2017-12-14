@@ -19,6 +19,7 @@ pub struct Model {
     list: ::tasks::List,
     popover: ::gtk::Popover,
     entry: ::gtk::Entry,
+    xdg: ::xdg::BaseDirectories,
 }
 
 #[derive(Msg)]
@@ -42,25 +43,29 @@ impl Widget
         let screen = self.window.get_screen()
             .unwrap();
         let css = ::gtk::CssProvider::new();
-        css.load_from_path(self.get_stylesheet())
-            .unwrap_or(error!("Invalid CSS"));
+        if let Some(stylesheet) = self.get_stylesheet() {
+            css.load_from_path(stylesheet.to_str().unwrap())
+                .unwrap_or(error!("Invalid CSS"));
 
-        ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
-    }
-
-    fn get_stylesheet(&self) -> &str
-    {
-        let setting = match ::gtk::Settings::get_default() {
-            Some(setting) => setting,
-            None => return "resources/style_light.css",
-        };
-
-        if setting.get_property_gtk_application_prefer_dark_theme() {
-            "resources/style_dark.css"
+            ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
         }
         else {
-            "resources/style_light.css"
+            error!("Unable to find stylesheet");
         }
+    }
+
+    fn get_stylesheet(&self) -> Option<::std::path::PathBuf>
+    {
+        let mut stylesheet = "style_light.css";
+
+        match ::gtk::Settings::get_default() {
+            Some(setting) => if setting.get_property_gtk_application_prefer_dark_theme() {
+                stylesheet = "style_dark.css";
+            }
+            None => (),
+        }
+
+        self.model.xdg.find_data_file(stylesheet)
     }
 
     fn create_popover(&self)
@@ -109,8 +114,14 @@ impl Widget
                 ""
             },
         };
-        let image = ::gtk::Image::new_from_file(format!("resources/{}.png", title));
-        vbox.pack_start(&image, false, false, 0);
+
+        if let Some(filename) = self.model.xdg.find_data_file(format!("{}.png", title).as_str()) {
+            let image = ::gtk::Image::new_from_file(filename);
+            vbox.pack_start(&image, false, false, 0);
+        }
+        else {
+            error!("Unable to find resource '{}.png'", title);
+        }
 
         let label = ::gtk::Label::new(Some(title));
         vbox.pack_start(&label, false, false, 0);
@@ -235,6 +246,8 @@ impl ::relm::Widget for Widget
             list: ::tasks::List::new(),
             popover: ::gtk::Popover::new(None::<&::gtk::Button>),
             entry: ::gtk::Entry::new(),
+            xdg: ::xdg::BaseDirectories::with_prefix(::application::NAME.to_lowercase())
+                .unwrap(),
         }
     }
 

@@ -14,6 +14,7 @@ extern crate relm_attributes;
 #[macro_use]
 extern crate relm_derive;
 extern crate todo_txt;
+extern crate xdg;
 
 use relm::Widget;
 

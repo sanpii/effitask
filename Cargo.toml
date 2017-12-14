@@ -13,6 +13,7 @@ relm = "^0.11"
 relm-attributes = "^0.11"
 relm-derive = "^0.11"
 todo-txt = "^0.7"
+xdg = "^2.1"
 
 [dependencies.gtk]
 version = "0.3"

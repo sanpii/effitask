@@ -11,6 +11,7 @@ extern crate log;
 extern crate gdk;
 extern crate gtk;
 extern crate rand;
+extern crate regex;
 #[macro_use]
 extern crate relm;
 extern crate relm_attributes;

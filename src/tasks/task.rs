@@ -16,6 +16,15 @@ impl Task
         }
     }
 
+    pub fn markup_subject(&self) -> String
+    {
+        let regex = ::regex::Regex::new("(?P<url>[\\w]+://[^\\s]+)")
+            .unwrap();
+
+        regex.replace(&self.subject, "<a href=\"$url\">$url</a>")
+            .into_owned()
+    }
+
     fn note(task: &::todo_txt::Task) -> super::Note
     {
         let tag = match ::std::env::var("TODO_NOTE_TAG") {

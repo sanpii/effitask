@@ -140,7 +140,7 @@ impl ::relm::Widget for Task
                             expand: true,
                             fill: true,
                         },
-                        label: self.model.task.subject.as_str(),
+                        markup: self.model.task.markup_subject().as_str(),
                         xalign: 0.,
                     },
                     #[name="note_button"]

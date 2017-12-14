@@ -37,15 +37,12 @@ impl Tags
         self.filter.emit(::widgets::filter::Msg::UpdateFilters(tags));
     }
 
-    fn get_progress(&self, tag: Type, list: &::tasks::List, current: &String) -> (u32, u32)
+    fn get_progress(&self, tag: Type, list: &::tasks::List, current: &str) -> (u32, u32)
     {
         list.tasks.iter()
             .filter(|x| {
                 for tag in self.get_tags(tag, x) {
-                    if tag == current {
-                        return true;
-                    }
-                    else if tag.starts_with(format!("{}-", current).as_str()) {
+                    if tag == current || tag.starts_with(format!("{}-", current).as_str()) {
                         return true;
                     }
                 }
@@ -61,7 +58,7 @@ impl Tags
             })
     }
 
-    fn update_tasks(&self, tag: Type, list: &::tasks::List, filters: Vec<String>)
+    fn update_tasks(&self, tag: Type, list: &::tasks::List, filters: &[String])
     {
         let today = ::chrono::Local::now()
             .date()
@@ -73,10 +70,10 @@ impl Tags
 
                 !x.finished
                     && !tags.is_empty()
-                    && Self::has_filter(tags, &filters)
+                    && Self::has_filter(tags, filters)
                     && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
-            .map(|x| x.clone())
+            .cloned()
             .collect();
 
         self.filter.emit(::widgets::filter::Msg::UpdateTasks(tasks));
@@ -90,7 +87,7 @@ impl Tags
         }
     }
 
-    fn has_filter(tags: &Vec<String>, filters: &Vec<String>) -> bool
+    fn has_filter(tags: &[String], filters: &[String]) -> bool
     {
         for filter in filters {
             if tags.contains(filter) {
@@ -124,9 +121,9 @@ impl ::relm::Widget for Tags
                 self.model.list = list.clone();
 
                 self.update_tags(self.model.tag, &self.model.list);
-                self.update_tasks(self.model.tag, &self.model.list, Vec::new());
+                self.update_tasks(self.model.tag, &self.model.list, &[]);
             },
-            UpdateFilters(filters) =>  self.update_tasks(self.model.tag, &self.model.list, filters),
+            UpdateFilters(filters) =>  self.update_tasks(self.model.tag, &self.model.list, &filters),
         }
     }
 

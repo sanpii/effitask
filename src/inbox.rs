@@ -10,7 +10,7 @@ pub enum Msg {
 
 impl Widget
 {
-    fn update_tasks(&self, list: ::tasks::List)
+    fn update_tasks(&self, list: &::tasks::List)
     {
         let today = ::chrono::Local::now()
             .date()
@@ -22,7 +22,7 @@ impl Widget
                     && x.projects.is_empty()
                     && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
-            .map(|x| x.clone())
+            .cloned()
             .collect();
 
         self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
@@ -43,7 +43,7 @@ impl ::relm::Widget for Widget
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(list) => self.update_tasks(list),
+            Update(list) => self.update_tasks(&list),
         }
     }
 

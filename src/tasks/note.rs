@@ -10,7 +10,7 @@ pub enum Note {
 
 impl Note
 {
-    pub fn from_file(filename: &String) -> Self
+    pub fn from_file(filename: &str) -> Self
     {
         use std::io::Read;
 
@@ -22,7 +22,7 @@ impl Note
             Ok(note_file) => note_file,
             Err(err) => {
                 error!("{}", err);
-                return Note::Short(filename.clone());
+                return Note::Short(filename.to_string());
             },
         };
 
@@ -30,7 +30,7 @@ impl Note
             Ok(file) => file,
             Err(_) => {
                 error!("Unable to open {:?}", note_file);
-                return Note::Short(filename.clone());
+                return Note::Short(filename.to_string());
             },
         };
 
@@ -41,22 +41,21 @@ impl Note
             Ok(_) => (),
             Err(_) => {
                 error!("Unable to read {:?}", note_file);
-                return Note::Short(filename.clone());
+                return Note::Short(filename.to_string());
             },
         };
 
         Note::Long {
-            filename: filename.clone(),
+            filename: filename.to_string(),
             content,
         }
     }
 
     pub fn content(&self) -> Option<String>
     {
-        match self {
-            &Note::None => None,
-            &Note::Short(ref content) => Some(content.clone()),
-            &Note::Long { filename: _, ref content } => Some(content.clone()),
+        match *self {
+            Note::None => None,
+            Note::Short(ref content) | Note::Long { ref content, .. } => Some(content.clone()),
         }
     }
 
@@ -68,7 +67,7 @@ impl Note
             return Ok(note);
         }
 
-        if let &Note::Short(ref content) = self {
+        if let Note::Short(ref content) = *self {
             note = Note::Long {
                 filename: Self::new_filename(),
                 content: content.clone(),
@@ -77,7 +76,7 @@ impl Note
 
         if let Note::Long { ref filename, ref content } = note {
             if content.is_empty() {
-                match ::std::fs::remove_file(Self::note_file(&filename)?) {
+                match ::std::fs::remove_file(Self::note_file(filename)?) {
                     Ok(_) => (),
                     Err(err) => error!("Unable to delete note: {}", err),
                 };
@@ -89,7 +88,7 @@ impl Note
         if let Note::Long { ref filename, ref content } = note {
             use std::io::Write;
 
-            let note_file = Self::note_file(&filename)?;
+            let note_file = Self::note_file(filename)?;
 
             let mut f = match ::std::fs::File::create(note_file) {
                 Ok(f) => f,
@@ -122,7 +121,7 @@ impl Note
         format!("{}{}", name, ext)
     }
 
-    fn note_file(filename: &String) -> Result<String, String>
+    fn note_file(filename: &str) -> Result<String, String>
     {
         let todo_dir = match ::std::env::var("TODO_DIR") {
             Ok(todo_dir) => todo_dir,
@@ -147,10 +146,10 @@ impl ::std::fmt::Display for Note
             Err(_) => "note".to_owned(),
         };
 
-        let tag = match self {
-            &Note::None => String::new(),
-            &Note::Short(ref content) => format!("{}:{}", tag, content),
-            &Note::Long { ref filename, content: _ } => format!("{}:{}", tag, filename),
+        let tag = match *self {
+            Note::None => String::new(),
+            Note::Short(ref content) => format!("{}:{}", tag, content),
+            Note::Long { ref filename, .. } => format!("{}:{}", tag, filename),
         };
 
         f.write_str(tag.as_str())

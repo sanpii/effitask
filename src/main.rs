@@ -35,7 +35,7 @@ fn main()
         .unwrap();
 
     if ::std::env::args().nth(1) == Some("usage".to_owned()) {
-        usage(::std::env::args().nth(0).unwrap());
+        usage(&::std::env::args().nth(0).unwrap());
 
         ::std::process::exit(0);
     }
@@ -44,7 +44,7 @@ fn main()
         .unwrap();
 }
 
-fn usage(program: String)
+fn usage(program: &str)
 {
     let path = ::std::path::Path::new(&program);
 

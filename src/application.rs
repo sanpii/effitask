@@ -58,11 +58,10 @@ impl Widget
     {
         let mut stylesheet = "style_light.css";
 
-        match ::gtk::Settings::get_default() {
-            Some(setting) => if setting.get_property_gtk_application_prefer_dark_theme() {
+        if let Some(setting) = ::gtk::Settings::get_default() {
+            if setting.get_property_gtk_application_prefer_dark_theme() {
                 stylesheet = "style_dark.css";
             }
-            None => (),
         }
 
         self.model.xdg.find_data_file(stylesheet)

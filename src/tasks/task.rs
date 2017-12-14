@@ -94,7 +94,7 @@ impl ::std::fmt::Display for Task
         f.write_str(format!("{}", self.deref()).as_str())?;
 
         let note = format!(" {}", self.note);
-        if note != String::from(" ") {
+        if note.as_str() != " " {
             f.write_str(note.as_str())?;
         }
 
@@ -127,6 +127,6 @@ impl ::std::cmp::Ord for Task
             return self.inner.subject.cmp(&other.inner.subject);
         }
 
-        return ::std::cmp::Ordering::Equal;
+        ::std::cmp::Ordering::Equal
     }
 }

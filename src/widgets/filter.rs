@@ -70,14 +70,14 @@ impl Filter
         let progress = (done as f32 / total as f32) * 100.;
         let f = filter.clone();
 
-        let mut levels: Vec<_> = f.split("-")
+        let mut levels: Vec<_> = f.split('-')
             .collect();
         let title = levels.pop()
             .unwrap();
 
         let parent = levels.join("-");
 
-        if parent.len() > 0 && root.get(&parent).is_none() {
+        if !parent.is_empty() && root.get(&parent).is_none() {
             self.append(root, (parent.clone(), (0, 0)));
         }
 
@@ -104,7 +104,7 @@ impl Filter
             .unwrap();
 
         let start = path;
-        let start_iter = model.get_iter(&path)
+        let start_iter = model.get_iter(path)
             .unwrap();
 
         let n_child = model.iter_n_children(Some(&start_iter));

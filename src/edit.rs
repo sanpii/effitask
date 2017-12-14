@@ -29,19 +29,19 @@ pub enum DateType {
 
 impl Widget
 {
-    fn set_task(&mut self, task: ::tasks::Task)
+    fn set_task(&mut self, task: &::tasks::Task)
     {
         self.model.task = task.clone();
 
         self.subject.set_text(task.subject.as_str());
-        self.priority.set_value(task.priority as f64);
+        self.priority.set_value(f64::from(task.priority));
         self.due.emit(::widgets::calendar::Msg::Set(task.due_date));
         self.threshold.emit(::widgets::calendar::Msg::Set(task.threshold_date));
         self.finish.emit(::widgets::calendar::Msg::Set(task.finish_date));
         self.keywords.emit(::widgets::keywords::Msg::Set(task.tags.clone()));
 
         let note = task.note.content()
-            .unwrap_or(String::new());
+            .unwrap_or_default();
         let buffer = self.note.get_buffer()
             .unwrap();
         buffer.set_text(note.as_str());
@@ -56,7 +56,7 @@ impl Widget
 
         let new_note = self.get_note();
         task.note = match task.note {
-            ::tasks::Note::Long { filename, content: _ } => ::tasks::Note::Long {
+            ::tasks::Note::Long { filename, .. } => ::tasks::Note::Long {
                 filename,
                 content: new_note.clone()
             },
@@ -81,7 +81,7 @@ impl Widget
         let end = buffer.get_end_iter();
 
         buffer.get_text(&start, &end, false)
-            .unwrap_or(String::new())
+            .unwrap_or_default()
     }
 
     fn edit_keywords(&mut self, keywords: &::std::collections::BTreeMap<String, String>)
@@ -94,10 +94,10 @@ impl Widget
         use self::DateType::*;
 
         match *date_type {
-            Due => self.model.task.due_date = date.clone(),
-            Threshold => self.model.task.threshold_date = date.clone(),
+            Due => self.model.task.due_date = *date,
+            Threshold => self.model.task.threshold_date = *date,
             Finish => {
-                self.model.task.finish_date = date.clone();
+                self.model.task.finish_date = *date;
                 self.model.task.finished = date.is_some();
             },
         }
@@ -135,7 +135,7 @@ impl ::relm::Widget for Widget
             Done(_) => (),
             EditKeyword(ref keywords) => self.edit_keywords(keywords),
             Ok => self.model.relm.stream().emit(Msg::Done(self.get_task())),
-            Set(task) => self.set_task(task),
+            Set(task) => self.set_task(&task),
             UpdateDate(ref date_type, ref date) => self.update_date(date_type, &date),
             UpdatePriority => self.update_priority(),
         }

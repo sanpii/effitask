@@ -65,9 +65,9 @@ impl Keywords
         }
     }
 
-    fn edit(&mut self, column: Column, path: &::gtk::TreePath, new_text: &String)
+    fn edit(&mut self, column: Column, path: &::gtk::TreePath, new_text: &str)
     {
-        let iter = self.model.store.get_iter(&path)
+        let iter = self.model.store.get_iter(path)
             .unwrap();
 
         self.model.store.set_value(&iter, column.into(), &new_text.to_value());
@@ -105,11 +105,11 @@ impl Keywords
         keywords
     }
 
-    fn set(&mut self, keywords: ::std::collections::BTreeMap<String, String>)
+    fn set(&mut self, keywords: &::std::collections::BTreeMap<String, String>)
     {
         self.model.store.clear();
 
-        for (name, value) in keywords.iter() {
+        for (name, value) in keywords {
             let row = self.model.store.append();
             self.model.store.set_value(&row, Column::Name.into(), &name.to_value());
             self.model.store.set_value(&row, Column::Value.into(), &value.to_value());
@@ -168,7 +168,7 @@ impl ::relm::Widget for Keywords
             Add => self.add(),
             Delete => self.delete(),
             Edit(ref column, ref path, ref new_text) => self.edit(column.clone(), path, new_text),
-            Set(keywords) => self.set(keywords),
+            Set(keywords) => self.set(&keywords),
             Updated(_) => (),
         }
     }

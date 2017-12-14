@@ -16,7 +16,7 @@ impl List
         }
     }
 
-    pub fn from_files(todo: &String, done: &String) -> Self
+    pub fn from_files(todo: &str, done: &str) -> Self
     {
         let mut list = Self::new();
 
@@ -26,23 +26,23 @@ impl List
         list
     }
 
-    fn load_todo(&mut self, todo: &String)
+    fn load_todo(&mut self, todo: &str)
     {
         let tasks = self.load_file(todo);
 
-        self.todo = todo.clone();
+        self.todo = todo.to_string();
         self.tasks.extend(tasks);
     }
 
-    fn load_done(&mut self, done: &String)
+    fn load_done(&mut self, done: &str)
     {
         let tasks = self.load_file(done);
 
-        self.done = done.clone();
+        self.done = done.to_string();
         self.tasks.extend(tasks);
     }
 
-    fn load_file(&self, path: &String) -> Vec<::tasks::Task>
+    fn load_file(&self, path: &str) -> Vec<::tasks::Task>
     {
         use std::io::BufRead;
         use std::str::FromStr;
@@ -114,24 +114,24 @@ impl List
     {
         let todo = self.tasks.iter()
             .filter(|x| !x.finished)
-            .map(|x| x.clone())
+            .cloned()
             .collect();
         self.write_tasks(&self.todo, todo)?;
 
         let done = self.tasks.iter()
             .filter(|x| x.finished)
-            .map(|x| x.clone())
+            .cloned()
             .collect();
         self.write_tasks(&self.done, done)?;
 
         Ok(())
     }
 
-    fn write_tasks(&self, file: &String, tasks: Vec<::tasks::Task>) -> Result<(), String>
+    fn write_tasks(&self, file: &str, tasks: Vec<::tasks::Task>) -> Result<(), String>
     {
         use std::io::Write;
 
-        self.backup(&file)?;
+        self.backup(file)?;
 
         let mut f = match ::std::fs::File::create(file) {
             Ok(f) => f,
@@ -150,7 +150,7 @@ impl List
         Ok(())
     }
 
-    fn backup(&self, file: &String) -> Result<(), String>
+    fn backup(&self, file: &str) -> Result<(), String>
     {
         let bak = format!("{}.bak", file);
 
@@ -160,11 +160,11 @@ impl List
         }
     }
 
-    pub fn add(&mut self, text: &String) -> Result<(), String>
+    pub fn add(&mut self, text: &str) -> Result<(), String>
     {
         use std::str::FromStr;
 
-        let task = match ::tasks::Task::from_str(text.as_str()) {
+        let task = match ::tasks::Task::from_str(text) {
             Ok(task) => task,
             Err(_) => return Err(format!("Unable to convert task: '{}'", text)),
         };

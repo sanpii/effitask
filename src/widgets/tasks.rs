@@ -17,7 +17,7 @@ pub struct Model {
 
 impl Tasks
 {
-    fn update_tasks(&mut self, tasks: Vec<::tasks::Task>)
+    fn update_tasks(&mut self, tasks: &[::tasks::Task])
     {
         self.clear();
 
@@ -29,11 +29,11 @@ impl Tasks
             self.list_box.show();
             self.label.hide();
 
-            let mut sorted_tasks = tasks.clone();
+            let mut sorted_tasks = tasks.to_owned();
             sorted_tasks.sort();
             sorted_tasks.reverse();
 
-            for task in sorted_tasks.iter() {
+            for task in &sorted_tasks {
                 let child = self.list_box.add_widget::<super::Task, _>(&self.model.relm, task.clone());
                 connect!(child@::widgets::task::Msg::Complete(ref task), self.model.relm, Msg::Complete(task.clone()));
                 connect!(child@::widgets::task::Msg::Edit(ref task), self.model.relm, Msg::Edit(task.clone()));
@@ -70,7 +70,7 @@ impl ::relm::Widget for Tasks
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(tasks) => self.update_tasks(tasks),
+            Update(tasks) => self.update_tasks(&tasks),
         }
     }
 

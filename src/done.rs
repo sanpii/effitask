@@ -10,11 +10,11 @@ pub enum Msg {
 
 impl Widget
 {
-    fn update_tasks(&mut self, list: ::tasks::List)
+    fn update_tasks(&mut self, list: &::tasks::List)
     {
         let tasks = list.tasks.iter()
             .filter(|x| x.finished)
-            .map(|x| x.clone())
+            .cloned()
             .collect();
 
         self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
@@ -35,7 +35,7 @@ impl ::relm::Widget for Widget
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(list) => self.update_tasks(list),
+            Update(list) => self.update_tasks(&list),
         }
     }
 

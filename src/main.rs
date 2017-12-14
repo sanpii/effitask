@@ -1,6 +1,9 @@
 #![feature(proc_macro)]
 #![feature(slice_concat_ext)]
 
+#![cfg_attr(feature="clippy", feature(plugin))]
+#![cfg_attr(feature="clippy", plugin(clippy))]
+
 extern crate chrono;
 extern crate env_logger;
 #[macro_use]

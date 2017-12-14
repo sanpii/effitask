@@ -18,3 +18,7 @@ xdg = "^2.1"
 [dependencies.gtk]
 version = "0.3"
 features = ["v3_22"]
+
+[dependencies.clippy]
+version = "*"
+optional = true

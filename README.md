@@ -17,7 +17,8 @@ format](https://github.com/todotxt/todo.txt).
 ```
 git clone https://github.com/sanpii/effitask
 cd effitask
-cargo build --release
+make
+sudo make install
 ```
 
 ## Launch

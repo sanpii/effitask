@@ -16,7 +16,7 @@ impl Task
         }
     }
 
-    fn get_note(task: &::todo_txt::Task) -> super::Note
+    fn note(task: &::todo_txt::Task) -> super::Note
     {
         let tag = match ::std::env::var("TODO_NOTE_TAG") {
             Ok(tag) => tag,
@@ -56,7 +56,7 @@ impl ::std::str::FromStr for Task
     {
         let mut task = ::todo_txt::Task::from_str(s)?;
 
-        let note = Self::get_note(&task);
+        let note = Self::note(&task);
         task.tags.remove(&"note".to_owned());
 
         Ok(Self {

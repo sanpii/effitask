@@ -127,48 +127,63 @@ impl ::relm::Widget for Task
         gtk::EventBox {
             button_press_event(_, event) => (Msg::Click(event.clone()), ::gtk::Inhibit(false)),
             gtk::Box {
-                orientation: ::gtk::Orientation::Vertical,
+                orientation: ::gtk::Orientation::Horizontal,
+                spacing: 5,
                 gtk::Box {
-                    spacing: 5,
-                    orientation: ::gtk::Orientation::Horizontal,
-                    gtk::CheckButton {
-                        active: self.model.task.finished,
-                        toggled => Msg::Toggle,
+                    orientation: ::gtk::Orientation::Vertical,
+                    packing: {
+                        expand: true,
+                        fill: true,
                     },
-                    gtk::Label {
-                        packing: {
-                            expand: true,
-                            fill: true,
+                    gtk::Box {
+                        spacing: 5,
+                        orientation: ::gtk::Orientation::Horizontal,
+                        gtk::CheckButton {
+                            active: self.model.task.finished,
+                            toggled => Msg::Toggle,
                         },
-                        markup: self.model.task.markup_subject().as_str(),
-                        xalign: 0.,
+                        gtk::Label {
+                            packing: {
+                                expand: true,
+                                fill: true,
+                            },
+                            markup: self.model.task.markup_subject().as_str(),
+                            xalign: 0.,
+                        },
                     },
-                    #[name="note_button"]
-                    gtk::Button {
-                        image: &::gtk::Image::new_from_icon_name("text-x-generic", ::gtk::IconSize::LargeToolbar.into()),
-                        clicked => Msg::ShowNote,
+                    gtk::Box {
+                        spacing: 5,
+                        orientation: ::gtk::Orientation::Horizontal,
+                        #[name="note_button"]
+                        gtk::Button {
+                            image: &::gtk::Image::new_from_icon_name("text-x-generic", ::gtk::IconSize::LargeToolbar.into()),
+                            clicked => Msg::ShowNote,
+                        },
+                        #[name="keywords"]
+                        gtk::Box {
+                            gtk::Image {
+                                property_icon_name: Some("mail-attachment"),
+                            },
+                            #[name="keywords_label"]
+                            gtk::Label {
+                            },
+                        },
+                        #[name="date"]
+                        gtk::Box {
+                            packing: {
+                                pack_type: ::gtk::PackType::End,
+                            },
+                            #[name="date_label"]
+                            gtk::Label {
+                            },
+                        },
                     },
                 },
-                gtk::Box {
-                    spacing: 5,
-                    orientation: ::gtk::Orientation::Horizontal,
-                    #[name="keywords"]
-                    gtk::Box {
-                        gtk::Image {
-                            property_icon_name: Some("mail-attachment"),
-                        },
-                        #[name="keywords_label"]
-                        gtk::Label {
-                        },
-                    },
-                    #[name="date"]
-                    gtk::Box {
-                        packing: {
-                            pack_type: ::gtk::PackType::End,
-                        },
-                        #[name="date_label"]
-                        gtk::Label {
-                        },
+                #[name="circle"]
+                ::widgets::Circle(self.model.task.clone()) {
+                    packing: {
+                        expand: false,
+                        fill: true,
                     },
                 },
             },

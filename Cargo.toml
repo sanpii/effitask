@@ -4,8 +4,10 @@ version = "0.1.0"
 authors = ["Sanpi <sanpi@homecomputing.fr>"]
 
 [dependencies]
+cairo-rs = "^0.3"
 chrono = "^0.4"
 gdk = "^0.7"
+gdk-sys = "^0.5"
 glib = "^0.4"
 log = "^0.3"
 rand = "^0.3"

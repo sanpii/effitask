@@ -1,4 +1,5 @@
 pub mod calendar;
+pub mod circle;
 pub mod filter;
 pub mod keywords;
 pub mod task;
@@ -6,6 +7,7 @@ pub mod tasks;
 pub mod tags;
 
 pub use self::calendar::Calendar;
+pub use self::circle::Circle;
 pub use self::filter::Filter;
 pub use self::keywords::Keywords;
 pub use self::task::Task;

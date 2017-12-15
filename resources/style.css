@@ -22,3 +22,15 @@ treeview, .task {
 .finished label {
     text-decoration: line-through;
 }
+
+.due {
+    font-size: 15px;
+    background-color: #FFC933;
+    color: black;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.due.past {
+    background-color: #F26177;
+}

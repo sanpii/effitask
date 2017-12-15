@@ -62,14 +62,21 @@ impl ::relm::Widget for Task
         }
 
         if let Some(due) = task.due_date {
+            use gtk::StyleContextExt;
+
+            let context = self.date_label.get_style_context()
+                .unwrap();
             let today = ::chrono::Local::now()
                 .date()
                 .naive_local();
+
+            context.add_class("due");
 
             let date = if due == today {
                 String::from("today")
             }
             else if due == today.pred() {
+                context.add_class("past");
                 String::from("yesterday")
             }
             else if due == today.succ() {

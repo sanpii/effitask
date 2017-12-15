@@ -143,72 +143,74 @@ impl ::relm::Widget for Widget
 
     view!
     {
-        gtk::Box {
-            orientation: ::gtk::Orientation::Vertical,
-            spacing: 10,
-            gtk::Frame {
-                label: "Subject",
-                #[name="subject"]
-                gtk::Entry {
+        gtk::ScrolledWindow {
+            gtk::Box {
+                orientation: ::gtk::Orientation::Vertical,
+                spacing: 10,
+                gtk::Frame {
+                    label: "Subject",
+                    #[name="subject"]
+                    gtk::Entry {
+                    },
                 },
-            },
-            gtk::Frame {
-                label: "Priority",
-                #[name="priority"]
-                gtk::SpinButton {
-                    focus_out_event(_, _) => (Msg::UpdatePriority, ::gtk::Inhibit(false)),
+                gtk::Frame {
+                    label: "Priority",
+                    #[name="priority"]
+                    gtk::SpinButton {
+                        focus_out_event(_, _) => (Msg::UpdatePriority, ::gtk::Inhibit(false)),
+                    },
                 },
-            },
-            gtk::Frame {
-                label: "Date",
-                gtk::Box {
-                    orientation: ::gtk::Orientation::Horizontal,
+                gtk::Frame {
+                    label: "Date",
                     gtk::Box {
-                        orientation: ::gtk::Orientation::Vertical,
-                        #[name="threshold"]
-                        ::widgets::Calendar("Defer until".to_owned()) {
-                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Threshold, date),
+                        orientation: ::gtk::Orientation::Horizontal,
+                        gtk::Box {
+                            orientation: ::gtk::Orientation::Vertical,
+                            #[name="threshold"]
+                            ::widgets::Calendar("Defer until".to_owned()) {
+                                CalendarUpdated(date) => Msg::UpdateDate(DateType::Threshold, date),
+                            },
+                            #[name="due"]
+                            ::widgets::Calendar("Due".to_owned()) {
+                                CalendarUpdated(date) => Msg::UpdateDate(DateType::Due, date),
+                            },
+                            #[name="finish"]
+                            ::widgets::Calendar("Completed".to_owned()) {
+                                CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
+                            },
                         },
-                        #[name="due"]
-                        ::widgets::Calendar("Due".to_owned()) {
-                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Due, date),
+                    },
+                },
+                gtk::Frame {
+                    label: "Keywords",
+                    #[name="keywords"]
+                    ::widgets::Keywords {
+                        KeywordsUpdated(ref keywords) => Msg::EditKeyword(keywords.clone()),
+                    },
+                },
+                gtk::Frame {
+                    label: "Note",
+                    #[name="note"]
+                    gtk::TextView {
+                    },
+                },
+                gtk::ActionBar {
+                    packing: {
+                        pack_type: ::gtk::PackType::End,
+                    },
+                    gtk::ButtonBox {
+                        orientation: ::gtk::Orientation::Horizontal,
+                        gtk::Button {
+                            label: "Ok",
+                            clicked => Msg::Ok,
                         },
-                        #[name="finish"]
-                        ::widgets::Calendar("Completed".to_owned()) {
-                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
+                        gtk::Button {
+                            label: "Cancel",
+                            clicked => Msg::Cancel,
                         },
                     },
                 },
             },
-            gtk::Frame {
-                label: "Keywords",
-                #[name="keywords"]
-                ::widgets::Keywords {
-                    KeywordsUpdated(ref keywords) => Msg::EditKeyword(keywords.clone()),
-                },
-            },
-            gtk::Frame {
-                label: "Note",
-                #[name="note"]
-                gtk::TextView {
-                },
-            },
-            gtk::ActionBar {
-                packing: {
-                    pack_type: ::gtk::PackType::End,
-                },
-                gtk::ButtonBox {
-                    orientation: ::gtk::Orientation::Horizontal,
-                    gtk::Button {
-                        label: "Ok",
-                        clicked => Msg::Ok,
-                    },
-                    gtk::Button {
-                        label: "Cancel",
-                        clicked => Msg::Cancel,
-                    },
-                },
-            },
-        },
+        }
     }
 }

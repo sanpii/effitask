@@ -12,7 +12,7 @@ use inbox::Msg::Edit as InboxEdit;
 use widgets::tags::Msg::Complete as TagsComplete;
 use widgets::tags::Msg::Edit as TagsEdit;
 
-const NAME: &str = "Effitask";
+pub const NAME: &str = "Effitask";
 
 pub struct Model {
     relm: ::relm::Relm<Widget>,
@@ -164,7 +164,12 @@ impl Widget
         }
 
         match list.write() {
-            Ok(_) => (),
+            Ok(_) => if list.tasks[id].finished {
+                info!("Task done");
+            }
+            else {
+                info!("Task undone");
+            },
             Err(err) => error!("Unable to save tasks: {}", err),
         };
 
@@ -191,6 +196,8 @@ impl Widget
             Ok(_) => (),
             Err(err) => error!("Unable to save tasks: {}", err),
         };
+
+        info!("Task updated");
 
         self.update_tasks();
         self.edit.widget().hide();
@@ -291,6 +298,8 @@ impl ::relm::Widget for Widget
                         label: "Add",
                         clicked => Msg::Add,
                     },
+                },
+                ::logger::Widget {
                 },
                 #[name="paned"]
                 gtk::Paned {

@@ -5,10 +5,10 @@
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
 extern crate chrono;
-extern crate env_logger;
 #[macro_use]
 extern crate log;
 extern crate gdk;
+extern crate glib;
 extern crate gtk;
 extern crate rand;
 extern crate regex;
@@ -27,14 +27,12 @@ mod application;
 mod done;
 mod edit;
 mod inbox;
+mod logger;
 mod tasks;
 mod widgets;
 
 fn main()
 {
-    ::env_logger::init()
-        .unwrap();
-
     if ::std::env::args().nth(1) == Some("usage".to_owned()) {
         usage(&::std::env::args().nth(0).unwrap());
 

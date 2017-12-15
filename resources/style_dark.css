@@ -1,10 +1,10 @@
 @import url("style.css");
 
-.pri_a {
+.pri_a, .error {
     background-color: #E64759;
 }
 
-.pri_b {
+.pri_b, .warn {
     background-color: #FF9400;
 }
 
@@ -12,7 +12,7 @@
     background-color: #1997C6;
 }
 
-.pri_d {
+.pri_d, .info {
     background-color: #1BC98E;
 }
 

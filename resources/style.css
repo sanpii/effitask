@@ -2,6 +2,10 @@ calendar *:active {
     color: #3C92CA;
 }
 
+.log label {
+    font-size: 30px;
+}
+
 expander {
     font-size: 30px;
 }

@@ -17,7 +17,12 @@ Supported toto.txt addons:
 * [due](https://github.com/rebeccamorgan/due)
 * [note](https://github.com/mgarrido/todo.txt-cli/tree/note/todo.actions.d)
 
-## Build
+## Install
+
+If you use archlinux, effitask is available in
+[AUR](https://aur.archlinux.org/packages/effitask/).
+
+### Manually
 
 ```
 git clone https://github.com/sanpii/effitask

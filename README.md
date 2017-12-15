@@ -12,6 +12,11 @@ format](https://github.com/todotxt/todo.txt).
 [<img title="Done view" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/done.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/done.png)
 [<img title="Light theme" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/theme-light.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/theme-light.png)
 
+Supported toto.txt addons:
+
+* [due](https://github.com/rebeccamorgan/due)
+* [note](https://github.com/mgarrido/todo.txt-cli/tree/note/todo.actions.d)
+
 ## Build
 
 ```

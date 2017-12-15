@@ -18,11 +18,19 @@ impl Task
 
     pub fn markup_subject(&self) -> String
     {
+        let mut subject = self.subject.clone();
+
         let regex = ::regex::Regex::new("(?P<url>[\\w]+://[^\\s]+)")
             .unwrap();
+        subject = regex.replace_all(&subject, "<a href=\"$url\">$url</a>")
+            .into_owned();
 
-        regex.replace(&self.subject, "<a href=\"$url\">$url</a>")
-            .into_owned()
+        let regex = ::regex::Regex::new("(?P<space>^|[\\s])(?P<tag>[\\+@][\\w-]+)")
+            .unwrap();
+        subject = regex.replace_all(&subject, "$space<span color=\"#3C92CA\">$tag</span>")
+            .into_owned();
+
+        subject
     }
 
     fn note(task: &::todo_txt::Task) -> super::Note

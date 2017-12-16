@@ -17,6 +17,27 @@ Supported toto.txt addons:
 * [due](https://github.com/rebeccamorgan/due)
 * [note](https://github.com/mgarrido/todo.txt-cli/tree/note/todo.actions.d)
 
+## Hidden features
+
+I tried to develop a clear interface without surprises, but you can easily
+miss some feature:
+
+* Double click on a feature, *everywhere*, open the edit pannel;
+* You can create sub-projects (or sub-contexts) by adding a dash. For example,
+  the projet `+work-admin-automation` create this arborescence:
+
+```
+work
+└── admin
+    └── automation
+```
+
+* Double click on a project/context select all there sub-projects/contexts,
+  therefore show their tasks;
+* The project/context tooltip (keep your mouse pointer on the name) display done
+  tasks and total tasks number, including sub-projects/contexts (also showed as
+  progress bar).
+
 ## Install
 
 If you use archlinux, effitask is available in

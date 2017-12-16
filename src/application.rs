@@ -9,10 +9,48 @@ use done::Msg::Edit as DoneEdit;
 use edit::Msg::{Cancel, Done};
 use inbox::Msg::Complete as InboxComplete;
 use inbox::Msg::Edit as InboxEdit;
+use search::Msg::Complete as SearchComplete;
+use search::Msg::Edit as SearchEdit;
 use widgets::tags::Msg::Complete as TagsComplete;
 use widgets::tags::Msg::Edit as TagsEdit;
 
 pub const NAME: &str = "Effitask";
+
+#[repr(u32)]
+enum Page {
+    Inbox = 0,
+    Projects,
+    Contexts,
+    Agenda,
+    Done,
+    Search,
+}
+
+impl ::std::convert::From<u32> for Page
+{
+    fn from(n: u32) -> Self
+    {
+        match n {
+            0 => Page::Inbox,
+            1 => Page::Projects,
+            2 => Page::Contexts,
+            3 => Page::Agenda,
+            4 => Page::Done,
+            5 => Page::Search,
+            _ => panic!("Invalid page {}", n),
+        }
+    }
+}
+
+impl ::std::convert::Into<i32> for Page
+{
+    fn into(self) -> i32
+    {
+        unsafe {
+            ::std::mem::transmute(self)
+        }
+    }
+}
 
 pub struct Model {
     relm: ::relm::Relm<Widget>,
@@ -31,6 +69,7 @@ pub enum Msg {
     EditCancel,
     EditDone(::tasks::Task),
     Refresh,
+    Search(String),
     Show,
     SwitchPage,
     Quit,
@@ -103,17 +142,13 @@ impl Widget
     fn get_tab_widget(&self, n: u32) -> ::gtk::Box
     {
         let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
-        let title = match n {
-            0 => "inbox",
-            1 => "projects",
-            2 => "contexts",
-            3 => "agenda",
-            4 => "done",
-            _ => {
-                error!("Invalid tab n°{}", n);
-
-                ""
-            },
+        let title = match n.into() {
+            Page::Inbox => "inbox",
+            Page::Projects => "projects",
+            Page::Contexts => "contexts",
+            Page::Agenda => "agenda",
+            Page::Done => "done",
+            Page::Search => "search",
         };
 
         if let Some(filename) = self.model.xdg.find_data_file(format!("{}.png", title).as_str()) {
@@ -203,6 +238,20 @@ impl Widget
         self.edit.widget().hide();
     }
 
+    fn search(&self, text: &str)
+    {
+        if text.is_empty() {
+            self.notebook.set_property_page(Page::Inbox.into());
+            self.search.widget().hide();
+        }
+        else {
+            self.search.widget().show();
+            self.notebook.set_property_page(Page::Search.into());
+        }
+
+        self.search.emit(::search::Msg::UpdateFilter(text.to_string()));
+    }
+
     fn update_tasks(&mut self)
     {
         let todo_file = match ::std::env::var("TODO_FILE") {
@@ -222,6 +271,7 @@ impl Widget
         self.contexts.emit(::widgets::tags::Msg::Update(list.clone()));
         self.agenda.emit(::agenda::Msg::Update(list.clone()));
         self.done.emit(::done::Msg::Update(list.clone()));
+        self.search.emit(::search::Msg::Update(list.clone()));
 
         self.model.list = list;
     }
@@ -239,6 +289,8 @@ impl ::relm::Widget for Widget
     fn init_view(&mut self)
     {
         self.edit.widget()
+            .hide();
+        self.search.widget()
             .hide();
 
         self.load_style();
@@ -271,6 +323,7 @@ impl ::relm::Widget for Widget
             EditDone(task) => self.save(&task),
             EditCancel => self.edit.widget().hide(),
             Refresh => self.update_tasks(),
+            Search(text) => self.search(&text),
             Show => self.on_show(),
             SwitchPage => self.edit.widget().hide(),
             Quit => ::gtk::main_quit(),
@@ -297,6 +350,12 @@ impl ::relm::Widget for Widget
                         icon_name: "list-add",
                         label: "Add",
                         clicked => Msg::Add,
+                    },
+                    gtk::SearchEntry {
+                        packing: {
+                            pack_type: ::gtk::PackType::End,
+                        },
+                        search_changed(entry) => Msg::Search(entry.get_text().unwrap().to_string()),
                     },
                 },
                 ::logger::Widget {
@@ -336,6 +395,11 @@ impl ::relm::Widget for Widget
                         ::done::Widget {
                             DoneComplete(ref task) => Msg::Complete(task.clone()),
                             DoneEdit(ref task) => Msg::Edit(task.clone()),
+                        },
+                        #[name="search"]
+                        ::search::Widget {
+                            SearchComplete(ref task) => Msg::Complete(task.clone()),
+                            SearchEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         switch_page(_, _, _) => Msg::SwitchPage,
                     },

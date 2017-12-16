@@ -30,6 +30,7 @@ mod done;
 mod edit;
 mod inbox;
 mod logger;
+mod search;
 mod tasks;
 mod widgets;
 

@@ -15,7 +15,11 @@ impl Circle
         let task = &self.model;
         let center = self.center();
 
-        if let Some(due_date) = task.due_date {
+        if task.finished || task.due_date.is_none() {
+            context.set_source_rgb(0.8, 0.8, 0.8);
+        }
+        else {
+            let due_date = task.due_date.unwrap();
             let today = ::chrono::Local::now()
                 .date()
                 .naive_local();
@@ -26,9 +30,6 @@ impl Circle
             else {
                 context.set_source_rgb(1., 0.8, 0.2);
             }
-        }
-        else {
-            context.set_source_rgb(0.8, 0.8, 0.8);
         }
 
         context.set_line_width(8.);

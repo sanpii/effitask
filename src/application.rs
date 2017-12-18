@@ -70,7 +70,6 @@ pub enum Msg {
     EditDone(::tasks::Task),
     Refresh,
     Search(String),
-    Show,
     SwitchPage,
     Quit,
 }
@@ -275,12 +274,6 @@ impl Widget
 
         self.model.list = list;
     }
-
-    fn on_show(&self)
-    {
-        let width = self.window.get_allocated_width();
-        self.paned.set_position(width - 400);
-    }
 }
 
 #[widget]
@@ -324,7 +317,6 @@ impl ::relm::Widget for Widget
             EditCancel => self.edit.widget().hide(),
             Refresh => self.update_tasks(),
             Search(text) => self.search(&text),
-            Show => self.on_show(),
             SwitchPage => self.edit.widget().hide(),
             Quit => ::gtk::main_quit(),
         }
@@ -410,7 +402,6 @@ impl ::relm::Widget for Widget
                     },
                 },
             },
-            size_allocate(_, _) => Msg::Show,
             delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),
         }
     }

@@ -80,13 +80,19 @@ impl List
 
     pub fn projects(&self) -> Vec<String>
     {
-        let mut projects = self.tasks.iter().fold(Vec::new(), |mut acc, item| {
-            let mut projects = item.projects.clone();
+        let today = ::chrono::Local::now()
+            .date()
+            .naive_local();
 
-            acc.append(&mut projects);
+        let mut projects = self.tasks.iter()
+            .filter(|x| !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today))
+            .fold(Vec::new(), |mut acc, item| {
+                let mut projects = item.projects.clone();
 
-            acc
-        });
+                acc.append(&mut projects);
+
+                acc
+            });
 
         projects.sort();
         projects.dedup();
@@ -96,13 +102,19 @@ impl List
 
     pub fn contexts(&self) -> Vec<String>
     {
-        let mut contexts = self.tasks.iter().fold(Vec::new(), |mut acc, item| {
-            let mut contexts = item.contexts.clone();
+        let today = ::chrono::Local::now()
+            .date()
+            .naive_local();
 
-            acc.append(&mut contexts);
+        let mut contexts = self.tasks.iter()
+            .filter(|x| !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today))
+            .fold(Vec::new(), |mut acc, item| {
+                let mut contexts = item.contexts.clone();
 
-            acc
-        });
+                acc.append(&mut contexts);
+
+                acc
+            });
 
         contexts.sort();
         contexts.dedup();

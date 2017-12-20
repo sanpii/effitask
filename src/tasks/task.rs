@@ -27,7 +27,7 @@ impl Task
 
         let regex = ::regex::Regex::new("(?P<space>^|[\\s])(?P<tag>[\\+@][\\w-]+)")
             .unwrap();
-        subject = regex.replace_all(&subject, "$space<span color=\"#3C92CA\">$tag</span>")
+        subject = regex.replace_all(&subject, "$space<b>$tag</b>")
             .into_owned();
 
         subject

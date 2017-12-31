@@ -2,7 +2,7 @@ use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
-type ChannelData = (::log::LogLevel, String);
+type ChannelData = (::log::Level, String);
 type Sender = ::std::sync::mpsc::Sender<ChannelData>;
 type Receiver = ::std::sync::mpsc::Receiver<ChannelData>;
 
@@ -27,18 +27,22 @@ impl Log
 
 impl ::log::Log for Log
 {
-    fn enabled(&self, metadata: &::log::LogMetadata) -> bool
+    fn enabled(&self, metadata: &::log::Metadata) -> bool
     {
         metadata.target() == ::application::NAME
-            && metadata.level() >= ::log::LogLevel::Info
+            && metadata.level() >= ::log::Level::Info
     }
 
-    fn log(&self, record: &::log::LogRecord)
+    fn log(&self, record: &::log::Record)
     {
         if let Ok(tx) = self.tx.lock() {
             tx.send((record.level(), format!("{}", record.args())))
                 .unwrap_or_default();
         }
+    }
+
+    fn flush(&self)
+    {
     }
 }
 
@@ -51,13 +55,10 @@ impl Widget
     fn init(&self)
     {
         let (tx, rx) = ::std::sync::mpsc::channel();
+        let log = Log::new(tx);
 
-        ::log::set_logger(|maxlevel| {
-            let log = Log::new(tx);
-            maxlevel.set(::log::LogLevelFilter::Info);
-
-            Box::new(log)
-        }).unwrap_or_default();
+        ::log::set_boxed_logger(Box::new(log))
+            .unwrap_or_default();
 
         let revealer = ::gtk::Revealer::new();
         revealer.set_border_width(10);
@@ -98,7 +99,7 @@ impl Widget
         ::glib::Continue(false)
     }
 
-    fn add_message(revealer: &::gtk::Revealer, level: ::log::LogLevel, text: &str)
+    fn add_message(revealer: &::gtk::Revealer, level: ::log::Level, text: &str)
     {
         use gtk::StyleContextExt;
 

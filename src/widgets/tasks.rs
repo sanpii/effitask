@@ -76,22 +76,24 @@ impl ::relm::Widget for Tasks
 
     view!
     {
-        gtk::Box {
-            #[name="list_box"]
-            gtk::ListBox {
-                padding: {
-                    fill: true,
-                    expand: true,
+        gtk::ScrolledWindow {
+            gtk::Box {
+                #[name="list_box"]
+                gtk::ListBox {
+                    padding: {
+                        fill: true,
+                        expand: true,
+                    },
                 },
-            },
-            #[name="label"]
-            gtk::Label {
-                padding: {
-                    fill: true,
-                    expand: true,
+                #[name="label"]
+                gtk::Label {
+                    padding: {
+                        fill: true,
+                        expand: true,
+                    },
+                    text: "Nothing to do :)",
                 },
-                text: "Nothing to do :)",
-            },
+            }
         }
     }
 }

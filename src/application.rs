@@ -102,7 +102,12 @@ impl Widget
     {
         let mut stylesheet = "style_light.css";
 
-        if let Some(setting) = ::gtk::Settings::get_default() {
+        if let Ok(theme) = ::std::env::var("GTK_THEME") {
+            if theme.ends_with(":dark") {
+                stylesheet = "style_dark.css";
+            }
+        }
+        else if let Some(setting) = ::gtk::Settings::get_default() {
             if setting.get_property_gtk_application_prefer_dark_theme() {
                 stylesheet = "style_dark.css";
             }

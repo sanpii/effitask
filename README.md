@@ -16,6 +16,7 @@ Supported toto.txt addons:
 
 * [due](https://github.com/rebeccamorgan/due)
 * [note](https://github.com/mgarrido/todo.txt-cli/tree/note/todo.actions.d)
+* [schedule](https://github.com/FND/todo.txt-cli/blob/extensions/schedule)
 
 ## Hidden features
 

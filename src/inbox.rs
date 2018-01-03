@@ -5,12 +5,12 @@ use widgets::tasks::Msg::{Complete, Edit};
 pub enum Msg {
     Complete(::tasks::Task),
     Edit(::tasks::Task),
-    Update(::tasks::List),
+    Update(::tasks::List, bool, bool),
 }
 
 impl Widget
 {
-    fn update_tasks(&self, list: &::tasks::List)
+    fn update_tasks(&self, list: &::tasks::List, defered: bool, _: bool)
     {
         let today = ::chrono::Local::now()
             .date()
@@ -20,7 +20,7 @@ impl Widget
             .filter(|x| {
                 !x.finished
                     && x.projects.is_empty()
-                    && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
+                    && (defered || x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
             .cloned()
             .collect();
@@ -43,7 +43,7 @@ impl ::relm::Widget for Widget
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(list) => self.update_tasks(&list),
+            Update(list, defered, done) => self.update_tasks(&list, defered, done),
         }
     }
 

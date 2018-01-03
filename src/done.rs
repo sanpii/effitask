@@ -5,12 +5,12 @@ use widgets::tasks::Msg::{Complete, Edit};
 pub enum Msg {
     Complete(::tasks::Task),
     Edit(::tasks::Task),
-    Update(::tasks::List),
+    Update(::tasks::List, bool, bool),
 }
 
 impl Widget
 {
-    fn update_tasks(&mut self, list: &::tasks::List)
+    fn update_tasks(&mut self, list: &::tasks::List, _: bool, _: bool)
     {
         let tasks = list.tasks.iter()
             .filter(|x| x.finished)
@@ -35,7 +35,7 @@ impl ::relm::Widget for Widget
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(list) => self.update_tasks(&list),
+            Update(list, defered, done) => self.update_tasks(&list, defered, done),
         }
     }
 

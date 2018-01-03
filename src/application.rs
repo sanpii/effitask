@@ -55,7 +55,10 @@ impl ::std::convert::Into<i32> for Page
 pub struct Model {
     relm: ::relm::Relm<Widget>,
     list: ::tasks::List,
-    popover: ::gtk::Popover,
+    add_popover: ::gtk::Popover,
+    pref_popover: ::gtk::Popover,
+    defered_button: ::gtk::CheckButton,
+    done_button: ::gtk::CheckButton,
     entry: ::gtk::Entry,
     xdg: ::xdg::BaseDirectories,
 }
@@ -68,6 +71,7 @@ pub enum Msg {
     Edit(::tasks::Task),
     EditCancel,
     EditDone(::tasks::Task),
+    Preferences,
     Refresh,
     Search(String),
     SwitchPage,
@@ -107,7 +111,7 @@ impl Widget
         self.model.xdg.find_data_file(stylesheet)
     }
 
-    fn create_popover(&self)
+    fn init_add_popover(&self)
     {
         let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
 
@@ -120,9 +124,27 @@ impl Widget
 
         vbox.show_all();
 
-        self.model.popover.set_relative_to(&self.add_button);
-        self.model.popover.add(&vbox);
-        self.model.popover.hide();
+        self.model.add_popover.set_relative_to(&self.add_button);
+        self.model.add_popover.add(&vbox);
+        self.model.add_popover.hide();
+    }
+
+    fn init_pref_popover(&self)
+    {
+        let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
+        vbox.show();
+
+        connect!(self.model.relm, self.model.defered_button, connect_toggled(_), Msg::Refresh);
+        vbox.add(&self.model.defered_button);
+        self.model.defered_button.show();
+
+        connect!(self.model.relm, self.model.done_button, connect_toggled(_), Msg::Refresh);
+        vbox.add(&self.model.done_button);
+        self.model.done_button.show();
+
+        self.model.pref_popover.set_relative_to(&self.pref_button);
+        self.model.pref_popover.add(&vbox);
+        self.model.pref_popover.hide();
     }
 
     fn replace_tab_widgets(&self)
@@ -169,7 +191,7 @@ impl Widget
     fn add(&self)
     {
         self.model.entry.set_text("");
-        self.model.popover.popup();
+        self.model.add_popover.popup();
     }
 
     fn create(&mut self, text: Option<String>)
@@ -180,7 +202,7 @@ impl Widget
                 Err(err) => error!("Unable to create task: '{}'", err),
             }
         }
-        self.model.popover.popdown();
+        self.model.add_popover.popdown();
     }
 
     fn complete(&mut self, task: &::tasks::Task)
@@ -264,15 +286,22 @@ impl Widget
         };
 
         let list = ::tasks::List::from_files(&todo_file, &done_file);
+        let defered = self.model.defered_button.get_active();
+        let done = self.model.done_button.get_active();
 
-        self.inbox.emit(::inbox::Msg::Update(list.clone()));
-        self.projects.emit(::widgets::tags::Msg::Update(list.clone()));
-        self.contexts.emit(::widgets::tags::Msg::Update(list.clone()));
-        self.agenda.emit(::agenda::Msg::Update(list.clone()));
-        self.done.emit(::done::Msg::Update(list.clone()));
-        self.search.emit(::search::Msg::Update(list.clone()));
+        self.inbox.emit(::inbox::Msg::Update(list.clone(), defered, done));
+        self.projects.emit(::widgets::tags::Msg::Update(list.clone(), defered, done));
+        self.contexts.emit(::widgets::tags::Msg::Update(list.clone(), defered, done));
+        self.agenda.emit(::agenda::Msg::Update(list.clone(), defered, done));
+        self.done.emit(::done::Msg::Update(list.clone(), defered, done));
+        self.search.emit(::search::Msg::Update(list.clone(), defered, done));
 
         self.model.list = list;
+    }
+
+    fn preferences(&self)
+    {
+        self.model.pref_popover.popup();
     }
 }
 
@@ -287,7 +316,8 @@ impl ::relm::Widget for Widget
             .hide();
 
         self.load_style();
-        self.create_popover();
+        self.init_add_popover();
+        self.init_pref_popover();
         self.replace_tab_widgets();
         self.update_tasks();
     }
@@ -297,7 +327,10 @@ impl ::relm::Widget for Widget
         Model {
             relm: relm.clone(),
             list: ::tasks::List::new(),
-            popover: ::gtk::Popover::new(None::<&::gtk::Button>),
+            add_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
+            pref_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
+            defered_button: ::gtk::CheckButton::new_with_label("Display defered tasks"),
+            done_button: ::gtk::CheckButton::new_with_label("Display done tasks"),
             entry: ::gtk::Entry::new(),
             xdg: ::xdg::BaseDirectories::with_prefix(::application::NAME.to_lowercase())
                 .unwrap(),
@@ -315,6 +348,7 @@ impl ::relm::Widget for Widget
             Edit(task) => self.edit(&task),
             EditDone(task) => self.save(&task),
             EditCancel => self.edit.widget().hide(),
+            Preferences => self.preferences(),
             Refresh => self.update_tasks(),
             Search(text) => self.search(&text),
             SwitchPage => self.edit.widget().hide(),
@@ -342,6 +376,12 @@ impl ::relm::Widget for Widget
                         icon_name: "list-add",
                         label: "Add",
                         clicked => Msg::Add,
+                    },
+                    #[name="pref_button"]
+                    gtk::ToolButton {
+                        icon_name: "preferences-system",
+                        label: "Preferences",
+                        clicked => Msg::Preferences,
                     },
                     gtk::SearchEntry {
                         packing: {

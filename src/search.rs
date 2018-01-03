@@ -5,20 +5,24 @@ use widgets::tasks::Msg::{Complete, Edit};
 pub enum Msg {
     Complete(::tasks::Task),
     Edit(::tasks::Task),
-    Update(::tasks::List),
+    Update(::tasks::List, bool, bool),
     UpdateFilter(String),
 }
 
 pub struct Model {
     list: ::tasks::List,
+    defered: bool,
+    done: bool,
     filter: String,
 }
 
 impl Widget
 {
-    fn update_tasks(&mut self, list: &::tasks::List)
+    fn update_tasks(&mut self, list: &::tasks::List, defered: bool, done: bool)
     {
         self.model.list = list.clone();
+        self.model.defered = defered;
+        self.model.done = done;
         self.update();
     }
 
@@ -49,6 +53,8 @@ impl ::relm::Widget for Widget
         Model {
             list: ::tasks::List::new(),
             filter: String::new(),
+            defered: false,
+            done: false,
         }
     }
 
@@ -59,7 +65,7 @@ impl ::relm::Widget for Widget
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(list) => self.update_tasks(&list),
+            Update(list, defered, done) => self.update_tasks(&list, defered, done),
             UpdateFilter(filter) => self.update_filter(&filter),
         }
     }

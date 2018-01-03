@@ -23,6 +23,8 @@ impl ::relm::Widget for Task
 {
     fn init_view(&mut self)
     {
+        use gtk::StyleContextExt;
+
         let task = &self.model.task;
 
         let context = self.root()
@@ -61,36 +63,70 @@ impl ::relm::Widget for Task
             self.keywords.hide();
         }
 
-        if let Some(due) = task.due_date {
-            use gtk::StyleContextExt;
+        let context = self.date.get_style_context()
+            .unwrap();
+        context.add_class("date");
 
-            let context = self.date_label.get_style_context()
+        if let Some(threshold) = task.threshold_date {
+            let context = self.threshold_label.get_style_context()
                 .unwrap();
+            context.add_class("threshold");
+
+            let date = self.date_alias(threshold);
+            self.threshold_label.set_text(format!("Deferred until {}", date).as_str());
+
+        }
+        else {
+            self.threshold_label.hide();
+        }
+
+        if task.threshold_date.is_some() && task.due_date.is_some() {
+            self.arrow_label.show();
+        }
+        else {
+            self.arrow_label.hide();
+        }
+
+        if let Some(due) = task.due_date {
+            let context = self.due_label.get_style_context()
+                .unwrap();
+            context.add_class("due");
+
+            let date = self.date_alias(due);
+
             let today = ::chrono::Local::now()
                 .date()
                 .naive_local();
 
-            context.add_class("due");
-
-            let date = if due == today {
-                String::from("today")
-            }
-            else if due == today.pred() {
+            if due < today {
                 context.add_class("past");
-                String::from("yesterday")
             }
-            else if due == today.succ() {
-                String::from("tomorrow")
-            }
-            else {
-                due.format("%Y-%m-%d")
-                    .to_string()
-            };
 
-            self.date_label.set_text(format!("due: {}", date).as_str());
+            self.due_label.set_text(format!("due: {}", date).as_str());
         }
         else {
-            self.date.hide();
+            self.due_label.hide();
+        }
+    }
+
+    fn date_alias(&self, date: ::chrono::NaiveDate) -> String
+    {
+        let today = ::chrono::Local::now()
+            .date()
+            .naive_local();
+
+        if date == today {
+            String::from("today")
+        }
+        else if date == today.pred() {
+            String::from("yesterday")
+        }
+        else if date == today.succ() {
+            String::from("tomorrow")
+        }
+        else {
+            date.format("%Y-%m-%d")
+                .to_string()
         }
     }
 
@@ -177,10 +213,18 @@ impl ::relm::Widget for Task
                         },
                         #[name="date"]
                         gtk::Box {
+                            spacing: 5,
                             packing: {
                                 pack_type: ::gtk::PackType::End,
                             },
-                            #[name="date_label"]
+                            #[name="threshold_label"]
+                            gtk::Label {
+                            },
+                            #[name="arrow_label"]
+                            gtk::Label {
+                                text: " ➡ ",
+                            },
+                            #[name="due_label"]
                             gtk::Label {
                             },
                         },

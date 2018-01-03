@@ -23,14 +23,21 @@ treeview, .task {
     text-decoration: line-through;
 }
 
-.due {
+.date {
     font-size: 15px;
+}
+
+.date .threshold {
+    color: gray;
+}
+
+.date .due {
     background-color: #FFC933;
     color: black;
     padding: 5px;
     border-radius: 10px;
 }
 
-.due.past {
+.date .due.past {
     background-color: #F26177;
 }

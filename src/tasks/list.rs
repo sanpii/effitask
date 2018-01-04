@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct List {
     pub tasks: Vec<::tasks::Task>,
     todo: String,
@@ -181,9 +181,12 @@ impl List
             Err(_) => return Err(format!("Unable to convert task: '{}'", text)),
         };
 
-        self.tasks.push(task);
-        self.write()?;
+        self.append(task);
+        self.write()
+    }
 
-        Ok(())
+    pub fn append(&mut self, task: ::tasks::Task)
+    {
+        self.tasks.push(task);
     }
 }

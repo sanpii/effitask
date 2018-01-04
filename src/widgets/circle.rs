@@ -42,6 +42,15 @@ impl Circle
 
         context.stroke();
 
+        if task.recurrence.is_some() {
+            context.set_line_width(2.);
+
+            for dx in &[-12., 0., 12.] {
+                context.arc(center + dx, center, 4., 0., 2. * ::std::f64::consts::PI);
+                context.close_path();
+                context.stroke();
+            }
+        }
     }
 
     fn center(&self) -> f64

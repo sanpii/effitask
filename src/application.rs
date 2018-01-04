@@ -223,6 +223,30 @@ impl Widget
                 t.uncomplete();
             }
         }
+        else {
+            return;
+        }
+
+        let t = list.tasks[id].clone();
+
+        if t.finished {
+            if let Some(ref recurrence) = t.recurrence {
+                let due = if recurrence.strict && t.due_date.is_some() {
+                    t.due_date.unwrap()
+                }
+                else {
+                    ::chrono::Local::now()
+                        .date()
+                        .naive_local()
+                };
+
+                let mut new: ::tasks::Task = t.clone();
+                new.uncomplete();
+                new.due_date = Some(due + recurrence.clone().into());
+                println!("{:?}", new);
+                list.append(new);
+            }
+        }
 
         match list.write() {
             Ok(_) => if list.tasks[id].finished {

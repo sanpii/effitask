@@ -3,6 +3,7 @@ pub struct Task {
     inner: ::todo_txt::Task,
     pub id: usize,
     pub note: super::Note,
+    pub recurrence: Option<super::Recurrence>,
 }
 
 impl Task
@@ -13,6 +14,7 @@ impl Task
             inner: Default::default(),
             id: 0,
             note: super::Note::None,
+            recurrence: None,
         }
     }
 
@@ -76,10 +78,21 @@ impl ::std::str::FromStr for Task
         let note = Self::note(&task);
         task.tags.remove(&"note".to_owned());
 
+        let mut recurrence = None;
+
+        if let Some(rec) = task.tags.get(&"rec".to_owned()) {
+            recurrence = match super::Recurrence::from_str(rec) {
+                Ok(rec) => Some(rec),
+                Err(_) => None,
+            };
+        }
+        task.tags.remove(&"rec".to_owned());
+
         Ok(Self {
             id: 0,
             note: note,
             inner: task,
+            recurrence: recurrence,
         })
     }
 }
@@ -110,9 +123,12 @@ impl ::std::fmt::Display for Task
 
         f.write_str(format!("{}", self.deref()).as_str())?;
 
-        let note = format!(" {}", self.note);
-        if note.as_str() != " " {
-            f.write_str(note.as_str())?;
+        if self.note != ::tasks::Note::None {
+            f.write_str(format!(" {}", self.note).as_str())?;
+        }
+
+        if let Some(ref recurrence) = self.recurrence {
+            f.write_str(format!(" rec:{}", recurrence).as_str())?;
         }
 
         Ok(())

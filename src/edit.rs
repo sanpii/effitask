@@ -3,6 +3,7 @@ use gtk::prelude::*;
 use relm_attributes::widget;
 use widgets::keywords::Msg::Updated as KeywordsUpdated;
 use widgets::calendar::Msg::Updated as CalendarUpdated;
+use widgets::repeat::Msg::Updated as RepeatUpdated;
 
 #[derive(Msg)]
 pub enum Msg {
@@ -12,6 +13,7 @@ pub enum Msg {
     Ok,
     Set(::tasks::Task),
     UpdateDate(DateType, Option<::chrono::NaiveDate>),
+    UpdateRepeat(Option<::tasks::Recurrence>),
     UpdatePriority,
 }
 
@@ -37,6 +39,7 @@ impl Widget
         self.priority.set_value(f64::from(task.priority));
         self.due.emit(::widgets::calendar::Msg::Set(task.due_date));
         self.threshold.emit(::widgets::calendar::Msg::Set(task.threshold_date));
+        self.repeat.emit(::widgets::repeat::Msg::Set(task.recurrence.clone()));
         self.finish.emit(::widgets::calendar::Msg::Set(task.finish_date));
         self.keywords.emit(::widgets::keywords::Msg::Set(task.tags.clone()));
 
@@ -103,6 +106,11 @@ impl Widget
         }
     }
 
+    fn update_repeat(&mut self, recurrence: &Option<::tasks::Recurrence>)
+    {
+        self.model.task.recurrence = recurrence.clone();
+    }
+
     fn update_priority(&mut self)
     {
         self.model.task.priority = self.priority.get_value() as u8;
@@ -137,6 +145,7 @@ impl ::relm::Widget for Widget
             Ok => self.model.relm.stream().emit(Msg::Done(self.get_task())),
             Set(task) => self.set_task(&task),
             UpdateDate(ref date_type, ref date) => self.update_date(date_type, &date),
+            UpdateRepeat(ref recurrence) => self.update_repeat(&recurrence),
             UpdatePriority => self.update_priority(),
         }
     }
@@ -179,6 +188,13 @@ impl ::relm::Widget for Widget
                                 CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
                             },
                         },
+                    },
+                },
+                gtk::Frame {
+                    label: "Repeat",
+                    #[name="repeat"]
+                    ::widgets::Repeat {
+                        RepeatUpdated(ref recurrence) => Msg::UpdateRepeat(recurrence.clone()),
                     },
                 },
                 gtk::Frame {

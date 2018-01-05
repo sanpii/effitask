@@ -169,6 +169,7 @@ impl ::relm::Widget for Widget
                         label: "Past due",
                         #[name="past"]
                         ::widgets::Tasks {
+                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -178,6 +179,7 @@ impl ::relm::Widget for Widget
                         label: "Today",
                         #[name="today"]
                         ::widgets::Tasks {
+                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -187,6 +189,7 @@ impl ::relm::Widget for Widget
                         label: "Tomorrow",
                         #[name="tomorrow"]
                         ::widgets::Tasks {
+                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -196,6 +199,7 @@ impl ::relm::Widget for Widget
                         label: "This week",
                         #[name="week"]
                         ::widgets::Tasks {
+                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -205,6 +209,7 @@ impl ::relm::Widget for Widget
                         label: "This month",
                         #[name="month"]
                         ::widgets::Tasks {
+                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         }

@@ -135,8 +135,8 @@ impl ::relm::Widget for Task
         let note_label = ::gtk::Label::new(None);
         note_label.show();
 
-        if let Some(ref note) = task.note.content() {
-            note_label.set_text(note);
+        if let Some(ref note) = task.note.markup() {
+            note_label.set_markup(note);
         }
 
         let note = ::gtk::Popover::new(None::<&::gtk::Button>);

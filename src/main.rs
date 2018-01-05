@@ -12,6 +12,7 @@ extern crate gdk;
 extern crate gdk_sys;
 extern crate glib;
 extern crate gtk;
+extern crate pulldown_cmark;
 extern crate rand;
 extern crate regex;
 #[macro_use]

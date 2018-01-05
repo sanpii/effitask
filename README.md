@@ -7,9 +7,12 @@ format](https://github.com/todotxt/todo.txt).
 [<img title="Add a task" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/add.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/add.png)
 [<img title="Edit a task" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/edit.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/edit.png)
 [<img title="Projects view" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/projects.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/projects.png)
+[<img title="Note" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/note.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/note.png)
 [<img title="Contexts view" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/contexts.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/contexts.png)
 [<img title="Agenda view" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/agenda.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/agenda.png)
+[<img title="Flag view" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/flag.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/flag.png)
 [<img title="Done view" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/done.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/done.png)
+[<img title="Search view" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/flag.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/search.png)
 [<img title="Light theme" src="https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/theme-light.png" width="200px" />](https://raw.githubusercontent.com/sanpii/effitask/master/screenshots/theme-light.png)
 
 Supported toto.txt addons:

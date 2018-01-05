@@ -11,15 +11,40 @@ pub struct Model {
 
 #[derive(Msg)]
 pub enum Msg {
+    Add(::tasks::Period),
     DateSelected,
     DateUpdated,
+    Sensitive,
     Set(Option<::chrono::NaiveDate>),
-    Updated(Option<::chrono::NaiveDate>),
     ShowCalendar,
+    Updated(Option<::chrono::NaiveDate>),
 }
 
 impl Calendar
 {
+    fn add(&self, period: ::tasks::Period)
+    {
+        let mut date = ::chrono::Local::now()
+            .date()
+            .naive_local();
+
+        let text = self.entry.get_text()
+            .unwrap();
+
+        if !text.is_empty() {
+            date = match ::chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
+                Ok(date) => date,
+                Err(_) => {
+                    error!("Invalid date format, use YYYY-MM-DD");
+                    return;
+                },
+            };
+        }
+
+        date += period.into();
+        self.set_date(Some(date));
+    }
+
     fn date_selected(&self)
     {
         let (y, m, d) = self.model.calendar.get_date();
@@ -57,6 +82,18 @@ impl Calendar
         }
         else {
             self.entry.set_text("");
+        }
+    }
+
+    fn sensitive(&self)
+    {
+        use ::relm::Widget;
+
+        if self.root().get_sensitive() {
+            self.buttons.show();
+        }
+        else {
+            self.buttons.hide();
         }
     }
 }
@@ -99,8 +136,10 @@ impl ::relm::Widget for Calendar
         use self::Msg::*;
 
         match event {
+            Add(period) => self.add(period),
             DateSelected => self.date_selected(),
             DateUpdated => self.date_updated(),
+            Sensitive => self.sensitive(),
             Set(date) => self.set_date(date),
             ShowCalendar => self.model.popover.popup(),
             Updated(_) => (),
@@ -112,6 +151,8 @@ impl ::relm::Widget for Calendar
         gtk::Box {
             orientation: ::gtk::Orientation::Horizontal,
             spacing: 10,
+            property_sensitive_notify => Msg::Sensitive,
+
             #[name="label"]
             gtk::Label {
                 packing: {
@@ -119,15 +160,57 @@ impl ::relm::Widget for Calendar
                     fill: true,
                 },
                 xalign: 1.,
+                yalign: 0.,
             },
-            #[name="entry"]
-            gtk::Entry {
-                packing: {
-                    expand: true,
-                    fill: true,
+
+            gtk::Box {
+                orientation: ::gtk::Orientation::Vertical,
+                #[name="entry"]
+                gtk::Entry {
+                    packing: {
+                        expand: true,
+                        fill: true,
+                    },
+                    property_width_request: 214,
+                    focus_out_event(_, _) => (Msg::DateUpdated, ::gtk::Inhibit(false)),
+                    icon_press(_, _, _) => Msg::ShowCalendar,
                 },
-                focus_out_event(_, _) => (Msg::DateUpdated, ::gtk::Inhibit(false)),
-                icon_press(_, _, _) => Msg::ShowCalendar,
+                #[name="buttons"]
+                gtk::Box {
+                    orientation: ::gtk::Orientation::Horizontal,
+                    gtk::Button {
+                        packing: {
+                            pack_type: ::gtk::PackType::End,
+                        },
+                        label: "+1y",
+                        tooltip_text: "Add one year",
+                        clicked => Msg::Add(::tasks::Period::Year),
+                    },
+                    gtk::Button {
+                        packing: {
+                            pack_type: ::gtk::PackType::End,
+                        },
+                        label: "+1m",
+                        tooltip_text: "Add one month",
+                        clicked => Msg::Add(::tasks::Period::Month),
+                    },
+                    gtk::Button {
+                        packing: {
+                            pack_type: ::gtk::PackType::End,
+                        },
+                        label: "+1w",
+                        tooltip_text: "Add one month",
+                        clicked => Msg::Add(::tasks::Period::Week),
+                    },
+                    gtk::Button {
+                        packing: {
+                            pack_type: ::gtk::PackType::End,
+                        },
+                        label: "+1d",
+                        tooltip_text: "Add one month",
+                        clicked => Msg::Add(::tasks::Period::Day),
+                    },
+                },
             },
         },
     }

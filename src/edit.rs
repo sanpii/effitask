@@ -41,6 +41,8 @@ impl Widget
         self.threshold.emit(::widgets::calendar::Msg::Set(task.threshold_date));
         if task.create_date.is_some() {
             self.created.emit(::widgets::calendar::Msg::Set(task.create_date));
+            self.created.widget()
+                .show();
         }
         else {
             self.created.widget()
@@ -181,24 +183,22 @@ impl ::relm::Widget for Widget
                 gtk::Frame {
                     label: "Date",
                     gtk::Box {
-                        orientation: ::gtk::Orientation::Horizontal,
-                        gtk::Box {
-                            orientation: ::gtk::Orientation::Vertical,
-                            #[name="threshold"]
-                            ::widgets::Calendar("Defer until".to_owned()) {
-                                CalendarUpdated(date) => Msg::UpdateDate(DateType::Threshold, date),
-                            },
-                            #[name="due"]
-                            ::widgets::Calendar("Due".to_owned()) {
-                                CalendarUpdated(date) => Msg::UpdateDate(DateType::Due, date),
-                            },
-                            #[name="finish"]
-                            ::widgets::Calendar("Completed".to_owned()) {
-                                CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
-                            },
-                            #[name="created"]
-                            ::widgets::Calendar("Created".to_owned()),
+                        spacing: 10,
+                        orientation: ::gtk::Orientation::Vertical,
+                        #[name="threshold"]
+                        ::widgets::Calendar("Defer until".to_owned()) {
+                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Threshold, date),
                         },
+                        #[name="due"]
+                        ::widgets::Calendar("Due".to_owned()) {
+                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Due, date),
+                        },
+                        #[name="finish"]
+                        ::widgets::Calendar("Completed".to_owned()) {
+                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
+                        },
+                        #[name="created"]
+                        ::widgets::Calendar("Created".to_owned()),
                     },
                 },
                 gtk::Frame {

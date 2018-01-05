@@ -42,3 +42,18 @@ impl ::std::fmt::Display for Period
         Ok(())
     }
 }
+
+impl ::std::convert::Into<::chrono::Duration> for Period
+{
+    fn into(self) -> ::chrono::Duration
+    {
+        use super::Period::*;
+
+        match self {
+            Day => ::chrono::Duration::days(1),
+            Week => ::chrono::Duration::weeks(1),
+            Month => ::chrono::Duration::weeks(4),
+            Year => ::chrono::Duration::weeks(52),
+        }
+    }
+}

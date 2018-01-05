@@ -160,6 +160,7 @@ impl ::relm::Widget for Widget
                     label: "Subject",
                     #[name="subject"]
                     gtk::Entry {
+                        activate => Msg::Ok,
                     },
                 },
                 gtk::Frame {

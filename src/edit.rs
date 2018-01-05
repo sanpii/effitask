@@ -131,7 +131,7 @@ impl ::relm::Widget for Widget
 {
     fn init_view(&mut self)
     {
-        self.note.set_property_height_request(250);
+        self.note.set_property_height_request(150);
         self.priority.set_adjustment(&::gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
         self.created.widget().set_sensitive(false);
     }

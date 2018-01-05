@@ -135,7 +135,7 @@ impl ::relm::Widget for Keywords
     fn init_view(&mut self)
     {
         self.scroll.set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
-        self.scroll.set_property_height_request(250);
+        self.scroll.set_property_height_request(150);
         self.tree_view.set_model(Some(&self.model.store));
         self.tree_view.get_selection()
             .set_mode(::gtk::SelectionMode::Multiple);

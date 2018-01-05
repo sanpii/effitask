@@ -39,6 +39,13 @@ impl Widget
         self.priority.set_value(f64::from(task.priority));
         self.due.emit(::widgets::calendar::Msg::Set(task.due_date));
         self.threshold.emit(::widgets::calendar::Msg::Set(task.threshold_date));
+        if task.create_date.is_some() {
+            self.created.emit(::widgets::calendar::Msg::Set(task.create_date));
+        }
+        else {
+            self.created.widget()
+                .hide();
+        }
         self.repeat.emit(::widgets::repeat::Msg::Set(task.recurrence.clone()));
         self.finish.emit(::widgets::calendar::Msg::Set(task.finish_date));
         self.keywords.emit(::widgets::keywords::Msg::Set(task.tags.clone()));
@@ -124,6 +131,7 @@ impl ::relm::Widget for Widget
     {
         self.note.set_property_height_request(250);
         self.priority.set_adjustment(&::gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
+        self.created.widget().set_sensitive(false);
     }
 
     fn model(relm: &::relm::Relm<Self>,_: ()) -> Model
@@ -188,6 +196,8 @@ impl ::relm::Widget for Widget
                             ::widgets::Calendar("Completed".to_owned()) {
                                 CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
                             },
+                            #[name="created"]
+                            ::widgets::Calendar("Created".to_owned()),
                         },
                     },
                 },

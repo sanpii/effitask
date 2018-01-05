@@ -28,6 +28,7 @@ mod agenda;
 mod application;
 mod done;
 mod edit;
+mod flag;
 mod inbox;
 mod logger;
 mod search;

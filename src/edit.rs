@@ -9,6 +9,7 @@ use widgets::repeat::Msg::Updated as RepeatUpdated;
 pub enum Msg {
     Cancel,
     EditKeyword(::std::collections::BTreeMap<String, String>),
+    Flag,
     Done(::tasks::Task),
     Ok,
     Set(::tasks::Task),
@@ -37,6 +38,7 @@ impl Widget
 
         self.subject.set_text(task.subject.as_str());
         self.priority.set_value(f64::from(task.priority));
+        self.flag.set_active(task.flagged);
         self.due.emit(::widgets::calendar::Msg::Set(task.due_date));
         self.threshold.emit(::widgets::calendar::Msg::Set(task.threshold_date));
         if task.create_date.is_some() {
@@ -101,6 +103,11 @@ impl Widget
         self.model.task.tags = keywords.clone();
     }
 
+    fn flag(&mut self)
+    {
+        self.model.task.flagged = self.flag.get_active();
+    }
+
     fn update_date(&mut self, date_type: &DateType, date: &Option<::chrono::NaiveDate>)
     {
         use self::DateType::*;
@@ -152,6 +159,7 @@ impl ::relm::Widget for Widget
             Cancel => (),
             Done(_) => (),
             EditKeyword(ref keywords) => self.edit_keywords(keywords),
+            Flag => self.flag(),
             Ok => self.model.relm.stream().emit(Msg::Done(self.get_task())),
             Set(task) => self.set_task(&task),
             UpdateDate(ref date_type, ref date) => self.update_date(date_type, &date),
@@ -175,9 +183,22 @@ impl ::relm::Widget for Widget
                 },
                 gtk::Frame {
                     label: "Priority",
-                    #[name="priority"]
-                    gtk::SpinButton {
-                        focus_out_event(_, _) => (Msg::UpdatePriority, ::gtk::Inhibit(false)),
+                    gtk::Box {
+                        orientation: ::gtk::Orientation::Horizontal,
+                        homogeneous: true,
+                        #[name="priority"]
+                        gtk::SpinButton {
+                            focus_out_event(_, _) => (Msg::UpdatePriority, ::gtk::Inhibit(false)),
+                        },
+                        #[name="flag"]
+                        gtk::ToggleButton {
+                            packing: {
+                                fill: false,
+                            },
+                            image: &::gtk::Image::new_from_icon_name("emblem-favorite", ::gtk::IconSize::SmallToolbar.into()),
+                            tooltip_text: "Flag",
+                            toggled => Msg::Flag,
+                        },
                     },
                 },
                 gtk::Frame {

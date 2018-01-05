@@ -42,6 +42,19 @@ impl Circle
 
         context.stroke();
 
+        if !task.finished && task.flagged {
+            let angle = if task.due_date.is_some() {
+                ::std::f64::consts::PI
+            }
+            else {
+                0.
+            };
+
+            context.set_source_rgb(1., 0.5, 0.3);
+            context.arc(center, center, center - 5., angle, 2. * ::std::f64::consts::PI);
+            context.stroke();
+        }
+
         if task.recurrence.is_some() {
             context.set_line_width(2.);
 

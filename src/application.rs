@@ -7,6 +7,8 @@ use agenda::Msg::Edit as AgendaEdit;
 use done::Msg::Complete as DoneComplete;
 use done::Msg::Edit as DoneEdit;
 use edit::Msg::{Cancel, Done};
+use flag::Msg::Complete as FlagComplete;
+use flag::Msg::Edit as FlagEdit;
 use inbox::Msg::Complete as InboxComplete;
 use inbox::Msg::Edit as InboxEdit;
 use search::Msg::Complete as SearchComplete;
@@ -22,6 +24,7 @@ enum Page {
     Projects,
     Contexts,
     Agenda,
+    Flag,
     Done,
     Search,
 }
@@ -35,8 +38,9 @@ impl ::std::convert::From<u32> for Page
             1 => Page::Projects,
             2 => Page::Contexts,
             3 => Page::Agenda,
-            4 => Page::Done,
-            5 => Page::Search,
+            4 => Page::Flag,
+            5 => Page::Done,
+            6 => Page::Search,
             _ => panic!("Invalid page {}", n),
         }
     }
@@ -173,6 +177,7 @@ impl Widget
             Page::Projects => "projects",
             Page::Contexts => "contexts",
             Page::Agenda => "agenda",
+            Page::Flag => "flag",
             Page::Done => "done",
             Page::Search => "search",
         };
@@ -323,6 +328,7 @@ impl Widget
         self.contexts.emit(::widgets::tags::Msg::Update(list.clone(), defered, done));
         self.agenda.emit(::agenda::Msg::Update(list.clone(), defered, done));
         self.done.emit(::done::Msg::Update(list.clone(), defered, done));
+        self.flag.emit(::flag::Msg::Update(list.clone(), defered, done));
         self.search.emit(::search::Msg::Update(list.clone(), defered, done));
 
         self.model.list = list;
@@ -451,6 +457,11 @@ impl ::relm::Widget for Widget
                         ::agenda::Widget {
                             AgendaComplete(ref task) => Msg::Complete(task.clone()),
                             AgendaEdit(ref task) => Msg::Edit(task.clone()),
+                        },
+                        #[name="flag"]
+                        ::flag::Widget {
+                            FlagComplete(ref task) => Msg::Complete(task.clone()),
+                            FlagEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="done"]
                         ::done::Widget {

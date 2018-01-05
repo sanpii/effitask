@@ -4,6 +4,7 @@ pub struct Task {
     pub id: usize,
     pub note: super::Note,
     pub recurrence: Option<super::Recurrence>,
+    pub flagged: bool,
 }
 
 impl Task
@@ -15,6 +16,7 @@ impl Task
             id: 0,
             note: super::Note::None,
             recurrence: None,
+            flagged: false,
         }
     }
 
@@ -88,11 +90,15 @@ impl ::std::str::FromStr for Task
         }
         task.tags.remove(&"rec".to_owned());
 
+        let flagged = task.tags.contains_key(&"f".to_owned());
+        task.tags.remove(&"f".to_owned());
+
         Ok(Self {
             id: 0,
-            note: note,
+            note,
             inner: task,
-            recurrence: recurrence,
+            recurrence,
+            flagged,
         })
     }
 }
@@ -129,6 +135,10 @@ impl ::std::fmt::Display for Task
 
         if let Some(ref recurrence) = self.recurrence {
             f.write_str(format!(" rec:{}", recurrence).as_str())?;
+        }
+
+        if self.flagged {
+            f.write_str(" f:1")?;
         }
 
         Ok(())

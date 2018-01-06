@@ -1,8 +1,9 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::keywords::Msg::Updated as KeywordsUpdated;
 use widgets::calendar::Msg::Updated as CalendarUpdated;
+use widgets::keywords::Msg::Updated as KeywordsUpdated;
+use widgets::priority::Msg::Updated as PriorityUpdated;
 use widgets::repeat::Msg::Updated as RepeatUpdated;
 
 #[derive(Msg)]
@@ -15,7 +16,7 @@ pub enum Msg {
     Set(::tasks::Task),
     UpdateDate(DateType, Option<::chrono::NaiveDate>),
     UpdateRepeat(Option<::tasks::Recurrence>),
-    UpdatePriority,
+    UpdatePriority(u8),
 }
 
 pub struct Model {
@@ -37,7 +38,7 @@ impl Widget
         self.model.task = task.clone();
 
         self.subject.set_text(task.subject.as_str());
-        self.priority.set_value(f64::from(task.priority));
+        self.priority.emit(::widgets::priority::Msg::Set(task.priority));
         self.flag.set_active(task.flagged);
         self.due.emit(::widgets::calendar::Msg::Set(task.due_date));
         self.threshold.emit(::widgets::calendar::Msg::Set(task.threshold_date));
@@ -127,9 +128,9 @@ impl Widget
         self.model.task.recurrence = recurrence.clone();
     }
 
-    fn update_priority(&mut self)
+    fn update_priority(&mut self, priority: u8)
     {
-        self.model.task.priority = self.priority.get_value() as u8;
+        self.model.task.priority = priority;
     }
 }
 
@@ -139,11 +140,10 @@ impl ::relm::Widget for Widget
     fn init_view(&mut self)
     {
         self.note.set_property_height_request(150);
-        self.priority.set_adjustment(&::gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
         self.created.widget().set_sensitive(false);
     }
 
-    fn model(relm: &::relm::Relm<Self>,_: ()) -> Model
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model
     {
         Model {
             task: ::tasks::Task::new(),
@@ -164,7 +164,7 @@ impl ::relm::Widget for Widget
             Set(task) => self.set_task(&task),
             UpdateDate(ref date_type, ref date) => self.update_date(date_type, &date),
             UpdateRepeat(ref recurrence) => self.update_repeat(&recurrence),
-            UpdatePriority => self.update_priority(),
+            UpdatePriority(priority) => self.update_priority(priority),
         }
     }
 
@@ -185,16 +185,16 @@ impl ::relm::Widget for Widget
                     label: "Priority",
                     gtk::Box {
                         orientation: ::gtk::Orientation::Horizontal,
-                        homogeneous: true,
                         #[name="priority"]
-                        gtk::SpinButton {
-                            focus_out_event(_, _) => (Msg::UpdatePriority, ::gtk::Inhibit(false)),
+                        ::widgets::Priority {
+                            PriorityUpdated(priority) => Msg::UpdatePriority(priority),
                         },
                         #[name="flag"]
                         gtk::ToggleButton {
                             packing: {
-                                fill: false,
+                                expand: true,
                             },
+                            halign: ::gtk::Align::Center,
                             image: &::gtk::Image::new_from_icon_name("emblem-favorite", ::gtk::IconSize::SmallToolbar.into()),
                             tooltip_text: "Flag",
                             toggled => Msg::Flag,

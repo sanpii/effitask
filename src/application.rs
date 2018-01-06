@@ -266,9 +266,14 @@ impl Widget
 
     fn edit(&mut self, task: &::tasks::Task)
     {
+        use ::relm::Widget;
+
         self.edit.emit(::edit::Msg::Set(task.clone()));
         self.edit.widget()
             .show();
+
+        let (width, _) = self.root().get_size();
+        self.paned.set_position(width - 436);
     }
 
     fn save(&mut self, task: &::tasks::Task)

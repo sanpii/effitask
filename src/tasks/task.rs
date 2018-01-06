@@ -54,9 +54,7 @@ impl Task
 
     pub fn complete(&mut self)
     {
-        let today = ::chrono::Local::now()
-            .date()
-            .naive_local();
+        let today = ::date::today();
 
         self.finished = true;
         self.finish_date = Some(today);

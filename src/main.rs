@@ -27,6 +27,7 @@ use relm::Widget;
 
 mod agenda;
 mod application;
+mod date;
 mod done;
 mod edit;
 mod flag;

@@ -80,9 +80,7 @@ impl List
 
     pub fn projects(&self) -> Vec<String>
     {
-        let today = ::chrono::Local::now()
-            .date()
-            .naive_local();
+        let today = ::date::today();
 
         let mut projects = self.tasks.iter()
             .filter(|x| !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today))
@@ -102,9 +100,7 @@ impl List
 
     pub fn contexts(&self) -> Vec<String>
     {
-        let today = ::chrono::Local::now()
-            .date()
-            .naive_local();
+        let today = ::date::today();
 
         let mut contexts = self.tasks.iter()
             .filter(|x| !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today))

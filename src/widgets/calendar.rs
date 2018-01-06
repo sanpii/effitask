@@ -24,9 +24,7 @@ impl Calendar
 {
     fn add(&self, period: ::tasks::Period)
     {
-        let mut date = ::chrono::Local::now()
-            .date()
-            .naive_local();
+        let mut date = ::date::today();
 
         let text = self.entry.get_text()
             .unwrap();

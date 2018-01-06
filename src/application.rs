@@ -240,9 +240,7 @@ impl Widget
                     t.due_date.unwrap()
                 }
                 else {
-                    ::chrono::Local::now()
-                        .date()
-                        .naive_local()
+                    ::date::today()
                 };
 
                 let mut new: ::tasks::Task = t.clone();

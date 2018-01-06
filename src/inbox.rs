@@ -12,9 +12,7 @@ impl Widget
 {
     fn update_tasks(&self, list: &::tasks::List, defered: bool, _: bool)
     {
-        let today = ::chrono::Local::now()
-            .date()
-            .naive_local();
+        let today = ::date::today();
 
         let tasks = list.tasks.iter()
             .filter(|x| {

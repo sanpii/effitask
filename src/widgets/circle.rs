@@ -20,9 +20,7 @@ impl Circle
         }
         else {
             let due_date = task.due_date.unwrap();
-            let today = ::chrono::Local::now()
-                .date()
-                .naive_local();
+            let today = ::date::today();
 
             if due_date < today {
                 context.set_source_rgb(1., 0.4, 0.5);

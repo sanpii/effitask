@@ -94,9 +94,7 @@ impl ::relm::Widget for Task
 
             let date = self.date_alias(due);
 
-            let today = ::chrono::Local::now()
-                .date()
-                .naive_local();
+            let today = ::date::today();
 
             if due < today {
                 context.add_class("past");
@@ -111,9 +109,7 @@ impl ::relm::Widget for Task
 
     fn date_alias(&self, date: ::chrono::NaiveDate) -> String
     {
-        let today = ::chrono::Local::now()
-            .date()
-            .naive_local();
+        let today = ::date::today();
 
         if date == today {
             String::from("today")

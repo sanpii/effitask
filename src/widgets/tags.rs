@@ -62,9 +62,7 @@ impl Tags
 
     fn update_tasks(&self, tag: Type, filters: &[String])
     {
-        let today = ::chrono::Local::now()
-            .date()
-            .naive_local();
+        let today = ::date::today();
 
         let tasks = self.model.list.tasks.iter()
             .filter(|x| {

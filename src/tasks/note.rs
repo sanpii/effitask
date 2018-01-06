@@ -109,7 +109,7 @@ impl Note
                 Event::Start(Tag::CodeBlock(_)) => markup.push_str("<tt>"),
                 Event::End(Tag::CodeBlock(_)) => markup.push_str("</tt>"),
 
-                Event::Text(t) => markup.push_str(&t),
+                Event::Text(t) => markup.push_str(&t.replace("&", "&amp;")),
 
                 Event::SoftBreak => markup.push_str("\n"),
 

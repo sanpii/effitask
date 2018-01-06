@@ -150,12 +150,16 @@ impl ::relm::Widget for Repeat
                     mode: false,
                     toggled => Msg::UpdatePeriod,
                 },
-            },
-            #[name="strict"]
-            gtk::CheckButton {
-                label: "Strict",
-                tooltip_text: "Use real due date as offset, not today",
-                toggled => Msg::UpdateStrict,
+                #[name="strict"]
+                gtk::CheckButton {
+                    packing: {
+                        expand: true,
+                    },
+                    halign: ::gtk::Align::Center,
+                    label: "Strict",
+                    tooltip_text: "Use real due date as offset, not today",
+                    toggled => Msg::UpdateStrict,
+                },
             },
         }
     }

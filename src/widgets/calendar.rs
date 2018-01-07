@@ -41,6 +41,7 @@ impl Calendar
 
         date += period.into();
         self.set_date(Some(date));
+        self.date_updated();
     }
 
     fn date_selected(&self)

@@ -40,7 +40,8 @@ work
   therefore show their tasks;
 * The project/context tooltip (keep your mouse pointer on the name) display done
   tasks and total tasks number, including sub-projects/contexts (also showed as
-  progress bar).
+  progress bar);
+* Press enter in the "subject" input in the edit panel validate modification.
 
 ## Install
 

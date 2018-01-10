@@ -172,10 +172,12 @@ impl List
     {
         use std::str::FromStr;
 
-        let task = match ::tasks::Task::from_str(text) {
+        let mut task = match ::tasks::Task::from_str(text) {
             Ok(task) => task,
             Err(_) => return Err(format!("Unable to convert task: '{}'", text)),
         };
+
+        (*task).create_date = Some(::date::today());
 
         self.append(task);
         self.write()

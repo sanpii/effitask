@@ -245,6 +245,7 @@ impl Widget
 
                 let mut new: ::tasks::Task = t.clone();
                 new.uncomplete();
+                (*new).create_date = Some(::date::today());
                 new.due_date = Some(due + recurrence.clone().into());
                 list.append(new);
             }

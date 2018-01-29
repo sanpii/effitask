@@ -77,7 +77,11 @@ impl Calendar
     fn set_date(&self, date: Option<::chrono::NaiveDate>)
     {
         if let Some(date) = date {
+            use chrono::Datelike;
+
             self.entry.set_text(date.format("%Y-%m-%d").to_string().as_str());
+            self.model.calendar.select_month(date.month() - 1, date.year() as u32);
+            self.model.calendar.select_day(date.day());
         }
         else {
             self.entry.set_text("");

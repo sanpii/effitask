@@ -247,6 +247,11 @@ impl Widget
                 new.uncomplete();
                 (*new).create_date = Some(::date::today());
                 new.due_date = Some(due + recurrence.clone().into());
+
+                if let Some(threshold_date) = t.threshold_date {
+                    new.threshold_date = Some(threshold_date + recurrence.clone().into());
+                }
+
                 list.append(new);
             }
         }

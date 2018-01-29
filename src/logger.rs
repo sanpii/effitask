@@ -57,6 +57,7 @@ impl Widget
         let (tx, rx) = ::std::sync::mpsc::channel();
         let log = Log::new(tx);
 
+        ::log::set_max_level(::log::LevelFilter::Info);
         ::log::set_boxed_logger(Box::new(log))
             .unwrap_or_default();
 

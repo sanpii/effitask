@@ -25,7 +25,7 @@ impl Priority
 
     fn set(&self, priority: u8)
     {
-        self.button.set_value(priority as f64);
+        self.button.set_value(f64::from(priority));
 
         match priority {
             0 => self.a.set_active(true),
@@ -47,7 +47,7 @@ impl Priority
 
     fn updated(&self, priority: u8)
     {
-        self.button.set_value(priority as f64);
+        self.button.set_value(f64::from(priority));
     }
 }
 

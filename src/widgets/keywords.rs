@@ -97,11 +97,7 @@ impl Keywords
             None => return keywords,
         };
 
-        loop {
-            let name = match self.model.store.get_value(&iter, Column::Name.into()).get() {
-                Some(name) => name,
-                None => break,
-            };
+        while let Some(name) = self.model.store.get_value(&iter, Column::Name.into()).get() {
             let value = match self.model.store.get_value(&iter, Column::Value.into()).get() {
                 Some(value) => value,
                 None => break,

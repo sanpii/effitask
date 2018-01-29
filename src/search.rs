@@ -3,8 +3,8 @@ use widgets::tasks::Msg::{Complete, Edit};
 
 #[derive(Msg)]
 pub enum Msg {
-    Complete(::tasks::Task),
-    Edit(::tasks::Task),
+    Complete(Box<::tasks::Task>),
+    Edit(Box<::tasks::Task>),
     Update(::tasks::List, bool, bool),
     UpdateFilter(String),
 }

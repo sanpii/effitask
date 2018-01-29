@@ -9,8 +9,8 @@ pub enum Type {
 
 #[derive(Msg)]
 pub enum Msg {
-    Complete(::tasks::Task),
-    Edit(::tasks::Task),
+    Complete(Box<::tasks::Task>),
+    Edit(Box<::tasks::Task>),
     UpdateFilters(Vec<String>),
     Update(::tasks::List, bool, bool),
 }

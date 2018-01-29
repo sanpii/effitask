@@ -5,8 +5,8 @@ use relm_attributes::widget;
 #[derive(Msg)]
 pub enum Msg {
     Click(::gdk::EventButton),
-    Complete(::tasks::Task),
-    Edit(::tasks::Task),
+    Complete(Box<::tasks::Task>),
+    Edit(Box<::tasks::Task>),
     ShowNote,
     Toggle,
 }
@@ -152,12 +152,12 @@ impl ::relm::Widget for Task
 
         match event {
             Click(event) => if event.get_event_type() == ::gdk::EventType::DoubleButtonPress {
-                self.model.relm.stream().emit(Edit(self.model.task.clone()))
+                self.model.relm.stream().emit(Edit(Box::new(self.model.task.clone())))
             },
             Complete(_) => (),
             Edit(_) => (),
             ShowNote => self.model.note.popup(),
-            Toggle => self.model.relm.stream().emit(Complete(self.model.task.clone())),
+            Toggle => self.model.relm.stream().emit(Complete(Box::new(self.model.task.clone()))),
         }
     }
 

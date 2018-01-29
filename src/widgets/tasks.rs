@@ -5,8 +5,8 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
-    Edit(::tasks::Task),
-    Complete(::tasks::Task),
+    Edit(Box<::tasks::Task>),
+    Complete(Box<::tasks::Task>),
     Update(Vec<::tasks::Task>),
 }
 

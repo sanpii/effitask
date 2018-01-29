@@ -71,10 +71,10 @@ pub struct Model {
 pub enum Msg {
     Add,
     Create(Option<String>),
-    Complete(::tasks::Task),
-    Edit(::tasks::Task),
+    Complete(Box<::tasks::Task>),
+    Edit(Box<::tasks::Task>),
     EditCancel,
-    EditDone(::tasks::Task),
+    EditDone(Box<::tasks::Task>),
     Preferences,
     Refresh,
     Search(String),
@@ -273,7 +273,7 @@ impl Widget
     {
         use ::relm::Widget;
 
-        self.edit.emit(::edit::Msg::Set(task.clone()));
+        self.edit.emit(::edit::Msg::Set(Box::new(task.clone())));
         self.edit.widget()
             .show();
 
@@ -319,12 +319,12 @@ impl Widget
     {
         let todo_file = match ::std::env::var("TODO_FILE") {
             Ok(todo_file) => todo_file,
-            Err(_) => panic!("Launch this program via todo.sh"),
+            Err(err) => panic!("Launch this program via todo.sh: {}", err),
         };
 
         let done_file = match ::std::env::var("DONE_FILE") {
             Ok(done_file) => done_file,
-            Err(_) => panic!("Launch this program via todo.sh"),
+            Err(err) => panic!("Launch this program via todo.sh: {}", err),
         };
 
         let list = ::tasks::List::from_files(&todo_file, &done_file);

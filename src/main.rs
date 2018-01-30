@@ -25,6 +25,7 @@ extern crate xdg;
 
 use relm::Widget;
 
+mod add;
 mod agenda;
 mod application;
 mod date;

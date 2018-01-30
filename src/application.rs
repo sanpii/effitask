@@ -63,7 +63,6 @@ pub struct Model {
     pref_popover: ::gtk::Popover,
     defered_button: ::gtk::CheckButton,
     done_button: ::gtk::CheckButton,
-    entry: ::gtk::Entry,
     xdg: ::xdg::BaseDirectories,
 }
 
@@ -122,19 +121,12 @@ impl Widget
 
     fn init_add_popover(&self)
     {
-        let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
+        use relm::ContainerWidget;
 
-        vbox.add(&self.model.entry);
-        self.model.entry.set_size_request(500, -1);
-        connect!(self.model.relm, self.model.entry, connect_activate(entry), Msg::Create(entry.get_text()));
-
-        let label = ::gtk::Label::new("Create a new task +project @context due:2042-01-01");
-        vbox.add(&label);
-
-        vbox.show_all();
+        let add = self.model.add_popover.add_widget::<::add::Widget, _>(&self.model.relm, ());
+        connect!(add@::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
         self.model.add_popover.set_relative_to(&self.add_button);
-        self.model.add_popover.add(&vbox);
         self.model.add_popover.hide();
     }
 
@@ -200,7 +192,6 @@ impl Widget
 
     fn add(&self)
     {
-        self.model.entry.set_text("");
         self.model.add_popover.popup();
     }
 
@@ -374,7 +365,6 @@ impl ::relm::Widget for Widget
             pref_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
             defered_button: ::gtk::CheckButton::new_with_label("Display defered tasks"),
             done_button: ::gtk::CheckButton::new_with_label("Display done tasks"),
-            entry: ::gtk::Entry::new(),
             xdg: ::xdg::BaseDirectories::with_prefix(::application::NAME.to_lowercase())
                 .unwrap(),
         }

@@ -12,7 +12,7 @@ pub enum Msg {
     Complete(Box<::tasks::Task>),
     Edit(Box<::tasks::Task>),
     UpdateFilters(Vec<String>),
-    Update(::tasks::List, bool, bool),
+    Update(bool, bool),
 }
 
 pub struct Model {
@@ -119,8 +119,8 @@ impl ::relm::Widget for Tags
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(list, defered, done) =>  {
-                self.model.list = list.clone();
+            Update(defered, done) =>  {
+                self.model.list = ::application::tasks();
                 self.model.defered = defered;
                 self.model.done = done;
 

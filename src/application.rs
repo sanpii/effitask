@@ -18,6 +18,32 @@ use widgets::tags::Msg::Edit as TagsEdit;
 
 pub const NAME: &str = "Effitask";
 
+thread_local!(
+    static TASKS: ::std::cell::RefCell<::tasks::List> = ::std::cell::RefCell::new(::tasks::List::new());
+);
+
+pub fn tasks() -> ::tasks::List
+{
+    let mut list = ::tasks::List::new();
+
+    TASKS.with(|t| {
+        list = t.borrow().clone();
+    });
+
+    list
+}
+
+fn add_task(text: &str) -> Result<(), String>
+{
+    let mut result = Ok(());
+
+    TASKS.with(|t| {
+        result = t.borrow_mut().add(text);
+    });
+
+    result
+}
+
 #[repr(u32)]
 enum Page {
     Inbox = 0,
@@ -58,7 +84,6 @@ impl ::std::convert::Into<i32> for Page
 
 pub struct Model {
     relm: ::relm::Relm<Widget>,
-    list: ::tasks::List,
     add_popover: ::gtk::Popover,
     pref_popover: ::gtk::Popover,
     defered_button: ::gtk::CheckButton,
@@ -198,7 +223,7 @@ impl Widget
     fn create(&mut self, text: Option<String>)
     {
         if let Some(text) = text {
-            match self.model.list.add(&text) {
+            match add_task(&text) {
                 Ok(_) => self.update_tasks(),
                 Err(err) => error!("Unable to create task: '{}'", err),
             }
@@ -209,7 +234,7 @@ impl Widget
     fn complete(&mut self, task: &::tasks::Task)
     {
         let id = task.id;
-        let mut list = self.model.list.clone();
+        let mut list = tasks();
 
         if let Some(ref mut t) = list.tasks.get_mut(id) {
             if !t.finished {
@@ -275,7 +300,7 @@ impl Widget
     fn save(&mut self, task: &::tasks::Task)
     {
         let id = task.id;
-        let mut list = self.model.list.clone();
+        let mut list = tasks();
 
         if list.tasks.get_mut(id).is_some() {
             ::std::mem::replace(&mut list.tasks[id], task.clone());
@@ -322,15 +347,17 @@ impl Widget
         let defered = self.model.defered_button.get_active();
         let done = self.model.done_button.get_active();
 
-        self.inbox.emit(::inbox::Msg::Update(list.clone(), defered, done));
-        self.projects.emit(::widgets::tags::Msg::Update(list.clone(), defered, done));
-        self.contexts.emit(::widgets::tags::Msg::Update(list.clone(), defered, done));
-        self.agenda.emit(::agenda::Msg::Update(list.clone(), defered, done));
-        self.done.emit(::done::Msg::Update(list.clone(), defered, done));
-        self.flag.emit(::flag::Msg::Update(list.clone(), defered, done));
-        self.search.emit(::search::Msg::Update(list.clone(), defered, done));
+        TASKS.with(|t| {
+            *t.borrow_mut() = list.clone();
+        });
 
-        self.model.list = list;
+        self.inbox.emit(::inbox::Msg::Update(defered, done));
+        self.projects.emit(::widgets::tags::Msg::Update(defered, done));
+        self.contexts.emit(::widgets::tags::Msg::Update(defered, done));
+        self.agenda.emit(::agenda::Msg::Update(defered, done));
+        self.done.emit(::done::Msg::Update(defered, done));
+        self.flag.emit(::flag::Msg::Update(defered, done));
+        self.search.emit(::search::Msg::Update(defered, done));
     }
 
     fn preferences(&self)
@@ -360,7 +387,6 @@ impl ::relm::Widget for Widget
     {
         Model {
             relm: relm.clone(),
-            list: ::tasks::List::new(),
             add_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
             pref_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
             defered_button: ::gtk::CheckButton::new_with_label("Display defered tasks"),

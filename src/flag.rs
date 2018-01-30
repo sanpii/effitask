@@ -5,14 +5,15 @@ use widgets::tasks::Msg::{Complete, Edit};
 pub enum Msg {
     Complete(Box<::tasks::Task>),
     Edit(Box<::tasks::Task>),
-    Update(::tasks::List, bool, bool),
+    Update(bool, bool),
 }
 
 impl Widget
 {
-    fn update_tasks(&mut self, list: &::tasks::List, defered: bool, done: bool)
+    fn update_tasks(&mut self, defered: bool, done: bool)
     {
         let today = ::date::today();
+        let list = ::application::tasks();
 
         let tasks = list.tasks.iter()
             .filter(|x| {
@@ -41,7 +42,7 @@ impl ::relm::Widget for Widget
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(list, defered, done) => self.update_tasks(&list, defered, done),
+            Update(defered, done) => self.update_tasks(defered, done),
         }
     }
 

@@ -35,7 +35,18 @@ impl Circle
         context.close_path();
 
         if task.finished {
-            context.fill_preserve();
+            let width = self.drawing_area.get_property_width_request();
+            let height = self.drawing_area.get_property_height_request();
+
+            context.save();
+            context.fill();
+            context.translate(f64::from(width) as f64 / -4., f64::from(height) as f64 / 2.);
+            context.rotate(::std::f64::consts::PI / -4.);
+            context.set_source_rgb(0., 0., 0.);
+            context.rectangle(20., 30., 40., 10.);
+            context.rectangle(20., 20., 10., 10.);
+            context.fill();
+            context.restore();
         }
 
         context.stroke();
@@ -53,7 +64,7 @@ impl Circle
             context.stroke();
         }
 
-        if task.recurrence.is_some() {
+        if !task.finished && task.recurrence.is_some() {
             context.set_line_width(2.);
 
             for dx in &[-12., 0., 12.] {

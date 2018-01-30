@@ -16,63 +16,6 @@ use search::Msg::Edit as SearchEdit;
 use widgets::tags::Msg::Complete as TagsComplete;
 use widgets::tags::Msg::Edit as TagsEdit;
 
-pub const NAME: &str = "Effitask";
-
-#[derive(Clone)]
-pub struct Preferences {
-    pub defered: bool,
-    pub done: bool,
-}
-
-impl Preferences
-{
-    pub fn new() -> Self
-    {
-        Self {
-            defered: false,
-            done: false,
-        }
-    }
-}
-
-thread_local!(
-    static PREFERENCES: ::std::cell::RefCell<Preferences> = ::std::cell::RefCell::new(Preferences::new());
-    static TASKS: ::std::cell::RefCell<::tasks::List> = ::std::cell::RefCell::new(::tasks::List::new());
-);
-
-pub fn preferences() -> Preferences
-{
-    let mut preferences = Preferences::new();
-
-    PREFERENCES.with(|p| {
-        preferences = p.borrow().clone();
-    });
-
-    preferences
-}
-
-pub fn tasks() -> ::tasks::List
-{
-    let mut list = ::tasks::List::new();
-
-    TASKS.with(|t| {
-        list = t.borrow().clone();
-    });
-
-    list
-}
-
-fn add_task(text: &str) -> Result<(), String>
-{
-    let mut result = Ok(());
-
-    TASKS.with(|t| {
-        result = t.borrow_mut().add(text);
-    });
-
-    result
-}
-
 #[repr(u32)]
 enum Page {
     Inbox = 0,
@@ -252,7 +195,7 @@ impl Widget
     fn create(&mut self, text: Option<String>)
     {
         if let Some(text) = text {
-            match add_task(&text) {
+            match super::add_task(&text) {
                 Ok(_) => self.update_tasks(),
                 Err(err) => error!("Unable to create task: '{}'", err),
             }
@@ -263,7 +206,7 @@ impl Widget
     fn complete(&mut self, task: &::tasks::Task)
     {
         let id = task.id;
-        let mut list = tasks();
+        let mut list = super::tasks();
 
         if let Some(ref mut t) = list.tasks.get_mut(id) {
             if !t.finished {
@@ -329,7 +272,7 @@ impl Widget
     fn save(&mut self, task: &::tasks::Task)
     {
         let id = task.id;
-        let mut list = tasks();
+        let mut list = super::tasks();
 
         if list.tasks.get_mut(id).is_some() {
             ::std::mem::replace(&mut list.tasks[id], task.clone());
@@ -374,11 +317,11 @@ impl Widget
 
         let list = ::tasks::List::from_files(&todo_file, &done_file);
 
-        TASKS.with(|t| {
+        super::globals::TASKS.with(|t| {
             *t.borrow_mut() = list.clone();
         });
 
-        PREFERENCES.with(|p| {
+        super::globals::PREFERENCES.with(|p| {
             (*p.borrow_mut()).defered = self.model.defered_button.get_active();
             (*p.borrow_mut()).done = self.model.done_button.get_active();
         });
@@ -423,7 +366,7 @@ impl ::relm::Widget for Widget
             pref_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
             defered_button: ::gtk::CheckButton::new_with_label("Display defered tasks"),
             done_button: ::gtk::CheckButton::new_with_label("Display done tasks"),
-            xdg: ::xdg::BaseDirectories::with_prefix(::application::NAME.to_lowercase())
+            xdg: ::xdg::BaseDirectories::with_prefix(super::NAME.to_lowercase())
                 .unwrap(),
         }
     }
@@ -451,11 +394,11 @@ impl ::relm::Widget for Widget
     {
         #[name="window"]
         gtk::Window {
-            title: NAME,
+            title: super::NAME,
             gtk::Box {
                 orientation: ::gtk::Orientation::Vertical,
                 gtk::HeaderBar {
-                    title: NAME,
+                    title: super::NAME,
                     show_close_button: true,
                     gtk::ToolButton {
                         icon_name: "view-refresh",

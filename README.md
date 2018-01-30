@@ -18,6 +18,7 @@ format](https://github.com/todotxt/todo.txt).
 Supported toto.txt addons:
 
 * [due](https://github.com/rebeccamorgan/due)
+* [future](https://github.com/FND/todo.txt-cli/blob/extensions/futureTasks)
 * [note](https://github.com/mgarrido/todo.txt-cli/tree/note/todo.actions.d)
 * [schedule](https://github.com/FND/todo.txt-cli/blob/extensions/schedule)
 

@@ -47,7 +47,7 @@ impl ::log::Log for Log
 }
 
 thread_local!(
-    static GLOBAL: ::std::cell::RefCell<Option<(::gtk::Revealer, Receiver)>> = ::std::cell::RefCell::new(None)
+    static GLOBAL: ::std::cell::RefCell<Option<(::gtk::ListBox, Receiver)>> = ::std::cell::RefCell::new(None)
 );
 
 impl Widget
@@ -61,21 +61,20 @@ impl Widget
         ::log::set_boxed_logger(Box::new(log))
             .unwrap_or_default();
 
-        let revealer = ::gtk::Revealer::new();
-        revealer.set_border_width(10);
-        revealer.show();
-        self.event_box.add(&revealer);
+        self.revealer.set_border_width(10);
+        self.revealer.show();
 
-        let context = revealer.get_style_context()
+        let context = self.revealer.get_style_context()
             .unwrap();
         context.add_class("log");
 
-        let label = ::gtk::Label::new(None);
-        label.show();
-        revealer.add(&label);
+        let list_box = ::gtk::ListBox::new();
+        connect!(self.model, list_box, connect_button_press_event(_, _), return (Msg::Hide, ::gtk::Inhibit(false)));
+        list_box.show();
+        self.revealer.add(&list_box);
 
         GLOBAL.with(move |global| {
-            *global.borrow_mut() = Some((revealer, rx))
+            *global.borrow_mut() = Some((list_box, rx))
         });
 
         ::std::thread::spawn(move || {
@@ -89,9 +88,9 @@ impl Widget
     fn receive() -> ::glib::Continue
     {
         GLOBAL.with(|global| {
-            if let Some((ref revealer, ref rx)) = *global.borrow() {
+            if let Some((ref list_box, ref rx)) = *global.borrow() {
                 if let Ok((level, text)) = rx.try_recv() {
-                    Self::add_message(revealer, level, &text);
+                    Self::add_message(list_box, level, &text);
                 }
             }
 
@@ -100,26 +99,43 @@ impl Widget
         ::glib::Continue(false)
     }
 
-    fn add_message(revealer: &::gtk::Revealer, level: ::log::Level, text: &str)
+    fn add_message(list_box: &::gtk::ListBox, level: ::log::Level, text: &str)
     {
         use gtk::StyleContextExt;
 
-        if let Some(child) = revealer.get_child() {
-            let label = child.downcast::<::gtk::Label>()
+        let label = ::gtk::Label::new(Some(text));
+        label.show();
+        list_box.add(&label);
+
+        let context = label.get_style_context()
+            .unwrap();
+
+        for class in context.list_classes() {
+            context.remove_class(&class);
+        }
+
+        let class = format!("{}", level);
+        context.add_class(&class.to_lowercase());
+
+        if let Some(parent) = list_box.get_parent() {
+            let revealer = parent.downcast::<::gtk::Revealer>()
                 .unwrap();
-            label.set_text(text);
-
-            let context = label.get_style_context()
-                .unwrap();
-
-            for class in context.list_classes() {
-                context.remove_class(&class);
-            }
-
-            let class = format!("{}", level);
-            context.add_class(&class.to_lowercase());
 
             revealer.set_reveal_child(true);
+        }
+    }
+
+    fn hide(&self)
+    {
+        self.revealer.set_reveal_child(false);
+
+        if let Some(parent) = self.revealer.get_child() {
+            let list_box = parent.downcast::<::gtk::ListBox>()
+                .unwrap();
+
+            for child in list_box.get_children() {
+                child.destroy();
+            }
         }
     }
 }
@@ -132,8 +148,9 @@ impl ::relm::Widget for Widget
         self.init();
     }
 
-    fn model(_: ()) -> ()
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> ::relm::Relm<Widget>
     {
+        relm.clone()
     }
 
     fn update(&mut self, event: Msg)
@@ -141,19 +158,14 @@ impl ::relm::Widget for Widget
         use self::Msg::*;
 
         match event {
-            Hide => if let Some(child) = self.event_box.get_child() {
-                let revealer = child.downcast::<::gtk::Revealer>()
-                    .unwrap();
-                revealer.set_reveal_child(false);
-            },
+            Hide => self.hide(),
         }
     }
 
     view!
     {
-        #[name="event_box"]
-        gtk::EventBox {
-            button_press_event(_, _) => (Msg::Hide, ::gtk::Inhibit(false)),
+        #[name="revealer"]
+        gtk::Revealer {
         }
     }
 }

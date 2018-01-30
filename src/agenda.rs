@@ -9,12 +9,7 @@ pub enum Msg {
     Edit(Box<::tasks::Task>),
     Selected,
     Select(::chrono::DateTime<::chrono::Local>),
-    Update(bool, bool),
-}
-
-pub struct Model {
-    defered: bool,
-    done: bool,
+    Update,
 }
 
 macro_rules! update {
@@ -72,12 +67,13 @@ impl Widget
     fn get_tasks(&self, list: &::tasks::List, start: Option<::chrono::naive::NaiveDate>, end: Option<::chrono::naive::NaiveDate>) -> Vec<::tasks::Task>
     {
         let (_, month, _) = self.calendar.get_date();
+        let preferences = ::application::preferences();
 
         let tasks: Vec<::tasks::Task> = list.tasks.iter()
             .filter(|x| {
                 if let Some(due_date) = x.due_date {
-                    (self.model.done || !x.finished)
-                        && (self.model.defered || x.threshold_date.is_none() || start.is_none() || x.threshold_date.unwrap() <= start.unwrap())
+                    (preferences.done || !x.finished)
+                        && (preferences.defered || x.threshold_date.is_none() || start.is_none() || x.threshold_date.unwrap() <= start.unwrap())
                         && (start.is_none() || due_date >= start.unwrap())
                         && (end.is_none() || due_date < end.unwrap())
                 }
@@ -105,12 +101,8 @@ impl Widget
 #[widget]
 impl ::relm::Widget for Widget
 {
-    fn model(_: ()) -> Model
+    fn model(_: ()) -> ()
     {
-        Model {
-            defered: false,
-            done: false,
-        }
     }
 
     fn update(&mut self, event: Msg)
@@ -127,13 +119,7 @@ impl ::relm::Widget for Widget
                 self.calendar.select_month(date.month0(), date.year() as u32);
                 self.calendar.select_day(date.day());
             },
-            Update(defered, done) => {
-                self.model = Model {
-                    defered: defered,
-                    done: done,
-                };
-                self.update_tasks();
-            },
+            Update => self.update_tasks(),
         }
     }
 

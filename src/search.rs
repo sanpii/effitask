@@ -5,38 +5,29 @@ use widgets::tasks::Msg::{Complete, Edit};
 pub enum Msg {
     Complete(Box<::tasks::Task>),
     Edit(Box<::tasks::Task>),
-    Update(bool, bool),
+    Update,
     UpdateFilter(String),
-}
-
-pub struct Model {
-    list: ::tasks::List,
-    defered: bool,
-    done: bool,
-    filter: String,
 }
 
 impl Widget
 {
-    fn update_tasks(&mut self, defered: bool, done: bool)
+    fn update_tasks(&mut self)
     {
-        self.model.list = ::application::tasks();
-        self.model.defered = defered;
-        self.model.done = done;
         self.update();
     }
 
     fn update_filter(&mut self, filter: &str)
     {
-        self.model.filter = filter.to_string();
+        self.model = filter.to_string();
         self.update();
     }
 
     fn update(&self)
     {
-        let filter = self.model.filter.to_lowercase();
+        let filter = self.model.to_lowercase();
+        let list = ::application::tasks();
 
-        let tasks = self.model.list.tasks.iter()
+        let tasks = list.tasks.iter()
             .filter(|x| x.subject.to_lowercase().contains(filter.as_str()))
             .cloned()
             .collect();
@@ -48,14 +39,9 @@ impl Widget
 #[widget]
 impl ::relm::Widget for Widget
 {
-    fn model(_: ()) -> Model
+    fn model(_: ()) -> String
     {
-        Model {
-            list: ::tasks::List::new(),
-            filter: String::new(),
-            defered: false,
-            done: false,
-        }
+        String::new()
     }
 
     fn update(&mut self, event: Msg)
@@ -65,7 +51,7 @@ impl ::relm::Widget for Widget
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(defered, done) => self.update_tasks(defered, done),
+            Update => self.update_tasks(),
             UpdateFilter(filter) => self.update_filter(&filter),
         }
     }

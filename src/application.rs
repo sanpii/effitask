@@ -18,9 +18,38 @@ use widgets::tags::Msg::Edit as TagsEdit;
 
 pub const NAME: &str = "Effitask";
 
+#[derive(Clone)]
+pub struct Preferences {
+    pub defered: bool,
+    pub done: bool,
+}
+
+impl Preferences
+{
+    pub fn new() -> Self
+    {
+        Self {
+            defered: false,
+            done: false,
+        }
+    }
+}
+
 thread_local!(
+    static PREFERENCES: ::std::cell::RefCell<Preferences> = ::std::cell::RefCell::new(Preferences::new());
     static TASKS: ::std::cell::RefCell<::tasks::List> = ::std::cell::RefCell::new(::tasks::List::new());
 );
+
+pub fn preferences() -> Preferences
+{
+    let mut preferences = Preferences::new();
+
+    PREFERENCES.with(|p| {
+        preferences = p.borrow().clone();
+    });
+
+    preferences
+}
 
 pub fn tasks() -> ::tasks::List
 {
@@ -344,20 +373,23 @@ impl Widget
         };
 
         let list = ::tasks::List::from_files(&todo_file, &done_file);
-        let defered = self.model.defered_button.get_active();
-        let done = self.model.done_button.get_active();
 
         TASKS.with(|t| {
             *t.borrow_mut() = list.clone();
         });
 
-        self.inbox.emit(::inbox::Msg::Update(defered, done));
-        self.projects.emit(::widgets::tags::Msg::Update(defered, done));
-        self.contexts.emit(::widgets::tags::Msg::Update(defered, done));
-        self.agenda.emit(::agenda::Msg::Update(defered, done));
-        self.done.emit(::done::Msg::Update(defered, done));
-        self.flag.emit(::flag::Msg::Update(defered, done));
-        self.search.emit(::search::Msg::Update(defered, done));
+        PREFERENCES.with(|p| {
+            (*p.borrow_mut()).defered = self.model.defered_button.get_active();
+            (*p.borrow_mut()).done = self.model.done_button.get_active();
+        });
+
+        self.inbox.emit(::inbox::Msg::Update);
+        self.projects.emit(::widgets::tags::Msg::Update);
+        self.contexts.emit(::widgets::tags::Msg::Update);
+        self.agenda.emit(::agenda::Msg::Update);
+        self.done.emit(::done::Msg::Update);
+        self.flag.emit(::flag::Msg::Update);
+        self.search.emit(::search::Msg::Update);
     }
 
     fn preferences(&self)

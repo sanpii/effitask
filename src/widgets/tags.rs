@@ -12,27 +12,21 @@ pub enum Msg {
     Complete(Box<::tasks::Task>),
     Edit(Box<::tasks::Task>),
     UpdateFilters(Vec<String>),
-    Update(bool, bool),
-}
-
-pub struct Model {
-    defered: bool,
-    done: bool,
-    list: ::tasks::List,
-    tag: Type,
+    Update,
 }
 
 impl Tags
 {
     fn update_tags(&self, tag: Type)
     {
+        let list = ::application::tasks();
         let tags = match tag {
-            Type::Projects => self.model.list.projects(),
-            Type::Contexts => self.model.list.contexts(),
+            Type::Projects => list.projects(),
+            Type::Contexts => list.contexts(),
         };
 
         let tags = tags.iter()
-            .map(|x| (x.clone(), self.get_progress(tag, &self.model.list, x)))
+            .map(|x| (x.clone(), self.get_progress(tag, &list, x)))
             .filter(|&(_, (done, total))| done != total)
             .collect();
 
@@ -63,15 +57,17 @@ impl Tags
     fn update_tasks(&self, tag: Type, filters: &[String])
     {
         let today = ::date::today();
+        let preferences = ::application::preferences();
+        let list = ::application::tasks();
 
-        let tasks = self.model.list.tasks.iter()
+        let tasks = list.tasks.iter()
             .filter(|x| {
                 let tags = self.get_tags(tag, x);
 
-                (self.model.done || !x.finished)
+                (preferences.done || !x.finished)
                     && !tags.is_empty()
                     && Self::has_filter(tags, filters)
-                    && (self.model.defered || x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
+                    && (preferences.defered || x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
             .cloned()
             .collect();
@@ -102,14 +98,9 @@ impl Tags
 #[widget]
 impl ::relm::Widget for Tags
 {
-    fn model(tag: Type) -> Model
+    fn model(tag: Type) -> Type
     {
-        Model {
-            defered: false,
-            done: false,
-            list: ::tasks::List::new(),
-            tag: tag,
-        }
+        tag
     }
 
     fn update(&mut self, event: Msg)
@@ -119,15 +110,11 @@ impl ::relm::Widget for Tags
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update(defered, done) =>  {
-                self.model.list = ::application::tasks();
-                self.model.defered = defered;
-                self.model.done = done;
-
-                self.update_tags(self.model.tag);
-                self.update_tasks(self.model.tag, &[]);
+            Update =>  {
+                self.update_tags(self.model);
+                self.update_tasks(self.model, &[]);
             },
-            UpdateFilters(filters) =>  self.update_tasks(self.model.tag, &filters),
+            UpdateFilters(filters) =>  self.update_tasks(self.model, &filters),
         }
     }
 

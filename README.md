@@ -80,3 +80,15 @@ export DONE_FILE="$TODO_DIR/done.txt"
 
 ./target/release/effitask
 ```
+
+## Configuration
+
+As you can see above, effitask reuse todo.txt environment variables for
+configuration.
+
+* `TODO_DIR`: your todo.txt directory
+* `TODO_FILE`: your todo.txt location
+* `DONE_FILE`: your done.txt location
+* `TODO_NOTES_DIR`: directory for notes, `$TODO_DIR/notes` by default
+* `TODO_NOTE_EXT`: extension for note files, `.txt` by default
+* `TODO_NOTE_TAG`: tag name to add to task description, `note` by default

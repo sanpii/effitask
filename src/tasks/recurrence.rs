@@ -54,17 +54,18 @@ impl ::std::fmt::Display for Recurrence
     }
 }
 
-impl ::std::convert::Into<::chrono::Duration> for Recurrence
+impl ::std::ops::Add<::chrono::NaiveDate> for Recurrence
 {
-    fn into(self) -> ::chrono::Duration
-    {
-        use super::Period::*;
+    type Output = ::chrono::NaiveDate;
 
-        match self.period {
-            Day => ::chrono::Duration::days(self.num),
-            Week => ::chrono::Duration::weeks(self.num),
-            Month => ::chrono::Duration::weeks(self.num * 4),
-            Year => ::chrono::Duration::weeks(self.num * 52),
+    fn add(self, rhs: Self::Output) -> Self::Output
+    {
+        let mut result = rhs;
+
+        for _ in 0..self.num {
+            result = self.period.clone() + result;
         }
+
+        result
     }
 }

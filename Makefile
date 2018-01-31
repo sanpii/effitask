@@ -20,4 +20,7 @@ install:
 	install --mode 644 resources/*.png $(PREFIX)/usr/share/effitask/
 	install --mode 644 resources/*.css $(PREFIX)/usr/share/effitask/
 
-.PHONY: all build install
+test:
+	$(CARGO) test
+
+.PHONY: all build install test

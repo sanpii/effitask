@@ -39,7 +39,7 @@ impl Calendar
             };
         }
 
-        date += period.into();
+        date = period + date;
         self.set_date(Some(date));
         self.date_updated();
     }

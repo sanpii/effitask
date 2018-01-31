@@ -234,10 +234,10 @@ impl Widget
                 let mut new: ::tasks::Task = t.clone();
                 new.uncomplete();
                 new.create_date = Some(::date::today());
-                new.due_date = Some(due + recurrence.clone().into());
+                new.due_date = Some(recurrence.clone() + due);
 
                 if let Some(threshold_date) = t.threshold_date {
-                    new.threshold_date = Some(threshold_date + recurrence.clone().into());
+                    new.threshold_date = Some(recurrence.clone() + threshold_date);
                 }
 
                 list.append(new);

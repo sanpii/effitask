@@ -233,7 +233,7 @@ impl Widget
 
                 let mut new: ::tasks::Task = t.clone();
                 new.uncomplete();
-                (*new).create_date = Some(::date::today());
+                new.create_date = Some(::date::today());
                 new.due_date = Some(due + recurrence.clone().into());
 
                 if let Some(threshold_date) = t.threshold_date {

@@ -52,6 +52,10 @@ If you use archlinux, effitask is available in
 
 ### Manually
 
+Compiling effitask requires rust **nigtly**. I recommand to use
+[rustup](https://rustup.rs/) the `rust-toolchain` file sets the right version
+automatically.
+
 ```
 git clone https://github.com/sanpii/effitask
 cd effitask

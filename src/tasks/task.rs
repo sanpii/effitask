@@ -26,8 +26,9 @@ impl Task
 
         let regex = ::regex::Regex::new("(?P<url>[\\w]+://[^\\s]+)")
             .unwrap();
-        subject = regex.replace_all(&subject, "<a href=\"$url\">$url</a>")
-            .into_owned();
+        subject = regex.replace_all(&subject, |caps: &::regex::Captures| {
+            format!("<a href=\"{url}\">{url}</a>", url=caps[1].replace("&", "&amp;"))
+        }).into_owned();
 
         let regex = ::regex::Regex::new("(?P<space>^|[\\s])(?P<tag>[\\+@][\\w-]+)")
             .unwrap();

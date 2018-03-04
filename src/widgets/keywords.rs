@@ -189,7 +189,7 @@ impl ::relm::Widget for Keywords
             orientation: ::gtk::Orientation::Vertical,
             #[name="scroll"]
             gtk::ScrolledWindow {
-                packing: {
+                child: {
                     expand: true,
                     fill: true,
                 },
@@ -199,7 +199,7 @@ impl ::relm::Widget for Keywords
                 },
             },
             gtk::ActionBar {
-                packing: {
+                child: {
                     expand: false,
                     fill: true,
                 },

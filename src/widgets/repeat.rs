@@ -152,7 +152,7 @@ impl ::relm::Widget for Repeat
                 },
                 #[name="strict"]
                 gtk::CheckButton {
-                    packing: {
+                    child: {
                         expand: true,
                     },
                     halign: ::gtk::Align::Center,

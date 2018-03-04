@@ -80,14 +80,14 @@ impl ::relm::Widget for Tasks
             gtk::Box {
                 #[name="list_box"]
                 gtk::ListBox {
-                    padding: {
+                    child: {
                         fill: true,
                         expand: true,
                     },
                 },
                 #[name="label"]
                 gtk::Label {
-                    padding: {
+                    child: {
                         fill: true,
                         expand: true,
                     },

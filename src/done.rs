@@ -1,4 +1,5 @@
 use relm_attributes::widget;
+use ::widgets::Tasks;
 use widgets::tasks::Msg::{Complete, Edit};
 
 #[derive(Msg)]
@@ -43,7 +44,7 @@ impl ::relm::Widget for Widget
     view!
     {
         #[name="tasks"]
-        ::widgets::Tasks {
+        Tasks {
             Complete(ref task) => Msg::Complete(task.clone()),
             Edit(ref task) => Msg::Edit(task.clone()),
         }

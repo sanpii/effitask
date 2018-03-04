@@ -158,7 +158,7 @@ impl ::relm::Widget for Calendar
 
             #[name="label"]
             gtk::Label {
-                packing: {
+                child: {
                     expand: true,
                     fill: true,
                 },
@@ -170,7 +170,7 @@ impl ::relm::Widget for Calendar
                 orientation: ::gtk::Orientation::Vertical,
                 #[name="entry"]
                 gtk::Entry {
-                    packing: {
+                    child: {
                         expand: true,
                         fill: true,
                     },
@@ -182,7 +182,7 @@ impl ::relm::Widget for Calendar
                 gtk::Box {
                     orientation: ::gtk::Orientation::Horizontal,
                     gtk::Button {
-                        packing: {
+                        child: {
                             pack_type: ::gtk::PackType::End,
                         },
                         label: "+1y",
@@ -190,7 +190,7 @@ impl ::relm::Widget for Calendar
                         clicked => Msg::Add(::tasks::Period::Year),
                     },
                     gtk::Button {
-                        packing: {
+                        child: {
                             pack_type: ::gtk::PackType::End,
                         },
                         label: "+1m",
@@ -198,7 +198,7 @@ impl ::relm::Widget for Calendar
                         clicked => Msg::Add(::tasks::Period::Month),
                     },
                     gtk::Button {
-                        packing: {
+                        child: {
                             pack_type: ::gtk::PackType::End,
                         },
                         label: "+1w",
@@ -206,7 +206,7 @@ impl ::relm::Widget for Calendar
                         clicked => Msg::Add(::tasks::Period::Week),
                     },
                     gtk::Button {
-                        packing: {
+                        child: {
                             pack_type: ::gtk::PackType::End,
                         },
                         label: "+1d",

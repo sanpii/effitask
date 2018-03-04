@@ -13,9 +13,9 @@ log = "^0.4"
 pulldown-cmark = "^0.1"
 rand = "^0.4"
 regex = "^0.2"
-relm = "^0.11"
-relm-attributes = "^0.11"
-relm-derive = "^0.11"
+relm = "^0.12"
+relm-attributes = "^0.12"
+relm-derive = "^0.12"
 todo-txt = "^1.0"
 xdg = "^2.1"
 
@@ -26,3 +26,6 @@ features = ["v3_22"]
 [dependencies.clippy]
 version = "*"
 optional = true
+
+[features]
+default = ["relm/unstable", "relm-attributes/unstable", "relm-derive/unstable"]

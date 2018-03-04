@@ -4,15 +4,23 @@ use relm_attributes::widget;
 
 use agenda::Msg::Complete as AgendaComplete;
 use agenda::Msg::Edit as AgendaEdit;
+use agenda::Widget as AgendaWidget;
 use done::Msg::Complete as DoneComplete;
 use done::Msg::Edit as DoneEdit;
+use done::Widget as DoneWidget;
 use edit::Msg::{Cancel, Done};
+use edit::Widget as EditWidget;
 use flag::Msg::Complete as FlagComplete;
 use flag::Msg::Edit as FlagEdit;
+use flag::Widget as FlagWidget;
+use inbox::Widget as InboxWidget;
 use inbox::Msg::Complete as InboxComplete;
 use inbox::Msg::Edit as InboxEdit;
+use logger::Widget as LoggerWidget;
 use search::Msg::Complete as SearchComplete;
 use search::Msg::Edit as SearchEdit;
+use search::Widget as SearchWidget;
+use widgets::Tags as TagsWidget;
 use widgets::tags::Msg::Complete as TagsComplete;
 use widgets::tags::Msg::Edit as TagsEdit;
 
@@ -418,17 +426,17 @@ impl ::relm::Widget for Widget
                         clicked => Msg::Preferences,
                     },
                     gtk::SearchEntry {
-                        packing: {
+                        child: {
                             pack_type: ::gtk::PackType::End,
                         },
                         search_changed(entry) => Msg::Search(entry.get_text().unwrap().to_string()),
                     },
                 },
-                ::logger::Widget {
+                LoggerWidget {
                 },
                 #[name="paned"]
                 gtk::Paned {
-                    packing: {
+                    child: {
                         expand: true,
                         fill: true,
                     },
@@ -438,44 +446,44 @@ impl ::relm::Widget for Widget
                     gtk::Notebook {
                         tab_pos: ::gtk::PositionType::Left,
                         #[name="inbox"]
-                        ::inbox::Widget {
+                        InboxWidget {
                             InboxComplete(ref task) => Msg::Complete(task.clone()),
                             InboxEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="projects"]
-                        ::widgets::Tags(::widgets::tags::Type::Projects) {
+                        TagsWidget(::widgets::tags::Type::Projects) {
                             TagsComplete(ref task) => Msg::Complete(task.clone()),
                             TagsEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="contexts"]
-                        ::widgets::Tags(::widgets::tags::Type::Contexts) {
+                        TagsWidget(::widgets::tags::Type::Contexts) {
                             TagsComplete(ref task) => Msg::Complete(task.clone()),
                             TagsEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="agenda"]
-                        ::agenda::Widget {
+                        AgendaWidget {
                             AgendaComplete(ref task) => Msg::Complete(task.clone()),
                             AgendaEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="flag"]
-                        ::flag::Widget {
+                        FlagWidget {
                             FlagComplete(ref task) => Msg::Complete(task.clone()),
                             FlagEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="done"]
-                        ::done::Widget {
+                        DoneWidget {
                             DoneComplete(ref task) => Msg::Complete(task.clone()),
                             DoneEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="search"]
-                        ::search::Widget {
+                        SearchWidget {
                             SearchComplete(ref task) => Msg::Complete(task.clone()),
                             SearchEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         switch_page(_, _, _) => Msg::SwitchPage,
                     },
                     #[name="edit"]
-                    ::edit::Widget {
+                    EditWidget {
                         Cancel => Msg::EditCancel,
                         Done(ref task) => Msg::EditDone(task.clone()),
                     },

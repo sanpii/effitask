@@ -1,6 +1,7 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
+use widgets::Tasks;
 use widgets::tasks::Msg::{Complete, Edit};
 
 #[derive(Msg)]
@@ -202,7 +203,7 @@ impl ::relm::Widget for Filter
             },
             gtk::ScrolledWindow {
                 #[name="tasks"]
-                ::widgets::Tasks {
+                Tasks {
                     Complete(ref task) => Msg::Complete(task.clone()),
                     Edit(ref task) => Msg::Edit(task.clone()),
                 },

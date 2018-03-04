@@ -1,6 +1,7 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
+use widgets::Tasks;
 use widgets::tasks::Msg::{Complete, Edit};
 
 #[derive(Msg)]
@@ -135,7 +136,7 @@ impl ::relm::Widget for Widget
                     day_selected => Msg::Selected,
                 },
                 gtk::Button {
-                    packing: {
+                    child: {
                         padding: 5,
                     },
                     label: "Today",
@@ -143,7 +144,7 @@ impl ::relm::Widget for Widget
                 },
             },
             gtk::ScrolledWindow {
-                packing: {
+                child: {
                     expand: true,
                 },
                 gtk::Box {
@@ -152,7 +153,7 @@ impl ::relm::Widget for Widget
                     gtk::Expander {
                         label: "Past due",
                         #[name="past"]
-                        ::widgets::Tasks {
+                        Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
@@ -162,7 +163,7 @@ impl ::relm::Widget for Widget
                     gtk::Expander {
                         label: "Today",
                         #[name="today"]
-                        ::widgets::Tasks {
+                        Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
@@ -172,7 +173,7 @@ impl ::relm::Widget for Widget
                     gtk::Expander {
                         label: "Tomorrow",
                         #[name="tomorrow"]
-                        ::widgets::Tasks {
+                        Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
@@ -182,7 +183,7 @@ impl ::relm::Widget for Widget
                     gtk::Expander {
                         label: "This week",
                         #[name="week"]
-                        ::widgets::Tasks {
+                        Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
@@ -192,7 +193,7 @@ impl ::relm::Widget for Widget
                     gtk::Expander {
                         label: "This month",
                         #[name="month"]
-                        ::widgets::Tasks {
+                        Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),

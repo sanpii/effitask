@@ -1,4 +1,5 @@
 use relm_attributes::widget;
+use widgets::Filter;
 use widgets::filter::Msg::{Complete, Edit, Filters};
 
 #[derive(Clone, Copy)]
@@ -121,7 +122,7 @@ impl ::relm::Widget for Tags
     view!
     {
         #[name="filter"]
-        ::widgets::Filter {
+        Filter {
             Complete(ref task) => Msg::Complete(task.clone()),
             Edit(ref task) => Msg::Edit(task.clone()),
             Filters(ref filter) => Msg::UpdateFilters(filter.clone()),

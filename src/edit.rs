@@ -1,6 +1,7 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
+use widgets::{Calendar, Keywords, Priority, Repeat};
 use widgets::calendar::Msg::Updated as CalendarUpdated;
 use widgets::keywords::Msg::Updated as KeywordsUpdated;
 use widgets::priority::Msg::Updated as PriorityUpdated;
@@ -186,12 +187,12 @@ impl ::relm::Widget for Widget
                     gtk::Box {
                         orientation: ::gtk::Orientation::Horizontal,
                         #[name="priority"]
-                        ::widgets::Priority {
+                        Priority {
                             PriorityUpdated(priority) => Msg::UpdatePriority(priority),
                         },
                         #[name="flag"]
                         gtk::ToggleButton {
-                            packing: {
+                            child: {
                                 expand: true,
                             },
                             halign: ::gtk::Align::Center,
@@ -207,32 +208,32 @@ impl ::relm::Widget for Widget
                         spacing: 10,
                         orientation: ::gtk::Orientation::Vertical,
                         #[name="threshold"]
-                        ::widgets::Calendar("Defer until".to_owned()) {
+                        Calendar("Defer until".to_owned()) {
                             CalendarUpdated(date) => Msg::UpdateDate(DateType::Threshold, date),
                         },
                         #[name="due"]
-                        ::widgets::Calendar("Due".to_owned()) {
+                        Calendar("Due".to_owned()) {
                             CalendarUpdated(date) => Msg::UpdateDate(DateType::Due, date),
                         },
                         #[name="finish"]
-                        ::widgets::Calendar("Completed".to_owned()) {
+                        Calendar("Completed".to_owned()) {
                             CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
                         },
                         #[name="created"]
-                        ::widgets::Calendar("Created".to_owned()),
+                        Calendar("Created".to_owned()),
                     },
                 },
                 gtk::Frame {
                     label: "Repeat",
                     #[name="repeat"]
-                    ::widgets::Repeat {
+                    Repeat {
                         RepeatUpdated(ref recurrence) => Msg::UpdateRepeat(recurrence.clone()),
                     },
                 },
                 gtk::Frame {
                     label: "Keywords",
                     #[name="keywords"]
-                    ::widgets::Keywords {
+                    Keywords {
                         KeywordsUpdated(ref keywords) => Msg::EditKeyword(keywords.clone()),
                     },
                 },
@@ -243,7 +244,7 @@ impl ::relm::Widget for Widget
                     },
                 },
                 gtk::ActionBar {
-                    packing: {
+                    child: {
                         pack_type: ::gtk::PackType::End,
                     },
                     gtk::ButtonBox {

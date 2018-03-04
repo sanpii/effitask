@@ -1,6 +1,7 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
+use widgets::Circle;
 
 #[derive(Msg)]
 pub enum Msg {
@@ -170,7 +171,7 @@ impl ::relm::Widget for Task
                 spacing: 5,
                 gtk::Box {
                     orientation: ::gtk::Orientation::Vertical,
-                    packing: {
+                    child: {
                         expand: true,
                         fill: true,
                     },
@@ -182,7 +183,7 @@ impl ::relm::Widget for Task
                             toggled => Msg::Toggle,
                         },
                         gtk::Label {
-                            packing: {
+                            child: {
                                 expand: true,
                                 fill: true,
                             },
@@ -210,7 +211,7 @@ impl ::relm::Widget for Task
                         #[name="date"]
                         gtk::Box {
                             spacing: 5,
-                            packing: {
+                            child: {
                                 pack_type: ::gtk::PackType::End,
                             },
                             #[name="threshold_label"]
@@ -227,8 +228,8 @@ impl ::relm::Widget for Task
                     },
                 },
                 #[name="circle"]
-                ::widgets::Circle(self.model.task.clone()) {
-                    packing: {
+                Circle(self.model.task.clone()) {
+                    child: {
                         expand: false,
                         fill: true,
                     },

@@ -58,6 +58,13 @@ Compiling effitask requires rust **nigtly**. I recommand to use
 [rustup](https://rustup.rs/) the `rust-toolchain` file sets the right version
 automatically.
 
+You also need `gtk+ 3.0` on your system. Depending of your distributon, run:
+
+```
+apt install libgtk-3-dev # debian
+pacman -S gtk3 # archlinux
+```
+
 ```
 git clone https://github.com/sanpii/effitask
 cd effitask

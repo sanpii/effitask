@@ -10,8 +10,14 @@ endif
 
 all: build
 
-build:
+build: gtk+-3.0
 	$(CARGO) build $(CARGO_FLAGS)
+
+gtk+-3.0:
+	@if ! pkg-config $@; then \
+		printf '%s not installed\n' "$@" >&2; \
+		exit 1; \
+	fi
 
 install:
 	install --directory $(PREFIX)/usr/bin

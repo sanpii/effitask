@@ -22,7 +22,7 @@ impl Task
 
     pub fn markup_subject(&self) -> String
     {
-        let mut subject = self.subject.clone();
+        let mut subject = Self::markup_escape(&self.subject);
 
         let regex = ::regex::Regex::new("(?P<url>[\\w]+://[^\\s]+)")
             .unwrap();
@@ -36,6 +36,16 @@ impl Task
             .into_owned();
 
         subject
+    }
+
+    /* TODO: use `glib:functions:markup_escape_text` */
+    fn markup_escape(text: &str) -> String
+    {
+        text.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("'", "&apos;")
+            .replace("\"", "&quot;")
     }
 
     fn note(task: &::todo_txt::Task) -> super::Note
@@ -170,5 +180,20 @@ impl ::std::cmp::Ord for Task
         }
 
         ::std::cmp::Ordering::Equal
+    }
+}
+
+#[cfg(test)]
+mod tests
+{
+    use ::tasks::task::*;
+
+    #[test]
+    fn markup_escape()
+    {
+        let mut task = Task::new();
+        task.subject = "P&T keep focus on long term +HoWE".to_string();
+
+        assert_eq!(task.markup_subject(), "P&amp;T keep focus on long term <b>+HoWE</b>");
     }
 }

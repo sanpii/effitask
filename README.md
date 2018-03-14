@@ -1,5 +1,7 @@
 # Effitask
 
+[![Build Status](https://gitlab.com/sanpi/effitask/badges/master/build.svg)](https://gitlab.com/sanpi/effitask/commits/master)
+
 Effitask is a graphical task manager, based on the [todo.txt
 format](https://github.com/todotxt/todo.txt).
 

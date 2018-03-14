@@ -29,3 +29,6 @@ optional = true
 
 [features]
 default = ["relm/unstable", "relm-attributes/unstable", "relm-derive/unstable"]
+
+[badges]
+gitlab = { repository = "sanpi/effitask", branch = "master" }

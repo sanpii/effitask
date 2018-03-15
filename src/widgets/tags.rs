@@ -16,10 +16,8 @@ pub enum Msg {
     Update,
 }
 
-impl Tags
-{
-    fn update_tags(&self, tag: Type)
-    {
+impl Tags {
+    fn update_tags(&self, tag: Type) {
         let list = ::application::tasks();
         let tags = match tag {
             Type::Projects => list.projects(),
@@ -31,12 +29,13 @@ impl Tags
             .filter(|&(_, (done, total))| done != total)
             .collect();
 
-        self.filter.emit(::widgets::filter::Msg::UpdateFilters(tags));
+        self.filter
+            .emit(::widgets::filter::Msg::UpdateFilters(tags));
     }
 
-    fn get_progress(&self, tag: Type, list: &::tasks::List, current: &str) -> (u32, u32)
-    {
-        list.tasks.iter()
+    fn get_progress(&self, tag: Type, list: &::tasks::List, current: &str) -> (u32, u32) {
+        list.tasks
+            .iter()
             .filter(|x| {
                 for tag in self.get_tags(tag, x) {
                     if tag == current || tag.starts_with(format!("{}-", current).as_str()) {
@@ -55,20 +54,20 @@ impl Tags
             })
     }
 
-    fn update_tasks(&self, tag: Type, filters: &[String])
-    {
+    fn update_tasks(&self, tag: Type, filters: &[String]) {
         let today = ::date::today();
         let preferences = ::application::preferences();
         let list = ::application::tasks();
 
-        let tasks = list.tasks.iter()
+        let tasks = list.tasks
+            .iter()
             .filter(|x| {
                 let tags = self.get_tags(tag, x);
 
-                (preferences.done || !x.finished)
-                    && !tags.is_empty()
+                (preferences.done || !x.finished) && !tags.is_empty()
                     && Self::has_filter(tags, filters)
-                    && (preferences.defered || x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
+                    && (preferences.defered || x.threshold_date.is_none()
+                        || x.threshold_date.unwrap() <= today)
             })
             .cloned()
             .collect();
@@ -76,16 +75,14 @@ impl Tags
         self.filter.emit(::widgets::filter::Msg::UpdateTasks(tasks));
     }
 
-    fn get_tags<'a>(&self, tag: Type, task: &'a ::tasks::Task) -> &'a Vec<String>
-    {
+    fn get_tags<'a>(&self, tag: Type, task: &'a ::tasks::Task) -> &'a Vec<String> {
         match tag {
             Type::Projects => &task.projects,
             Type::Contexts => &task.contexts,
         }
     }
 
-    fn has_filter(tags: &[String], filters: &[String]) -> bool
-    {
+    fn has_filter(tags: &[String], filters: &[String]) -> bool {
         for filter in filters {
             if tags.contains(filter) {
                 return true;
@@ -97,25 +94,22 @@ impl Tags
 }
 
 #[widget]
-impl ::relm::Widget for Tags
-{
-    fn model(tag: Type) -> Type
-    {
+impl ::relm::Widget for Tags {
+    fn model(tag: Type) -> Type {
         tag
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {
             Complete(_) => (),
             Edit(_) => (),
-            Update =>  {
+            Update => {
                 self.update_tags(self.model);
                 self.update_tasks(self.model, &[]);
-            },
-            UpdateFilters(filters) =>  self.update_tasks(self.model, &filters),
+            }
+            UpdateFilters(filters) => self.update_tasks(self.model, &filters),
         }
     }
 

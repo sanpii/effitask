@@ -1,17 +1,16 @@
 #![feature(proc_macro)]
 #![feature(slice_concat_ext)]
-
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature = "clippy", feature(plugin))]
+#![cfg_attr(feature = "clippy", plugin(clippy))]
 
 extern crate cairo;
 extern crate chrono;
-#[macro_use]
-extern crate log;
 extern crate gdk;
 extern crate gdk_sys;
 extern crate glib;
 extern crate gtk;
+#[macro_use]
+extern crate log;
 extern crate pulldown_cmark;
 extern crate rand;
 extern crate regex;
@@ -38,20 +37,17 @@ mod search;
 mod tasks;
 mod widgets;
 
-fn main()
-{
+fn main() {
     if ::std::env::args().nth(1) == Some("usage".to_owned()) {
         usage(&::std::env::args().nth(0).unwrap());
 
         ::std::process::exit(0);
     }
 
-    ::application::Widget::run(())
-        .unwrap();
+    ::application::Widget::run(()).unwrap();
 }
 
-fn usage(program: &str)
-{
+fn usage(program: &str) {
     let path = ::std::path::Path::new(&program);
 
     println!("    {}", path.file_name().unwrap().to_str().unwrap());

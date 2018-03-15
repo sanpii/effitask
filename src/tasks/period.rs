@@ -6,20 +6,16 @@ pub enum Period {
     Year,
 }
 
-impl Period
-{
-    fn is_leap_year(year: i32) -> bool
-    {
+impl Period {
+    fn is_leap_year(year: i32) -> bool {
         year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
     }
 }
 
-impl ::std::str::FromStr for Period
-{
+impl ::std::str::FromStr for Period {
     type Err = ();
 
-    fn from_str(s: &str) -> Result<Self, ()>
-    {
+    fn from_str(s: &str) -> Result<Self, ()> {
         use self::Period::*;
 
         match s {
@@ -32,10 +28,8 @@ impl ::std::str::FromStr for Period
     }
 }
 
-impl ::std::fmt::Display for Period
-{
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result
-    {
+impl ::std::fmt::Display for Period {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         use self::Period::*;
 
         let s = match *self {
@@ -51,12 +45,10 @@ impl ::std::fmt::Display for Period
     }
 }
 
-impl ::std::ops::Add<::chrono::NaiveDate> for Period
-{
+impl ::std::ops::Add<::chrono::NaiveDate> for Period {
     type Output = ::chrono::NaiveDate;
 
-    fn add(self, rhs: Self::Output) -> Self::Output
-    {
+    fn add(self, rhs: Self::Output) -> Self::Output {
         use chrono::Datelike;
         use self::Period::*;
 
@@ -74,15 +66,12 @@ impl ::std::ops::Add<::chrono::NaiveDate> for Period
         let max_days = if m == 2 {
             if Period::is_leap_year(y) {
                 29
-            }
-            else {
+            } else {
                 28
             }
-        }
-        else if [1, 3, 5, 7, 8, 10, 12].contains(&m) {
+        } else if [1, 3, 5, 7, 8, 10, 12].contains(&m) {
             31
-        }
-        else {
+        } else {
             30
         };
 
@@ -101,13 +90,11 @@ impl ::std::ops::Add<::chrono::NaiveDate> for Period
 }
 
 #[cfg(test)]
-mod tests
-{
-    use ::tasks::Period::*;
+mod tests {
+    use tasks::Period::*;
 
     #[test]
-    fn add_year()
-    {
+    fn add_year() {
         let current = Year + ::chrono::NaiveDate::from_ymd(1999, 1, 1);
         let expected = ::chrono::NaiveDate::from_ymd(2000, 1, 1);
 
@@ -115,8 +102,7 @@ mod tests
     }
 
     #[test]
-    fn add_month()
-    {
+    fn add_month() {
         let current = Month + ::chrono::NaiveDate::from_ymd(1999, 1, 1);
         let expected = ::chrono::NaiveDate::from_ymd(1999, 2, 1);
 
@@ -124,8 +110,7 @@ mod tests
     }
 
     #[test]
-    fn add_month_extra()
-    {
+    fn add_month_extra() {
         let current = Month + ::chrono::NaiveDate::from_ymd(1999, 12, 1);
         let expected = ::chrono::NaiveDate::from_ymd(2000, 1, 1);
 
@@ -133,8 +118,7 @@ mod tests
     }
 
     #[test]
-    fn add_week()
-    {
+    fn add_week() {
         let current = Week + ::chrono::NaiveDate::from_ymd(1999, 1, 1);
         let expected = ::chrono::NaiveDate::from_ymd(1999, 1, 8);
 
@@ -142,8 +126,7 @@ mod tests
     }
 
     #[test]
-    fn add_day()
-    {
+    fn add_day() {
         let current = Day + ::chrono::NaiveDate::from_ymd(1999, 1, 1);
         let expected = ::chrono::NaiveDate::from_ymd(1999, 1, 2);
 
@@ -151,8 +134,7 @@ mod tests
     }
 
     #[test]
-    fn add_day_extra()
-    {
+    fn add_day_extra() {
         let current = Day + ::chrono::NaiveDate::from_ymd(1999, 1, 31);
         let expected = ::chrono::NaiveDate::from_ymd(1999, 2, 1);
 

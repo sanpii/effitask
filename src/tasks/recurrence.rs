@@ -5,12 +5,10 @@ pub struct Recurrence {
     pub strict: bool,
 }
 
-impl ::std::str::FromStr for Recurrence
-{
+impl ::std::str::FromStr for Recurrence {
     type Err = ();
 
-    fn from_str(s: &str) -> Result<Self, ()>
-    {
+    fn from_str(s: &str) -> Result<Self, ()> {
         let mut s = s;
 
         if s.len() < 2 && s.len() > 3 {
@@ -20,8 +18,7 @@ impl ::std::str::FromStr for Recurrence
         let strict = if s.get(0..1) == Some("+") {
             s = s.trim_left_matches('+');
             true
-        }
-        else {
+        } else {
             false
         };
 
@@ -40,10 +37,8 @@ impl ::std::str::FromStr for Recurrence
     }
 }
 
-impl ::std::fmt::Display for Recurrence
-{
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result
-    {
+impl ::std::fmt::Display for Recurrence {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         if self.strict {
             f.write_str("+")?;
         }
@@ -54,12 +49,10 @@ impl ::std::fmt::Display for Recurrence
     }
 }
 
-impl ::std::ops::Add<::chrono::NaiveDate> for Recurrence
-{
+impl ::std::ops::Add<::chrono::NaiveDate> for Recurrence {
     type Output = ::chrono::NaiveDate;
 
-    fn add(self, rhs: Self::Output) -> Self::Output
-    {
+    fn add(self, rhs: Self::Output) -> Self::Output {
         let mut result = rhs;
 
         for _ in 0..self.num {

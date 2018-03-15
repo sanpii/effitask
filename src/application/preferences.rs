@@ -4,10 +4,8 @@ pub struct Preferences {
     pub done: bool,
 }
 
-impl Preferences
-{
-    pub fn new() -> Self
-    {
+impl Preferences {
+    pub fn new() -> Self {
         Self {
             defered: false,
             done: false,

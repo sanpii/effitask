@@ -20,17 +20,13 @@ pub struct Model {
 }
 
 #[widget]
-impl ::relm::Widget for Task
-{
-    fn init_view(&mut self)
-    {
+impl ::relm::Widget for Task {
+    fn init_view(&mut self) {
         use gtk::StyleContextExt;
 
         let task = &self.model.task;
 
-        let context = self.root()
-            .get_style_context()
-            .unwrap();
+        let context = self.root().get_style_context().unwrap();
 
         context.add_class("task");
 
@@ -47,50 +43,44 @@ impl ::relm::Widget for Task
         if note.is_some() {
             self.model.note.set_relative_to(Some(&self.note_button));
             self.model.note.add(&self.model.note_label);
-        }
-        else {
+        } else {
             self.note_button.hide();
         }
 
         if task.tags.len() > 0 {
-            let text = task.tags.iter()
+            let text = task.tags
+                .iter()
                 .map(|(k, v)| format!("{}: {}", k, v))
                 .collect::<Vec<String>>()
                 .join(" · ");
 
             self.keywords_label.set_text(&text);
-        }
-        else {
+        } else {
             self.keywords.hide();
         }
 
-        let context = self.date.get_style_context()
-            .unwrap();
+        let context = self.date.get_style_context().unwrap();
         context.add_class("date");
 
         if let Some(threshold) = task.threshold_date {
-            let context = self.threshold_label.get_style_context()
-                .unwrap();
+            let context = self.threshold_label.get_style_context().unwrap();
             context.add_class("threshold");
 
             let date = self.date_alias(threshold);
-            self.threshold_label.set_text(format!("Deferred until {}", date).as_str());
-
-        }
-        else {
+            self.threshold_label
+                .set_text(format!("Deferred until {}", date).as_str());
+        } else {
             self.threshold_label.hide();
         }
 
         if task.threshold_date.is_some() && task.due_date.is_some() {
             self.arrow_label.show();
-        }
-        else {
+        } else {
             self.arrow_label.hide();
         }
 
         if let Some(due) = task.due_date {
-            let context = self.due_label.get_style_context()
-                .unwrap();
+            let context = self.due_label.get_style_context().unwrap();
             context.add_class("due");
 
             let date = self.date_alias(due);
@@ -102,33 +92,26 @@ impl ::relm::Widget for Task
             }
 
             self.due_label.set_text(format!("due: {}", date).as_str());
-        }
-        else {
+        } else {
             self.due_label.hide();
         }
     }
 
-    fn date_alias(&self, date: ::chrono::NaiveDate) -> String
-    {
+    fn date_alias(&self, date: ::chrono::NaiveDate) -> String {
         let today = ::date::today();
 
         if date == today {
             String::from("today")
-        }
-        else if date == today.pred() {
+        } else if date == today.pred() {
             String::from("yesterday")
-        }
-        else if date == today.succ() {
+        } else if date == today.succ() {
             String::from("tomorrow")
-        }
-        else {
-            date.format("%Y-%m-%d")
-                .to_string()
+        } else {
+            date.format("%Y-%m-%d").to_string()
         }
     }
 
-    fn model(relm: &::relm::Relm<Self>, task: ::tasks::Task) -> Model
-    {
+    fn model(relm: &::relm::Relm<Self>, task: ::tasks::Task) -> Model {
         let note_label = ::gtk::Label::new(None);
         note_label.show();
 
@@ -147,18 +130,23 @@ impl ::relm::Widget for Task
         }
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {
             Click(event) => if event.get_event_type() == ::gdk::EventType::DoubleButtonPress {
-                self.model.relm.stream().emit(Edit(Box::new(self.model.task.clone())))
+                self.model
+                    .relm
+                    .stream()
+                    .emit(Edit(Box::new(self.model.task.clone())))
             },
             Complete(_) => (),
             Edit(_) => (),
             ShowNote => self.model.note.popup(),
-            Toggle => self.model.relm.stream().emit(Complete(Box::new(self.model.task.clone()))),
+            Toggle => self.model
+                .relm
+                .stream()
+                .emit(Complete(Box::new(self.model.task.clone()))),
         }
     }
 

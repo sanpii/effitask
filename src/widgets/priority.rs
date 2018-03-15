@@ -9,22 +9,18 @@ pub enum Msg {
     Updated(u8),
 }
 
-impl Priority
-{
-    fn more(&self)
-    {
+impl Priority {
+    fn more(&self) {
         self.hbox.hide();
         self.button.show();
     }
 
-    fn less(&self)
-    {
+    fn less(&self) {
         self.hbox.show();
         self.button.hide();
     }
 
-    fn set(&self, priority: u8)
-    {
+    fn set(&self, priority: u8) {
         self.button.set_value(f64::from(priority));
 
         match priority {
@@ -39,24 +35,21 @@ impl Priority
 
         if priority < 5 || priority == 26 {
             self.less();
-        }
-        else {
+        } else {
             self.more();
         }
     }
 
-    fn updated(&self, priority: u8)
-    {
+    fn updated(&self, priority: u8) {
         self.button.set_value(f64::from(priority));
     }
 }
 
 #[widget]
-impl ::relm::Widget for Priority
-{
-    fn init_view(&mut self)
-    {
-        self.button.set_adjustment(&::gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
+impl ::relm::Widget for Priority {
+    fn init_view(&mut self) {
+        self.button
+            .set_adjustment(&::gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
         self.button.hide();
 
         self.b.join_group(Some(&self.a));
@@ -66,12 +59,9 @@ impl ::relm::Widget for Priority
         self.z.join_group(Some(&self.a));
     }
 
-    fn model(_: ()) -> ()
-    {
-    }
+    fn model(_: ()) -> () {}
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {
@@ -132,7 +122,10 @@ impl ::relm::Widget for Priority
             },
             #[name="button"]
             gtk::SpinButton {
-                focus_out_event(button, _) => (Msg::Updated(button.get_value() as u8), ::gtk::Inhibit(false)),
+                focus_out_event(button, _) => (
+                    Msg::Updated(button.get_value() as u8),
+                    ::gtk::Inhibit(false)
+                ),
             },
         }
     }

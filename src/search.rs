@@ -10,25 +10,22 @@ pub enum Msg {
     UpdateFilter(String),
 }
 
-impl Widget
-{
-    fn update_tasks(&mut self)
-    {
+impl Widget {
+    fn update_tasks(&mut self) {
         self.update();
     }
 
-    fn update_filter(&mut self, filter: &str)
-    {
+    fn update_filter(&mut self, filter: &str) {
         self.model = filter.to_string();
         self.update();
     }
 
-    fn update(&self)
-    {
+    fn update(&self) {
         let filter = self.model.to_lowercase();
         let list = ::application::tasks();
 
-        let tasks = list.tasks.iter()
+        let tasks = list.tasks
+            .iter()
             .filter(|x| x.subject.to_lowercase().contains(filter.as_str()))
             .cloned()
             .collect();
@@ -38,15 +35,12 @@ impl Widget
 }
 
 #[widget]
-impl ::relm::Widget for Widget
-{
-    fn model(_: ()) -> String
-    {
+impl ::relm::Widget for Widget {
+    fn model(_: ()) -> String {
         String::new()
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {

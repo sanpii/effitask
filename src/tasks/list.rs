@@ -5,10 +5,8 @@ pub struct List {
     done: String,
 }
 
-impl List
-{
-    pub fn new() -> Self
-    {
+impl List {
+    pub fn new() -> Self {
         Self {
             tasks: Vec::new(),
             todo: String::new(),
@@ -16,8 +14,7 @@ impl List
         }
     }
 
-    pub fn from_files(todo: &str, done: &str) -> Self
-    {
+    pub fn from_files(todo: &str, done: &str) -> Self {
         let mut list = Self::new();
 
         list.load_todo(todo);
@@ -26,24 +23,21 @@ impl List
         list
     }
 
-    fn load_todo(&mut self, todo: &str)
-    {
+    fn load_todo(&mut self, todo: &str) {
         let tasks = self.load_file(todo);
 
         self.todo = todo.to_string();
         self.tasks.extend(tasks);
     }
 
-    fn load_done(&mut self, done: &str)
-    {
+    fn load_done(&mut self, done: &str) {
         let tasks = self.load_file(done);
 
         self.done = done.to_string();
         self.tasks.extend(tasks);
     }
 
-    fn load_file(&self, path: &str) -> Vec<::tasks::Task>
-    {
+    fn load_file(&self, path: &str) -> Vec<::tasks::Task> {
         use std::io::BufRead;
         use std::str::FromStr;
 
@@ -54,7 +48,7 @@ impl List
                 error!("Unable to open {:?}", path);
 
                 return tasks;
-            },
+            }
         };
 
         let last_id = self.tasks.len();
@@ -70,7 +64,7 @@ impl List
                 Ok(mut task) => {
                     task.id = last_id + id;
                     tasks.push(task);
-                },
+                }
                 Err(_) => error!("Invalid tasks: '{}'", line),
             };
         }
@@ -78,12 +72,14 @@ impl List
         tasks
     }
 
-    pub fn projects(&self) -> Vec<String>
-    {
+    pub fn projects(&self) -> Vec<String> {
         let today = ::date::today();
 
-        let mut projects = self.tasks.iter()
-            .filter(|x| !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today))
+        let mut projects = self.tasks
+            .iter()
+            .filter(|x| {
+                !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
+            })
             .fold(Vec::new(), |mut acc, item| {
                 let mut projects = item.projects.clone();
 
@@ -98,12 +94,14 @@ impl List
         projects
     }
 
-    pub fn contexts(&self) -> Vec<String>
-    {
+    pub fn contexts(&self) -> Vec<String> {
         let today = ::date::today();
 
-        let mut contexts = self.tasks.iter()
-            .filter(|x| !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today))
+        let mut contexts = self.tasks
+            .iter()
+            .filter(|x| {
+                !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
+            })
             .fold(Vec::new(), |mut acc, item| {
                 let mut contexts = item.contexts.clone();
 
@@ -118,25 +116,17 @@ impl List
         contexts
     }
 
-    pub fn write(&self) -> Result<(), String>
-    {
-        let todo = self.tasks.iter()
-            .filter(|x| !x.finished)
-            .cloned()
-            .collect();
+    pub fn write(&self) -> Result<(), String> {
+        let todo = self.tasks.iter().filter(|x| !x.finished).cloned().collect();
         self.write_tasks(&self.todo, todo)?;
 
-        let done = self.tasks.iter()
-            .filter(|x| x.finished)
-            .cloned()
-            .collect();
+        let done = self.tasks.iter().filter(|x| x.finished).cloned().collect();
         self.write_tasks(&self.done, done)?;
 
         Ok(())
     }
 
-    fn write_tasks(&self, file: &str, tasks: Vec<::tasks::Task>) -> Result<(), String>
-    {
+    fn write_tasks(&self, file: &str, tasks: Vec<::tasks::Task>) -> Result<(), String> {
         use std::io::Write;
 
         self.backup(file)?;
@@ -158,8 +148,7 @@ impl List
         Ok(())
     }
 
-    fn backup(&self, file: &str) -> Result<(), String>
-    {
+    fn backup(&self, file: &str) -> Result<(), String> {
         let bak = format!("{}.bak", file);
 
         match ::std::fs::copy(file, bak) {
@@ -168,8 +157,7 @@ impl List
         }
     }
 
-    pub fn add(&mut self, text: &str) -> Result<(), String>
-    {
+    pub fn add(&mut self, text: &str) -> Result<(), String> {
         use std::str::FromStr;
 
         let mut task = match ::tasks::Task::from_str(text) {
@@ -183,8 +171,7 @@ impl List
         self.write()
     }
 
-    pub fn append(&mut self, task: ::tasks::Task)
-    {
+    pub fn append(&mut self, task: ::tasks::Task) {
         self.tasks.push(task);
     }
 }

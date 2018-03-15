@@ -15,17 +15,14 @@ pub struct Model {
     relm: ::relm::Relm<Tasks>,
 }
 
-impl Tasks
-{
-    fn update_tasks(&mut self, tasks: &[::tasks::Task])
-    {
+impl Tasks {
+    fn update_tasks(&mut self, tasks: &[::tasks::Task]) {
         self.clear();
 
         if tasks.is_empty() {
             self.list_box.hide();
             self.label.show();
-        }
-        else {
+        } else {
             self.list_box.show();
             self.label.hide();
 
@@ -34,17 +31,26 @@ impl Tasks
             sorted_tasks.reverse();
 
             for task in &sorted_tasks {
-                let child = self.list_box.add_widget::<super::Task, _>(&self.model.relm, task.clone());
-                connect!(child@::widgets::task::Msg::Complete(ref task), self.model.relm, Msg::Complete(task.clone()));
-                connect!(child@::widgets::task::Msg::Edit(ref task), self.model.relm, Msg::Edit(task.clone()));
+                let child = self.list_box
+                    .add_widget::<super::Task, _>(&self.model.relm, task.clone());
+
+                connect!(
+                    child@::widgets::task::Msg::Complete(ref task),
+                    self.model.relm,
+                    Msg::Complete(task.clone())
+                );
+                connect!(
+                    child@::widgets::task::Msg::Edit(ref task),
+                    self.model.relm,
+                    Msg::Edit(task.clone())
+                );
 
                 self.model.children.push(child);
             }
         }
     }
 
-    fn clear(&mut self)
-    {
+    fn clear(&mut self) {
         for child in self.list_box.get_children() {
             self.list_box.remove(&child);
         }
@@ -53,18 +59,15 @@ impl Tasks
 }
 
 #[widget]
-impl ::relm::Widget for Tasks
-{
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model
-    {
+impl ::relm::Widget for Tasks {
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
         Model {
             children: Vec::new(),
-            relm: relm.clone()
+            relm: relm.clone(),
         }
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {

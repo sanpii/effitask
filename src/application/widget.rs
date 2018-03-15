@@ -35,10 +35,8 @@ enum Page {
     Search,
 }
 
-impl ::std::convert::From<u32> for Page
-{
-    fn from(n: u32) -> Self
-    {
+impl ::std::convert::From<u32> for Page {
+    fn from(n: u32) -> Self {
         match n {
             0 => Page::Inbox,
             1 => Page::Projects,
@@ -52,13 +50,9 @@ impl ::std::convert::From<u32> for Page
     }
 }
 
-impl ::std::convert::Into<i32> for Page
-{
-    fn into(self) -> i32
-    {
-        unsafe {
-            ::std::mem::transmute(self)
-        }
+impl ::std::convert::Into<i32> for Page {
+    fn into(self) -> i32 {
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 
@@ -86,12 +80,9 @@ pub enum Msg {
     Quit,
 }
 
-impl Widget
-{
-    fn load_style(&self)
-    {
-        let screen = self.window.get_screen()
-            .unwrap();
+impl Widget {
+    fn load_style(&self) {
+        let screen = self.window.get_screen().unwrap();
         let css = ::gtk::CssProvider::new();
         if let Some(stylesheet) = self.get_stylesheet() {
             match css.load_from_path(stylesheet.to_str().unwrap()) {
@@ -100,22 +91,19 @@ impl Widget
             }
 
             ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
-        }
-        else {
+        } else {
             error!("Unable to find stylesheet");
         }
     }
 
-    fn get_stylesheet(&self) -> Option<::std::path::PathBuf>
-    {
+    fn get_stylesheet(&self) -> Option<::std::path::PathBuf> {
         let mut stylesheet = "style_light.css";
 
         if let Ok(theme) = ::std::env::var("GTK_THEME") {
             if theme.ends_with(":dark") {
                 stylesheet = "style_dark.css";
             }
-        }
-        else if let Some(setting) = ::gtk::Settings::get_default() {
+        } else if let Some(setting) = ::gtk::Settings::get_default() {
             if setting.get_property_gtk_application_prefer_dark_theme() {
                 stylesheet = "style_dark.css";
             }
@@ -125,14 +113,12 @@ impl Widget
     }
 
     #[cfg(not(debug_assertions))]
-    fn find_data_file(&self, stylesheet: &str) -> Option<::std::path::PathBuf>
-    {
+    fn find_data_file(&self, stylesheet: &str) -> Option<::std::path::PathBuf> {
         self.model.xdg.find_data_file(stylesheet)
     }
 
     #[cfg(debug_assertions)]
-    fn find_data_file(&self, stylesheet: &str) -> Option<::std::path::PathBuf>
-    {
+    fn find_data_file(&self, stylesheet: &str) -> Option<::std::path::PathBuf> {
         let mut path = ::std::path::PathBuf::new();
 
         path.push("resources");
@@ -141,27 +127,37 @@ impl Widget
         Some(path)
     }
 
-    fn init_add_popover(&self)
-    {
+    fn init_add_popover(&self) {
         use relm::ContainerWidget;
 
-        let add = self.model.add_popover.add_widget::<::add::Widget, _>(&self.model.relm, ());
+        let add = self.model
+            .add_popover
+            .add_widget::<::add::Widget, _>(&self.model.relm, ());
         connect!(add@::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
         self.model.add_popover.set_relative_to(&self.add_button);
         self.model.add_popover.hide();
     }
 
-    fn init_pref_popover(&self)
-    {
+    fn init_pref_popover(&self) {
         let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
         vbox.show();
 
-        connect!(self.model.relm, self.model.defered_button, connect_toggled(_), Msg::Refresh);
+        connect!(
+            self.model.relm,
+            self.model.defered_button,
+            connect_toggled(_),
+            Msg::Refresh
+        );
         vbox.add(&self.model.defered_button);
         self.model.defered_button.show();
 
-        connect!(self.model.relm, self.model.done_button, connect_toggled(_), Msg::Refresh);
+        connect!(
+            self.model.relm,
+            self.model.done_button,
+            connect_toggled(_),
+            Msg::Refresh
+        );
         vbox.add(&self.model.done_button);
         self.model.done_button.show();
 
@@ -170,21 +166,18 @@ impl Widget
         self.model.pref_popover.hide();
     }
 
-    fn replace_tab_widgets(&self)
-    {
+    fn replace_tab_widgets(&self) {
         let n = self.notebook.get_n_pages();
 
         for x in 0..n {
-            let page = self.notebook.get_nth_page(Some(x))
-                .unwrap();
+            let page = self.notebook.get_nth_page(Some(x)).unwrap();
             let widget = self.get_tab_widget(x);
 
             self.notebook.set_tab_label(&page, Some(&widget));
         }
     }
 
-    fn get_tab_widget(&self, n: u32) -> ::gtk::Box
-    {
+    fn get_tab_widget(&self, n: u32) -> ::gtk::Box {
         let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
         let title = match n.into() {
             Page::Inbox => "inbox",
@@ -199,8 +192,7 @@ impl Widget
         if let Some(filename) = self.find_data_file(format!("{}.png", title).as_str()) {
             let image = ::gtk::Image::new_from_file(filename);
             vbox.pack_start(&image, false, false, 0);
-        }
-        else {
+        } else {
             error!("Unable to find resource '{}.png'", title);
         }
 
@@ -212,13 +204,11 @@ impl Widget
         vbox
     }
 
-    fn add(&self)
-    {
+    fn add(&self) {
         self.model.add_popover.popup();
     }
 
-    fn create(&mut self, text: Option<String>)
-    {
+    fn create(&mut self, text: Option<String>) {
         if let Some(text) = text {
             match super::add_task(&text) {
                 Ok(_) => self.update_tasks(),
@@ -228,20 +218,17 @@ impl Widget
         self.model.add_popover.popdown();
     }
 
-    fn complete(&mut self, task: &::tasks::Task)
-    {
+    fn complete(&mut self, task: &::tasks::Task) {
         let id = task.id;
         let mut list = super::tasks();
 
         if let Some(ref mut t) = list.tasks.get_mut(id) {
             if !t.finished {
                 t.complete();
-            }
-            else {
+            } else {
                 t.uncomplete();
             }
-        }
-        else {
+        } else {
             return;
         }
 
@@ -251,8 +238,7 @@ impl Widget
             if let Some(ref recurrence) = t.recurrence {
                 let due = if recurrence.strict && t.due_date.is_some() {
                     t.due_date.unwrap()
-                }
-                else {
+                } else {
                     ::date::today()
                 };
 
@@ -272,8 +258,7 @@ impl Widget
         match list.write() {
             Ok(_) => if list.tasks[id].finished {
                 info!("Task done");
-            }
-            else {
+            } else {
                 info!("Task undone");
             },
             Err(err) => error!("Unable to save tasks: {}", err),
@@ -282,20 +267,17 @@ impl Widget
         self.update_tasks();
     }
 
-    fn edit(&mut self, task: &::tasks::Task)
-    {
-        use ::relm::Widget;
+    fn edit(&mut self, task: &::tasks::Task) {
+        use relm::Widget;
 
         self.edit.emit(::edit::Msg::Set(Box::new(task.clone())));
-        self.edit.widget()
-            .show();
+        self.edit.widget().show();
 
         let (width, _) = self.root().get_size();
         self.paned.set_position(width - 436);
     }
 
-    fn save(&mut self, task: &::tasks::Task)
-    {
+    fn save(&mut self, task: &::tasks::Task) {
         let id = task.id;
         let mut list = super::tasks();
 
@@ -314,22 +296,20 @@ impl Widget
         self.edit.widget().hide();
     }
 
-    fn search(&self, text: &str)
-    {
+    fn search(&self, text: &str) {
         if text.is_empty() {
             self.notebook.set_property_page(Page::Inbox.into());
             self.search.widget().hide();
-        }
-        else {
+        } else {
             self.search.widget().show();
             self.notebook.set_property_page(Page::Search.into());
         }
 
-        self.search.emit(::search::Msg::UpdateFilter(text.to_string()));
+        self.search
+            .emit(::search::Msg::UpdateFilter(text.to_string()));
     }
 
-    fn update_tasks(&mut self)
-    {
+    fn update_tasks(&mut self) {
         let todo_file = match ::std::env::var("TODO_FILE") {
             Ok(todo_file) => todo_file,
             Err(err) => panic!("Launch this program via todo.sh: {}", err),
@@ -360,21 +340,16 @@ impl Widget
         self.search.emit(::search::Msg::Update);
     }
 
-    fn preferences(&self)
-    {
+    fn preferences(&self) {
         self.model.pref_popover.popup();
     }
 }
 
 #[widget]
-impl ::relm::Widget for Widget
-{
-    fn init_view(&mut self)
-    {
-        self.edit.widget()
-            .hide();
-        self.search.widget()
-            .hide();
+impl ::relm::Widget for Widget {
+    fn init_view(&mut self) {
+        self.edit.widget().hide();
+        self.search.widget().hide();
 
         self.load_style();
         self.init_add_popover();
@@ -383,21 +358,18 @@ impl ::relm::Widget for Widget
         self.update_tasks();
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model
-    {
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
         Model {
             relm: relm.clone(),
             add_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
             pref_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
             defered_button: ::gtk::CheckButton::new_with_label("Display defered tasks"),
             done_button: ::gtk::CheckButton::new_with_label("Display done tasks"),
-            xdg: ::xdg::BaseDirectories::with_prefix(super::NAME.to_lowercase())
-                .unwrap(),
+            xdg: ::xdg::BaseDirectories::with_prefix(super::NAME.to_lowercase()).unwrap(),
         }
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {

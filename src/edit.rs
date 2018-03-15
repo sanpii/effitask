@@ -32,54 +32,50 @@ pub enum DateType {
     Finish,
 }
 
-impl Widget
-{
-    fn set_task(&mut self, task: &::tasks::Task)
-    {
+impl Widget {
+    fn set_task(&mut self, task: &::tasks::Task) {
         self.model.task = task.clone();
 
         self.subject.set_text(task.subject.as_str());
-        self.priority.emit(::widgets::priority::Msg::Set(task.priority));
+        self.priority
+            .emit(::widgets::priority::Msg::Set(task.priority));
         self.flag.set_active(task.flagged);
         self.due.emit(::widgets::calendar::Msg::Set(task.due_date));
-        self.threshold.emit(::widgets::calendar::Msg::Set(task.threshold_date));
+        self.threshold
+            .emit(::widgets::calendar::Msg::Set(task.threshold_date));
         if task.create_date.is_some() {
-            self.created.emit(::widgets::calendar::Msg::Set(task.create_date));
-            self.created.widget()
-                .show();
+            self.created
+                .emit(::widgets::calendar::Msg::Set(task.create_date));
+            self.created.widget().show();
+        } else {
+            self.created.widget().hide();
         }
-        else {
-            self.created.widget()
-                .hide();
-        }
-        self.repeat.emit(::widgets::repeat::Msg::Set(task.recurrence.clone()));
-        self.finish.emit(::widgets::calendar::Msg::Set(task.finish_date));
-        self.keywords.emit(::widgets::keywords::Msg::Set(task.tags.clone()));
+        self.repeat
+            .emit(::widgets::repeat::Msg::Set(task.recurrence.clone()));
+        self.finish
+            .emit(::widgets::calendar::Msg::Set(task.finish_date));
+        self.keywords
+            .emit(::widgets::keywords::Msg::Set(task.tags.clone()));
 
-        let note = task.note.content()
-            .unwrap_or_default();
-        let buffer = self.note.get_buffer()
-            .unwrap();
+        let note = task.note.content().unwrap_or_default();
+        let buffer = self.note.get_buffer().unwrap();
         buffer.set_text(note.as_str());
     }
 
-    fn get_task(&self) -> ::tasks::Task
-    {
+    fn get_task(&self) -> ::tasks::Task {
         let mut task = self.model.task.clone();
 
-        task.subject = self.subject.get_text()
-            .unwrap();
+        task.subject = self.subject.get_text().unwrap();
 
         let new_note = self.get_note();
         task.note = match task.note {
             ::tasks::Note::Long { filename, .. } => ::tasks::Note::Long {
                 filename,
-                content: new_note.clone()
+                content: new_note.clone(),
             },
             _ => if new_note.is_empty() {
                 ::tasks::Note::None
-            }
-            else {
+            } else {
                 ::tasks::Note::Short(new_note.clone())
             },
         };
@@ -87,8 +83,7 @@ impl Widget
         task
     }
 
-    fn get_note(&self) -> String
-    {
+    fn get_note(&self) -> String {
         let buffer = match self.note.get_buffer() {
             Some(buffer) => buffer,
             None => return String::new(),
@@ -96,22 +91,18 @@ impl Widget
         let start = buffer.get_start_iter();
         let end = buffer.get_end_iter();
 
-        buffer.get_text(&start, &end, false)
-            .unwrap_or_default()
+        buffer.get_text(&start, &end, false).unwrap_or_default()
     }
 
-    fn edit_keywords(&mut self, keywords: &::std::collections::BTreeMap<String, String>)
-    {
+    fn edit_keywords(&mut self, keywords: &::std::collections::BTreeMap<String, String>) {
         self.model.task.tags = keywords.clone();
     }
 
-    fn flag(&mut self)
-    {
+    fn flag(&mut self) {
         self.model.task.flagged = self.flag.get_active();
     }
 
-    fn update_date(&mut self, date_type: &DateType, date: &Option<::chrono::NaiveDate>)
-    {
+    fn update_date(&mut self, date_type: &DateType, date: &Option<::chrono::NaiveDate>) {
         use self::DateType::*;
 
         match *date_type {
@@ -120,40 +111,34 @@ impl Widget
             Finish => {
                 self.model.task.finish_date = *date;
                 self.model.task.finished = date.is_some();
-            },
+            }
         }
     }
 
-    fn update_repeat(&mut self, recurrence: &Option<::tasks::Recurrence>)
-    {
+    fn update_repeat(&mut self, recurrence: &Option<::tasks::Recurrence>) {
         self.model.task.recurrence = recurrence.clone();
     }
 
-    fn update_priority(&mut self, priority: u8)
-    {
+    fn update_priority(&mut self, priority: u8) {
         self.model.task.priority = priority;
     }
 }
 
 #[widget]
-impl ::relm::Widget for Widget
-{
-    fn init_view(&mut self)
-    {
+impl ::relm::Widget for Widget {
+    fn init_view(&mut self) {
         self.note.set_property_height_request(150);
         self.created.widget().set_sensitive(false);
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model
-    {
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
         Model {
             task: ::tasks::Task::new(),
             relm: relm.clone(),
         }
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {
@@ -161,7 +146,10 @@ impl ::relm::Widget for Widget
             Done(_) => (),
             EditKeyword(ref keywords) => self.edit_keywords(keywords),
             Flag => self.flag(),
-            Ok => self.model.relm.stream().emit(Msg::Done(Box::new(self.get_task()))),
+            Ok => self.model
+                .relm
+                .stream()
+                .emit(Msg::Done(Box::new(self.get_task()))),
             Set(task) => self.set_task(&task),
             UpdateDate(ref date_type, ref date) => self.update_date(date_type, &date),
             UpdateRepeat(ref recurrence) => self.update_repeat(&recurrence),

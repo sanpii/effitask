@@ -7,25 +7,21 @@ pub enum Msg {
     Draw,
 }
 
-impl Circle
-{
-    fn draw(&self)
-    {
+impl Circle {
+    fn draw(&self) {
         let context = self.create_context();
         let task = &self.model;
         let center = self.center();
 
         if task.finished || task.due_date.is_none() {
             context.set_source_rgb(0.8, 0.8, 0.8);
-        }
-        else {
+        } else {
             let due_date = task.due_date.unwrap();
             let today = ::date::today();
 
             if due_date < today {
                 context.set_source_rgb(1., 0.4, 0.5);
-            }
-            else {
+            } else {
                 context.set_source_rgb(1., 0.8, 0.2);
             }
         }
@@ -54,13 +50,18 @@ impl Circle
         if !task.finished && task.flagged {
             let angle = if task.due_date.is_some() {
                 ::std::f64::consts::PI
-            }
-            else {
+            } else {
                 0.
             };
 
             context.set_source_rgb(1., 0.5, 0.3);
-            context.arc(center, center, center - 5., angle, 2. * ::std::f64::consts::PI);
+            context.arc(
+                center,
+                center,
+                center - 5.,
+                angle,
+                2. * ::std::f64::consts::PI,
+            );
             context.stroke();
         }
 
@@ -75,18 +76,15 @@ impl Circle
         }
     }
 
-    fn center(&self) -> f64
-    {
+    fn center(&self) -> f64 {
         f64::min(
             f64::from(self.drawing_area.get_property_width_request()) / 2.,
             f64::from(self.drawing_area.get_property_height_request()) / 2.,
         )
     }
 
-    fn create_context(&self) -> ::cairo::Context
-    {
-        let window = self.drawing_area.get_window()
-            .unwrap();
+    fn create_context(&self) -> ::cairo::Context {
+        let window = self.drawing_area.get_window().unwrap();
 
         unsafe {
             use glib::translate::ToGlibPtr;
@@ -100,15 +98,12 @@ impl Circle
 }
 
 #[widget]
-impl ::relm::Widget for Circle
-{
-    fn model(task: ::tasks::Task) -> ::tasks::Task
-    {
+impl ::relm::Widget for Circle {
+    fn model(task: ::tasks::Task) -> ::tasks::Task {
         task
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {

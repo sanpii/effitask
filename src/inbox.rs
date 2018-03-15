@@ -9,19 +9,18 @@ pub enum Msg {
     Update,
 }
 
-impl Widget
-{
-    fn update_tasks(&self)
-    {
+impl Widget {
+    fn update_tasks(&self) {
         let today = ::date::today();
 
         let list = ::application::tasks();
         let preferences = ::application::preferences();
-        let tasks = list.tasks.iter()
+        let tasks = list.tasks
+            .iter()
             .filter(|x| {
-                !x.finished
-                    && x.projects.is_empty()
-                    && (preferences.defered || x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
+                !x.finished && x.projects.is_empty()
+                    && (preferences.defered || x.threshold_date.is_none()
+                        || x.threshold_date.unwrap() <= today)
             })
             .cloned()
             .collect();
@@ -31,14 +30,10 @@ impl Widget
 }
 
 #[widget]
-impl ::relm::Widget for Widget
-{
-    fn model() -> ()
-    {
-    }
+impl ::relm::Widget for Widget {
+    fn model() -> () {}
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {

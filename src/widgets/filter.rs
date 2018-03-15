@@ -21,30 +21,20 @@ enum Column {
     Tooltip = 3,
 }
 
-impl ::std::convert::Into<u32> for Column
-{
-    fn into(self) -> u32
-    {
-        unsafe {
-            ::std::mem::transmute(self)
-        }
+impl ::std::convert::Into<u32> for Column {
+    fn into(self) -> u32 {
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 
-impl ::std::convert::Into<i32> for Column
-{
-    fn into(self) -> i32
-    {
-        unsafe {
-            ::std::mem::transmute(self)
-        }
+impl ::std::convert::Into<i32> for Column {
+    fn into(self) -> i32 {
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 
-impl Filter
-{
-    fn update_filters(&mut self, filters: Vec<(String, (u32, u32))>)
-    {
+impl Filter {
+    fn update_filters(&mut self, filters: Vec<(String, (u32, u32))>) {
         let selection = self.filters.get_selection();
         let (paths, _) = selection.get_selected_rows();
 
@@ -62,8 +52,11 @@ impl Filter
         }
     }
 
-    fn append(&self, root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>, filter: (String, (u32, u32)))
-    {
+    fn append(
+        &self,
+        root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>,
+        filter: (String, (u32, u32)),
+    ) {
         use gtk::ToValue;
         use std::slice::SliceConcatExt;
 
@@ -71,10 +64,8 @@ impl Filter
         let progress = (done as f32 / total as f32) * 100.;
         let f = filter.clone();
 
-        let mut levels: Vec<_> = f.split('-')
-            .collect();
-        let title = levels.pop()
-            .unwrap();
+        let mut levels: Vec<_> = f.split('-').collect();
+        let title = levels.pop().unwrap();
 
         let parent = levels.join("-");
 
@@ -84,53 +75,53 @@ impl Filter
 
         let row = self.model.append(root.get(&parent));
 
-        self.model.set_value(&row, Column::Title.into(), &title.to_value());
-        self.model.set_value(&row, Column::Raw.into(), &filter.to_value());
-        self.model.set_value(&row, Column::Progress.into(), &progress.to_value());
+        self.model
+            .set_value(&row, Column::Title.into(), &title.to_value());
+        self.model
+            .set_value(&row, Column::Raw.into(), &filter.to_value());
+        self.model
+            .set_value(&row, Column::Progress.into(), &progress.to_value());
 
         let tooltip = format!("{}/{}", done, total);
-        self.model.set_value(&row, Column::Tooltip.into(), &tooltip.to_value());
+        self.model
+            .set_value(&row, Column::Tooltip.into(), &tooltip.to_value());
 
         root.insert(filter, row);
     }
 
-    fn update_tasks(&self, tasks: Vec<::tasks::Task>)
-    {
+    fn update_tasks(&self, tasks: Vec<::tasks::Task>) {
         self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
     }
 
-    fn select_range(treeview: &::gtk::TreeView, path: &::gtk::TreePath)
-    {
-        let model = treeview.get_model()
-            .unwrap();
+    fn select_range(treeview: &::gtk::TreeView, path: &::gtk::TreePath) {
+        let model = treeview.get_model().unwrap();
 
         let start = path;
-        let start_iter = model.get_iter(path)
-            .unwrap();
+        let start_iter = model.get_iter(path).unwrap();
 
         let n_child = model.iter_n_children(Some(&start_iter));
 
         if n_child > 0 {
-            let end_iter = model.iter_nth_child(Some(&start_iter), n_child - 1)
+            let end_iter = model
+                .iter_nth_child(Some(&start_iter), n_child - 1)
                 .unwrap();
-            let end = model.get_path(&end_iter)
-                .unwrap();
+            let end = model.get_path(&end_iter).unwrap();
 
-            treeview.get_selection()
-                .select_range(start, &end);
+            treeview.get_selection().select_range(start, &end);
         }
     }
 }
 
 #[widget]
-impl ::relm::Widget for Filter
-{
-    fn init_view(&mut self)
-    {
+impl ::relm::Widget for Filter {
+    fn init_view(&mut self) {
         self.filters.set_size_request(200, -1);
-        self.scroll.set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
+        self.scroll
+            .set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
         self.filters.set_model(Some(&self.model));
-        self.filters.get_selection().set_mode(::gtk::SelectionMode::Multiple);
+        self.filters
+            .get_selection()
+            .set_mode(::gtk::SelectionMode::Multiple);
 
         let column = ::gtk::TreeViewColumn::new();
         self.filters.append_column(&column);
@@ -144,8 +135,7 @@ impl ::relm::Widget for Filter
         self.filters.set_tooltip_column(Column::Tooltip.into());
     }
 
-    fn model(_: ()) -> ::gtk::TreeStore
-    {
+    fn model(_: ()) -> ::gtk::TreeStore {
         let columns = vec![
             ::gtk::Type::String,
             ::gtk::Type::String,
@@ -156,8 +146,7 @@ impl ::relm::Widget for Filter
         ::gtk::TreeStore::new(&columns)
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {

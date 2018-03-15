@@ -2,16 +2,11 @@
 pub enum Note {
     None,
     Short(String),
-    Long {
-        filename: String,
-        content: String,
-    },
+    Long { filename: String, content: String },
 }
 
-impl Note
-{
-    pub fn from_file(filename: &str) -> Self
-    {
+impl Note {
+    pub fn from_file(filename: &str) -> Self {
         use std::io::Read;
 
         if filename.is_empty() {
@@ -23,7 +18,7 @@ impl Note
             Err(err) => {
                 error!("{}", err);
                 return Note::Short(filename.to_string());
-            },
+            }
         };
 
         let file = match ::std::fs::File::open(note_file.clone()) {
@@ -31,7 +26,7 @@ impl Note
             Err(_) => {
                 error!("Unable to open {:?}", note_file);
                 return Note::Short(filename.to_string());
-            },
+            }
         };
 
         let mut buffer = ::std::io::BufReader::new(file);
@@ -42,7 +37,7 @@ impl Note
             Err(_) => {
                 error!("Unable to read {:?}", note_file);
                 return Note::Short(filename.to_string());
-            },
+            }
         };
 
         Note::Long {
@@ -51,16 +46,14 @@ impl Note
         }
     }
 
-    pub fn content(&self) -> Option<String>
-    {
+    pub fn content(&self) -> Option<String> {
         match *self {
             Note::None => None,
             Note::Short(ref content) | Note::Long { ref content, .. } => Some(content.clone()),
         }
     }
 
-    pub fn markup(&self) -> Option<String>
-    {
+    pub fn markup(&self) -> Option<String> {
         let content = match self.content() {
             Some(content) => content,
             None => return None,
@@ -71,27 +64,26 @@ impl Note
         let mut markup = String::from("<markup>");
 
         let headers = vec![
-            "xx-large",
-            "x-large",
-            "large",
-            "medium",
-            "small",
-            "x-small",
-            "xx-small",
+            "xx-large", "x-large", "large", "medium", "small", "x-small", "xx-small"
         ];
 
         for event in parser {
-            use ::pulldown_cmark::Event;
-            use ::pulldown_cmark::Tag;
+            use pulldown_cmark::Event;
+            use pulldown_cmark::Tag;
 
             match event {
-                Event::Start(Tag::Header(level)) => markup.push_str(&format!("<span font_size='{}'><u>", headers[level as usize])),
+                Event::Start(Tag::Header(level)) => markup.push_str(&format!(
+                    "<span font_size='{}'><u>",
+                    headers[level as usize]
+                )),
                 Event::End(Tag::Header(_)) => markup.push_str("</u></span>\n\n"),
 
                 Event::Start(Tag::Paragraph) => markup.push_str("<span>"),
                 Event::End(Tag::Paragraph) => markup.push_str("</span>\n"),
 
-                Event::Start(Tag::Code) | Event::Start(Tag::CodeBlock(_)) => markup.push_str("<tt>"),
+                Event::Start(Tag::Code) | Event::Start(Tag::CodeBlock(_)) => {
+                    markup.push_str("<tt>")
+                }
                 Event::End(Tag::Code) | Event::End(Tag::CodeBlock(_)) => markup.push_str("</tt>"),
 
                 Event::Start(Tag::Emphasis) => markup.push_str("<i>"),
@@ -103,7 +95,9 @@ impl Note
                 Event::Start(Tag::Item) => markup.push_str("· "),
                 Event::End(Tag::Item) | Event::SoftBreak => markup.push_str("\n"),
 
-                Event::Start(Tag::Link(link, title)) => markup.push_str(&format!("<a href='{}' title='{}'>", link, title)),
+                Event::Start(Tag::Link(link, title)) => {
+                    markup.push_str(&format!("<a href='{}' title='{}'>", link, title))
+                }
                 Event::End(Tag::Link(_, _)) => markup.push_str("</a>"),
 
                 Event::Text(t) => markup.push_str(&t.replace("&", "&amp;")),
@@ -116,8 +110,7 @@ impl Note
         Some(markup)
     }
 
-    pub fn write(&self) -> Result<Self, String>
-    {
+    pub fn write(&self) -> Result<Self, String> {
         let mut note = self.clone();
 
         if self == &Note::None {
@@ -131,7 +124,11 @@ impl Note
             }
         }
 
-        if let Note::Long { ref filename, ref content } = note {
+        if let Note::Long {
+            ref filename,
+            ref content,
+        } = note
+        {
             if content.is_empty() {
                 match ::std::fs::remove_file(Self::note_file(filename)?) {
                     Ok(_) => (),
@@ -142,7 +139,11 @@ impl Note
             }
         }
 
-        if let Note::Long { ref filename, ref content } = note {
+        if let Note::Long {
+            ref filename,
+            ref content,
+        } = note
+        {
             use std::io::Write;
 
             let note_file = Self::note_file(filename)?;
@@ -161,8 +162,7 @@ impl Note
         Ok(note)
     }
 
-    fn new_filename() -> String
-    {
+    fn new_filename() -> String {
         use rand::Rng;
 
         let ext = match ::std::env::var("TODO_NOTE_EXT") {
@@ -170,16 +170,12 @@ impl Note
             Err(_) => ".txt".to_owned(),
         };
 
-        let name: String = ::rand::thread_rng()
-            .gen_ascii_chars()
-            .take(3)
-            .collect();
+        let name: String = ::rand::thread_rng().gen_ascii_chars().take(3).collect();
 
         format!("{}{}", name, ext)
     }
 
-    fn note_file(filename: &str) -> Result<String, String>
-    {
+    fn note_file(filename: &str) -> Result<String, String> {
         let todo_dir = match ::std::env::var("TODO_DIR") {
             Ok(todo_dir) => todo_dir,
             Err(_) => return Err("Launch this program via todo.sh".to_owned()),
@@ -194,10 +190,8 @@ impl Note
     }
 }
 
-impl ::std::fmt::Display for Note
-{
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result
-    {
+impl ::std::fmt::Display for Note {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let tag = match ::std::env::var("TODO_NOTE_TAG") {
             Ok(tag) => tag,
             Err(_) => "note".to_owned(),

@@ -23,40 +23,28 @@ pub enum Column {
     Value = 1,
 }
 
-impl ::std::convert::Into<u32> for Column
-{
-    fn into(self) -> u32
-    {
-        unsafe {
-            ::std::mem::transmute(self)
-        }
+impl ::std::convert::Into<u32> for Column {
+    fn into(self) -> u32 {
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 
-impl ::std::convert::Into<i32> for Column
-{
-    fn into(self) -> i32
-    {
-        unsafe {
-            ::std::mem::transmute(self)
-        }
+impl ::std::convert::Into<i32> for Column {
+    fn into(self) -> i32 {
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 
-impl Keywords
-{
-    fn add(&mut self)
-    {
+impl Keywords {
+    fn add(&mut self) {
         let iter = self.model.store.append();
-        let path = self.model.store.get_path(&iter)
-            .unwrap();
+        let path = self.model.store.get_path(&iter).unwrap();
         let column = self.tree_view.get_column(Column::Name.into());
 
         self.tree_view.set_cursor(&path, column.as_ref(), true);
     }
 
-    fn delete(&mut self)
-    {
+    fn delete(&mut self) {
         let selection = self.tree_view.get_selection();
         let (rows, _) = selection.get_selected_rows();
         let references: Vec<_> = rows.iter()
@@ -73,23 +61,20 @@ impl Keywords
             }
         }
 
-        self.model.relm.stream()
-            .emit(Msg::Updated(self.keywords()));
+        self.model.relm.stream().emit(Msg::Updated(self.keywords()));
     }
 
-    fn edit(&mut self, column: Column, path: &::gtk::TreePath, new_text: &str)
-    {
-        let iter = self.model.store.get_iter(path)
-            .unwrap();
+    fn edit(&mut self, column: Column, path: &::gtk::TreePath, new_text: &str) {
+        let iter = self.model.store.get_iter(path).unwrap();
 
-        self.model.store.set_value(&iter, column.into(), &new_text.to_value());
+        self.model
+            .store
+            .set_value(&iter, column.into(), &new_text.to_value());
 
-        self.model.relm.stream()
-            .emit(Msg::Updated(self.keywords()));
+        self.model.relm.stream().emit(Msg::Updated(self.keywords()));
     }
 
-    fn keywords(&self) -> ::std::collections::BTreeMap<String, String>
-    {
+    fn keywords(&self) -> ::std::collections::BTreeMap<String, String> {
         let mut keywords = ::std::collections::BTreeMap::new();
 
         let iter = match self.model.store.get_iter_first() {
@@ -98,7 +83,11 @@ impl Keywords
         };
 
         while let Some(name) = self.model.store.get_value(&iter, Column::Name.into()).get() {
-            let value = match self.model.store.get_value(&iter, Column::Value.into()).get() {
+            let value = match self.model
+                .store
+                .get_value(&iter, Column::Value.into())
+                .get()
+            {
                 Some(value) => value,
                 None => break,
             };
@@ -113,27 +102,30 @@ impl Keywords
         keywords
     }
 
-    fn set(&mut self, keywords: &::std::collections::BTreeMap<String, String>)
-    {
+    fn set(&mut self, keywords: &::std::collections::BTreeMap<String, String>) {
         self.model.store.clear();
 
         for (name, value) in keywords {
             let row = self.model.store.append();
-            self.model.store.set_value(&row, Column::Name.into(), &name.to_value());
-            self.model.store.set_value(&row, Column::Value.into(), &value.to_value());
+            self.model
+                .store
+                .set_value(&row, Column::Name.into(), &name.to_value());
+            self.model
+                .store
+                .set_value(&row, Column::Value.into(), &value.to_value());
         }
     }
 }
 
 #[widget]
-impl ::relm::Widget for Keywords
-{
-    fn init_view(&mut self)
-    {
-        self.scroll.set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
+impl ::relm::Widget for Keywords {
+    fn init_view(&mut self) {
+        self.scroll
+            .set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
         self.scroll.set_property_height_request(150);
         self.tree_view.set_model(Some(&self.model.store));
-        self.tree_view.get_selection()
+        self.tree_view
+            .get_selection()
             .set_mode(::gtk::SelectionMode::Multiple);
 
         let column = ::gtk::TreeViewColumn::new();
@@ -142,7 +134,12 @@ impl ::relm::Widget for Keywords
 
         let cell = ::gtk::CellRendererText::new();
         cell.set_property_editable(true);
-        connect!(self.model.relm, cell, connect_edited(_, path, new_text), Msg::Edit(Column::Name, path, new_text.to_owned()));
+        connect!(
+            self.model.relm,
+            cell,
+            connect_edited(_, path, new_text),
+            Msg::Edit(Column::Name, path, new_text.to_owned())
+        );
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Name.into());
 
@@ -152,17 +149,18 @@ impl ::relm::Widget for Keywords
 
         let cell = ::gtk::CellRendererText::new();
         cell.set_property_editable(true);
-        connect!(self.model.relm, cell, connect_edited(_, path, new_text), Msg::Edit(Column::Value, path, new_text.to_owned()));
+        connect!(
+            self.model.relm,
+            cell,
+            connect_edited(_, path, new_text),
+            Msg::Edit(Column::Value, path, new_text.to_owned())
+        );
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Value.into());
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model
-    {
-        let columns = vec![
-            ::gtk::Type::String,
-            ::gtk::Type::String,
-        ];
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
+        let columns = vec![::gtk::Type::String, ::gtk::Type::String];
 
         Model {
             store: ::gtk::ListStore::new(&columns),
@@ -170,8 +168,7 @@ impl ::relm::Widget for Keywords
         }
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {

@@ -20,14 +20,11 @@ pub enum Msg {
     Updated(Option<::chrono::NaiveDate>),
 }
 
-impl Calendar
-{
-    fn add(&self, period: ::tasks::Period)
-    {
+impl Calendar {
+    fn add(&self, period: ::tasks::Period) {
         let mut date = ::date::today();
 
-        let text = self.entry.get_text()
-            .unwrap();
+        let text = self.entry.get_text().unwrap();
 
         if !text.is_empty() {
             date = match ::chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
@@ -35,7 +32,7 @@ impl Calendar
                 Err(_) => {
                     error!("Invalid date format, use YYYY-MM-DD");
                     return;
-                },
+                }
             };
         }
 
@@ -44,21 +41,19 @@ impl Calendar
         self.date_updated();
     }
 
-    fn date_selected(&self)
-    {
+    fn date_selected(&self) {
         let (y, m, d) = self.model.calendar.get_date();
 
-        self.entry.set_text(format!("{}-{}-{}", y, m + 1, d).as_str());
+        self.entry
+            .set_text(format!("{}-{}-{}", y, m + 1, d).as_str());
         self.model.popover.popdown();
 
         self.date_updated();
     }
 
-    fn date_updated(&self)
-    {
+    fn date_updated(&self) {
         let mut date = None;
-        let text = self.entry.get_text()
-            .unwrap();
+        let text = self.entry.get_text().unwrap();
 
         if !text.is_empty() {
             date = match ::chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
@@ -66,52 +61,54 @@ impl Calendar
                 Err(_) => {
                     error!("Invalid date format, use YYYY-MM-DD");
                     return;
-                },
+                }
             };
         }
 
-        self.model.relm.stream()
-            .emit(Msg::Updated(date));
+        self.model.relm.stream().emit(Msg::Updated(date));
     }
 
-    fn set_date(&self, date: Option<::chrono::NaiveDate>)
-    {
+    fn set_date(&self, date: Option<::chrono::NaiveDate>) {
         if let Some(date) = date {
             use chrono::Datelike;
 
-            self.entry.set_text(date.format("%Y-%m-%d").to_string().as_str());
-            self.model.calendar.select_month(date.month() - 1, date.year() as u32);
+            self.entry
+                .set_text(date.format("%Y-%m-%d").to_string().as_str());
+            self.model
+                .calendar
+                .select_month(date.month() - 1, date.year() as u32);
             self.model.calendar.select_day(date.day());
-        }
-        else {
+        } else {
             self.entry.set_text("");
         }
     }
 
-    fn sensitive(&self)
-    {
-        use ::relm::Widget;
+    fn sensitive(&self) {
+        use relm::Widget;
 
         if self.root().get_sensitive() {
             self.buttons.show();
-        }
-        else {
+        } else {
             self.buttons.hide();
         }
     }
 }
 
 #[widget]
-impl ::relm::Widget for Calendar
-{
-    fn init_view(&mut self)
-    {
-        self.entry.set_icon_from_icon_name(::gtk::EntryIconPosition::Primary, "x-office-calendar");
+impl ::relm::Widget for Calendar {
+    fn init_view(&mut self) {
+        self.entry
+            .set_icon_from_icon_name(::gtk::EntryIconPosition::Primary, "x-office-calendar");
 
         self.label.set_size_request(200, -1);
         self.label.set_text(self.model.label.as_str());
 
-        connect!(self.model.relm, self.model.calendar, connect_day_selected(_), Msg::DateSelected);
+        connect!(
+            self.model.relm,
+            self.model.calendar,
+            connect_day_selected(_),
+            Msg::DateSelected
+        );
         self.model.calendar.show();
         self.model.popover.set_relative_to(&self.entry);
         self.model.popover.set_pointing_to(&::gdk::Rectangle {
@@ -124,8 +121,7 @@ impl ::relm::Widget for Calendar
         self.model.popover.hide();
     }
 
-    fn model(relm: &::relm::Relm<Self>, label: String) -> Model
-    {
+    fn model(relm: &::relm::Relm<Self>, label: String) -> Model {
         Model {
             label: label.clone(),
             popover: ::gtk::Popover::new(None::<&::gtk::Calendar>),
@@ -134,8 +130,7 @@ impl ::relm::Widget for Calendar
         }
     }
 
-    fn update(&mut self, event: Msg)
-    {
+    fn update(&mut self, event: Msg) {
         use self::Msg::*;
 
         match event {

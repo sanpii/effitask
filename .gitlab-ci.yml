@@ -4,5 +4,8 @@ before_script:
     - apt update -yqq
     - apt install -yqq --no-install-recommends libgtk-3-dev
 
-test:
-    script: make test
+test:debug:
+    script: make MODE=debug test
+
+test:release:
+    script: make MODE=release test

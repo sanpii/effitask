@@ -27,6 +27,6 @@ install:
 	install --mode 644 resources/*.css $(PREFIX)/usr/share/effitask/
 
 test:
-	$(CARGO) test
+	$(CARGO) test $(CARGO_FLAGS)
 
 .PHONY: all build install test

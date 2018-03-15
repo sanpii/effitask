@@ -62,6 +62,7 @@ pub struct Model {
     pref_popover: ::gtk::Popover,
     defered_button: ::gtk::CheckButton,
     done_button: ::gtk::CheckButton,
+    #[allow(dead_code)]
     xdg: ::xdg::BaseDirectories,
 }
 

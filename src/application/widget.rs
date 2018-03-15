@@ -121,7 +121,24 @@ impl Widget
             }
         }
 
+        self.find_data_file(stylesheet)
+    }
+
+    #[cfg(not(debug_assertions))]
+    fn find_data_file(&self, stylesheet: &str) -> Option<::std::path::PathBuf>
+    {
         self.model.xdg.find_data_file(stylesheet)
+    }
+
+    #[cfg(debug_assertions)]
+    fn find_data_file(&self, stylesheet: &str) -> Option<::std::path::PathBuf>
+    {
+        let mut path = ::std::path::PathBuf::new();
+
+        path.push("resources");
+        path.push(stylesheet);
+
+        Some(path)
     }
 
     fn init_add_popover(&self)
@@ -179,7 +196,7 @@ impl Widget
             Page::Search => "search",
         };
 
-        if let Some(filename) = self.model.xdg.find_data_file(format!("{}.png", title).as_str()) {
+        if let Some(filename) = self.find_data_file(format!("{}.png", title).as_str()) {
             let image = ::gtk::Image::new_from_file(filename);
             vbox.pack_start(&image, false, false, 0);
         }

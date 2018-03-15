@@ -1,6 +1,7 @@
 _(Thanks for reporting an issue to Effitask! If you haven't already read the
-[contributor guidelines](CONTRIBUTING.md), Please do that now, then procede to
-fill out the details below.)_
+[contributor
+guidelines](https://github.com/sanpii/effitask/blob/master/docs/CONTRIBUTING.md),
+Please do that now, then procede to fill out the details below.)_
 
 ## What are the minimum necessary steps to reproduce this issue?
 

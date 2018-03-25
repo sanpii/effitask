@@ -1,11 +1,11 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::{Calendar, Keywords, Priority, Repeat};
 use widgets::calendar::Msg::Updated as CalendarUpdated;
 use widgets::keywords::Msg::Updated as KeywordsUpdated;
 use widgets::priority::Msg::Updated as PriorityUpdated;
 use widgets::repeat::Msg::Updated as RepeatUpdated;
+use widgets::{Calendar, Keywords, Priority, Repeat};
 
 #[derive(Msg)]
 pub enum Msg {

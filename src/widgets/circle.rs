@@ -87,8 +87,8 @@ impl Circle {
         let window = self.drawing_area.get_window().unwrap();
 
         unsafe {
-            use glib::translate::ToGlibPtr;
             use glib::translate::FromGlibPtrNone;
+            use glib::translate::ToGlibPtr;
 
             let ptr = ::gdk_sys::gdk_cairo_create(window.to_glib_none().0);
 

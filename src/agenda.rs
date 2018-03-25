@@ -14,13 +14,13 @@ pub enum Msg {
 }
 
 macro_rules! update {
-    ($self:ident, $exp:ident, $task:ident, $get:ident, $list:ident, $date:ident) => {
+    ($self: ident, $exp: ident, $task: ident, $get: ident, $list: ident, $date: ident) => {
         let tasks = $self.$get(&$list, $date);
 
         $self.$exp.set_expanded(!tasks.is_empty());
         $self.$exp.set_sensitive(!tasks.is_empty());
         $self.$task.emit(::widgets::tasks::Msg::Update(tasks));
-    }
+    };
 }
 
 impl Widget {

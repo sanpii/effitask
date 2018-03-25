@@ -49,8 +49,8 @@ impl ::std::ops::Add<::chrono::NaiveDate> for Period {
     type Output = ::chrono::NaiveDate;
 
     fn add(self, rhs: Self::Output) -> Self::Output {
-        use chrono::Datelike;
         use self::Period::*;
+        use chrono::Datelike;
 
         let mut y = rhs.year();
         let mut m = rhs.month();

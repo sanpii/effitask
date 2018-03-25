@@ -4,9 +4,9 @@ pub mod filter;
 pub mod keywords;
 pub mod priority;
 pub mod repeat;
+pub mod tags;
 pub mod task;
 pub mod tasks;
-pub mod tags;
 
 pub use self::calendar::Calendar;
 pub use self::circle::Circle;
@@ -14,6 +14,6 @@ pub use self::filter::Filter;
 pub use self::keywords::Keywords;
 pub use self::priority::Priority;
 pub use self::repeat::Repeat;
+pub use self::tags::Tags;
 pub use self::task::Task;
 pub use self::tasks::Tasks;
-pub use self::tags::Tags;

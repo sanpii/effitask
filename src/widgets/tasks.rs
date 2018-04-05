@@ -31,8 +31,7 @@ impl Tasks {
             sorted_tasks.reverse();
 
             for task in &sorted_tasks {
-                let child = self.list_box
-                    .add_widget::<super::Task>(task.clone());
+                let child = self.list_box.add_widget::<super::Task>(task.clone());
 
                 connect!(
                     child@::widgets::task::Msg::Complete(ref task),

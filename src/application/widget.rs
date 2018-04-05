@@ -131,9 +131,7 @@ impl Widget {
     fn init_add_popover(&self) {
         use relm::ContainerWidget;
 
-        let add = self.model
-            .add_popover
-            .add_widget::<::add::Widget>(());
+        let add = self.model.add_popover.add_widget::<::add::Widget>(());
         connect!(add@::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
         self.model.add_popover.set_relative_to(&self.add_button);

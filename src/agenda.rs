@@ -14,7 +14,7 @@ pub enum Msg {
 }
 
 macro_rules! update {
-    ($self: ident, $exp: ident, $task: ident, $get: ident, $list: ident, $date: ident) => {
+    ($self:ident, $exp:ident, $task:ident, $get:ident, $list:ident, $date:ident) => {
         let tasks = $self.$get(&$list, $date);
 
         $self.$exp.set_expanded(!tasks.is_empty());

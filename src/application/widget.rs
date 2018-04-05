@@ -133,7 +133,7 @@ impl Widget {
 
         let add = self.model
             .add_popover
-            .add_widget::<::add::Widget, _>(&self.model.relm, ());
+            .add_widget::<::add::Widget>(());
         connect!(add@::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
         self.model.add_popover.set_relative_to(&self.add_button);

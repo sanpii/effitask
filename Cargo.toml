@@ -9,7 +9,6 @@ chrono = "^0.4"
 gdk = "^0.8"
 gdk-sys = "^0.6"
 glib = "^0.5"
-log = "^0.4"
 pulldown-cmark = "^0.1"
 rand = "^0.4"
 regex = "^0.2"
@@ -22,6 +21,10 @@ xdg = "^2.1"
 [dependencies.gtk]
 version = "0.4"
 features = ["v3_22"]
+
+[dependencies.log]
+version = "^0.4"
+features = ["std"]
 
 [dependencies.clippy]
 version = "*"

@@ -311,12 +311,18 @@ impl Widget {
     fn update_tasks(&mut self) {
         let todo_file = match ::std::env::var("TODO_FILE") {
             Ok(todo_file) => todo_file,
-            Err(err) => panic!("Launch this program via todo.sh: {}", err),
+            Err(err) => {
+                eprintln!("Launch this program via todo.sh: {}", err);
+                ::std::process::exit(1);
+            },
         };
 
         let done_file = match ::std::env::var("DONE_FILE") {
             Ok(done_file) => done_file,
-            Err(err) => panic!("Launch this program via todo.sh: {}", err),
+            Err(err) => {
+                eprintln!("Launch this program via todo.sh: {}", err);
+                ::std::process::exit(1);
+            },
         };
 
         let list = ::tasks::List::from_files(&todo_file, &done_file);

@@ -10,6 +10,8 @@ extern crate gdk_sys;
 extern crate glib;
 extern crate gtk;
 #[macro_use]
+extern crate human_panic;
+#[macro_use]
 extern crate log;
 extern crate pulldown_cmark;
 extern crate rand;
@@ -38,6 +40,8 @@ mod tasks;
 mod widgets;
 
 fn main() {
+    setup_panic!();
+
     if ::std::env::args().nth(1) == Some("usage".to_owned()) {
         usage(&::std::env::args().nth(0).unwrap());
 

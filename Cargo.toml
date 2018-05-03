@@ -2,6 +2,7 @@
 name = "effitask"
 version = "0.1.0"
 authors = ["Sanpi <sanpi@homecomputing.fr>"]
+homepage = "https://github.com/sanpii/effitask"
 
 [dependencies]
 cairo-rs = "^0.4"

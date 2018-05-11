@@ -30,11 +30,11 @@ Supported toto.txt addons:
 I tried to develop a clear interface without surprises, but you can easily
 miss some feature:
 
-* Double click on a feature, *everywhere*, open the edit pannel;
+* Double click on a feature, *everywhere*, open the edit panel;
 * You can create sub-projects (or sub-contexts) by adding a dash. For example,
-  the projet `+work-admin-automation` create this arborescence:
+  the project `+work-admin-automation` create this arborescence:
 
-```
+```txt
 work
 └── admin
     └── automation
@@ -49,23 +49,23 @@ work
 
 ## Install
 
-If you use archlinux, effitask is available in
+If you use Arch Linux, effitask is available in
 [AUR](https://aur.archlinux.org/packages/effitask/).
 
 ### Manually
 
-Compiling effitask requires rust **nightly**. I recommand to use
+Compiling effitask requires rust **nightly**. I recommend to use
 [rustup](https://rustup.rs/) the `rust-toolchain` file sets the right version
 automatically.
 
-You also need `gtk+ 3.0` on your system. Depending of your distributon, run:
+You also need `gtk+ 3.0` on your system. Depending of your distribution, run:
 
-```
+```bash
 apt install libgtk-3-dev # debian
 pacman -S gtk3 # archlinux
 ```
 
-```
+```bash
 git clone https://github.com/sanpii/effitask
 cd effitask
 make
@@ -79,14 +79,14 @@ This program is designed to be used as
 add-ons:
 <https://github.com/todotxt/todo.txt-cli/wiki/Creating-and-Installing-Add-ons>.
 
-```
+```bash
 ln -s "$(pwd)/target/release/effitask" ~/.todo.actions.d/et
 todo.sh et
 ```
 
 You can use it as standalone program by defining some environment variables:
 
-```
+```bash
 export TODO_DIR="$HOME/.local/opt/share/todo"
 export TODO_FILE="$TODO_DIR/todo.txt"
 export DONE_FILE="$TODO_DIR/done.txt"

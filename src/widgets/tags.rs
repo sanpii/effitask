@@ -1,6 +1,6 @@
 use relm_attributes::widget;
-use widgets::Filter;
 use widgets::filter::Msg::{Complete, Edit, Filters};
+use widgets::Filter;
 
 #[derive(Clone, Copy)]
 pub enum Type {

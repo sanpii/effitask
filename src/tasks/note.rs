@@ -64,7 +64,7 @@ impl Note {
         let mut markup = String::from("<markup>");
 
         let headers = vec![
-            "xx-large", "x-large", "large", "medium", "small", "x-small", "xx-small"
+            "xx-large", "x-large", "large", "medium", "small", "x-small", "xx-small",
         ];
 
         for event in parser {

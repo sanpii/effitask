@@ -1,8 +1,8 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::Tasks;
 use widgets::tasks::Msg::{Complete, Edit};
+use widgets::Tasks;
 
 #[derive(Msg)]
 pub enum Msg {

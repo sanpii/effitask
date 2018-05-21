@@ -20,9 +20,9 @@ use logger::Widget as LoggerWidget;
 use search::Msg::Complete as SearchComplete;
 use search::Msg::Edit as SearchEdit;
 use search::Widget as SearchWidget;
-use widgets::Tags as TagsWidget;
 use widgets::tags::Msg::Complete as TagsComplete;
 use widgets::tags::Msg::Edit as TagsEdit;
+use widgets::Tags as TagsWidget;
 
 #[repr(u32)]
 enum Page {
@@ -314,7 +314,7 @@ impl Widget {
             Err(err) => {
                 eprintln!("Launch this program via todo.sh: {}", err);
                 ::std::process::exit(1);
-            },
+            }
         };
 
         let done_file = match ::std::env::var("DONE_FILE") {
@@ -322,7 +322,7 @@ impl Widget {
             Err(err) => {
                 eprintln!("Launch this program via todo.sh: {}", err);
                 ::std::process::exit(1);
-            },
+            }
         };
 
         let list = ::tasks::List::from_files(&todo_file, &done_file);

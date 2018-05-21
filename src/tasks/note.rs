@@ -163,16 +163,24 @@ impl Note {
     }
 
     fn new_filename() -> String {
-        use rand::Rng;
-
         let ext = match ::std::env::var("TODO_NOTE_EXT") {
             Ok(ext) => ext,
             Err(_) => ".txt".to_owned(),
         };
 
-        let name: String = ::rand::thread_rng().gen_ascii_chars().take(3).collect();
+        let name = Self::new_note_id();
 
         format!("{}{}", name, ext)
+    }
+
+    fn new_note_id() -> String {
+        use rand::distributions::Alphanumeric;
+        use rand::Rng;
+
+        ::rand::thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(3)
+            .collect()
     }
 
     fn note_file(filename: &str) -> Result<String, String> {

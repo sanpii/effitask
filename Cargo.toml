@@ -28,10 +28,6 @@ features = ["v3_22"]
 version = "^0.4"
 features = ["std"]
 
-[dependencies.clippy]
-version = "*"
-optional = true
-
 [features]
 default = ["relm/unstable", "relm-attributes/unstable", "relm-derive/unstable"]
 

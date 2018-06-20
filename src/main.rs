@@ -1,7 +1,5 @@
 #![feature(proc_macro)]
 #![feature(slice_concat_ext)]
-#![cfg_attr(feature = "clippy", feature(plugin))]
-#![cfg_attr(feature = "clippy", plugin(clippy))]
 
 extern crate cairo;
 extern crate chrono;

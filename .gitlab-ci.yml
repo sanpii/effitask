@@ -11,6 +11,13 @@ lint:fmt:
         - cargo fmt
         - test $(git ls-files --modified | wc -l) -eq 0 || (echo 'You have introduced some unformated code:'; git ls-files --modified | sed 's/^/* /'; echo 'Please run `cargo fmt` and amend your PR.'; exit 1)
 
+lint:clippy:
+    before_script:
+        - rustup install nightly
+        - cargo +nightly install clippy
+    script: cargo +nightly clippy -- --deny warnings
+    allow_faiture: true
+
 test:debug:
     script: make MODE=debug test
 

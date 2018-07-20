@@ -60,14 +60,15 @@ impl Filter {
         use gtk::ToValue;
         use std::slice::SliceConcatExt;
 
+        let separator = '\\';
         let (filter, (done, total)) = filter;
         let progress = (done as f32 / total as f32) * 100.;
         let f = filter.clone();
 
-        let mut levels: Vec<_> = f.split('-').collect();
+        let mut levels: Vec<_> = f.split(separator).collect();
         let title = levels.pop().unwrap();
 
-        let parent = levels.join("-");
+        let parent = levels.join(&separator.to_string());
 
         if !parent.is_empty() && root.get(&parent).is_none() {
             self.append(root, (parent.clone(), (0, 0)));

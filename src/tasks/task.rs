@@ -15,7 +15,7 @@ impl Task {
     pub fn markup_subject(&self) -> String {
         let mut subject = Self::markup_escape(&self.subject);
 
-        let regex = ::regex::Regex::new("(?P<url>[\\w]+://[^\\s]+)").unwrap();
+        let regex = ::regex::Regex::new(r"(?P<url>[\w]+://[^\s]+)").unwrap();
         subject = regex
             .replace_all(&subject, |caps: &::regex::Captures| {
                 format!(
@@ -25,7 +25,7 @@ impl Task {
             })
             .into_owned();
 
-        let regex = ::regex::Regex::new("(?P<space>^|[\\s])(?P<tag>[\\+@][\\w-]+)").unwrap();
+        let regex = ::regex::Regex::new(r"(?P<space>^|[\s])(?P<tag>[\+@][\w\-]+)").unwrap();
         subject = regex
             .replace_all(&subject, "$space<b>$tag</b>")
             .into_owned();

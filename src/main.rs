@@ -1,4 +1,4 @@
-#![feature(proc_macro)]
+#![feature(use_extern_macros)]
 #![feature(slice_concat_ext)]
 
 extern crate cairo;

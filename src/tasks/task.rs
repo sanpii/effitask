@@ -1,10 +1,7 @@
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Task {
-    inner: ::todo_txt::Task,
+    inner: ::todo_txt::task::Extended,
     pub id: usize,
-    pub note: super::Note,
-    pub recurrence: Option<super::Recurrence>,
-    pub flagged: bool,
 }
 
 impl Task {
@@ -12,9 +9,6 @@ impl Task {
         Self {
             inner: Default::default(),
             id: 0,
-            note: super::Note::None,
-            recurrence: None,
-            flagged: false,
         }
     }
 
@@ -47,67 +41,23 @@ impl Task {
             .replace("'", "&apos;")
             .replace("\"", "&quot;")
     }
-
-    fn note(task: &::todo_txt::Task) -> super::Note {
-        let tag = match ::std::env::var("TODO_NOTE_TAG") {
-            Ok(tag) => tag,
-            Err(_) => "note".to_owned(),
-        };
-
-        if let Some(file) = task.tags.get(&tag) {
-            super::Note::from_file(file)
-        } else {
-            super::Note::None
-        }
-    }
-
-    pub fn complete(&mut self) {
-        let today = ::date::today();
-
-        self.finished = true;
-        self.finish_date = Some(today);
-    }
-
-    pub fn uncomplete(&mut self) {
-        self.finished = false;
-        self.finish_date = None;
-    }
 }
 
 impl ::std::str::FromStr for Task {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, ()> {
-        let mut task = ::todo_txt::Task::from_str(s)?;
-
-        let note = Self::note(&task);
-        task.tags.remove(&"note".to_owned());
-
-        let mut recurrence = None;
-
-        if let Some(rec) = task.tags.get(&"rec".to_owned()) {
-            recurrence = match super::Recurrence::from_str(rec) {
-                Ok(rec) => Some(rec),
-                Err(_) => None,
-            };
-        }
-        task.tags.remove(&"rec".to_owned());
-
-        let flagged = task.tags.contains_key(&"f".to_owned());
-        task.tags.remove(&"f".to_owned());
+        let inner = ::todo_txt::task::Extended::from_str(s)?;
 
         Ok(Self {
+            inner,
             id: 0,
-            note,
-            inner: task,
-            recurrence,
-            flagged,
         })
     }
 }
 
 impl ::std::ops::Deref for Task {
-    type Target = ::todo_txt::Task;
+    type Target = ::todo_txt::task::Extended;
 
     fn deref(&self) -> &Self::Target {
         &self.inner
@@ -125,18 +75,6 @@ impl ::std::fmt::Display for Task {
         use std::ops::Deref;
 
         f.write_str(format!("{}", self.deref()).as_str())?;
-
-        if self.note != ::tasks::Note::None {
-            f.write_str(format!(" {}", self.note).as_str())?;
-        }
-
-        if let Some(ref recurrence) = self.recurrence {
-            f.write_str(format!(" rec:{}", recurrence).as_str())?;
-        }
-
-        if self.flagged {
-            f.write_str(" f:1")?;
-        }
 
         Ok(())
     }

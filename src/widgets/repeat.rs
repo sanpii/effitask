@@ -4,22 +4,22 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
-    Set(Option<::tasks::Recurrence>),
-    Updated(Option<::tasks::Recurrence>),
+    Set(Option<::todo_txt::task::Recurrence>),
+    Updated(Option<::todo_txt::task::Recurrence>),
     UpdateNum,
     UpdatePeriod,
     UpdateStrict,
 }
 
 impl Repeat {
-    fn set_recurrence(&self, recurrence: Option<::tasks::Recurrence>) {
+    fn set_recurrence(&self, recurrence: Option<::todo_txt::task::Recurrence>) {
         self.day.set_active(false);
         self.week.set_active(false);
         self.month.set_active(false);
         self.year.set_active(false);
 
         if let Some(recurrence) = recurrence {
-            use tasks::Period::*;
+            use todo_txt::task::Period::*;
 
             self.num.set_text(format!("{}", recurrence.num).as_str());
             self.strict.set_active(recurrence.strict);
@@ -42,7 +42,7 @@ impl Repeat {
         self.model.stream().emit(Msg::Updated(recurrence));
     }
 
-    fn get_recurrence(&self) -> Option<::tasks::Recurrence> {
+    fn get_recurrence(&self) -> Option<::todo_txt::task::Recurrence> {
         let num = self.num.get_value() as i64;
 
         if num == 0 {
@@ -52,18 +52,18 @@ impl Repeat {
         let strict = self.strict.get_active();
 
         let period = if self.day.get_active() {
-            ::tasks::Period::Day
+            ::todo_txt::task::Period::Day
         } else if self.week.get_active() {
-            ::tasks::Period::Week
+            ::todo_txt::task::Period::Week
         } else if self.month.get_active() {
-            ::tasks::Period::Month
+            ::todo_txt::task::Period::Month
         } else if self.year.get_active() {
-            ::tasks::Period::Year
+            ::todo_txt::task::Period::Year
         } else {
             return None;
         };
 
-        Some(::tasks::Recurrence {
+        Some(::todo_txt::task::Recurrence {
             num,
             period,
             strict,

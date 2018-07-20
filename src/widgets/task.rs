@@ -112,6 +112,8 @@ impl ::relm::Widget for Task {
     }
 
     fn model(relm: &::relm::Relm<Self>, task: ::tasks::Task) -> Model {
+        use tasks::Markup;
+
         let note_label = ::gtk::Label::new(None);
         note_label.show();
 

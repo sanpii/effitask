@@ -16,7 +16,7 @@ pub enum Msg {
     Ok,
     Set(Box<::tasks::Task>),
     UpdateDate(DateType, Option<::chrono::NaiveDate>),
-    UpdateRepeat(Option<::tasks::Recurrence>),
+    UpdateRepeat(Option<::todo_txt::task::Recurrence>),
     UpdatePriority(u8),
 }
 
@@ -69,14 +69,14 @@ impl Widget {
 
         let new_note = self.get_note();
         task.note = match task.note {
-            ::tasks::Note::Long { filename, .. } => ::tasks::Note::Long {
-                filename,
+            ::todo_txt::task::Note::Long { ref filename, .. } => ::todo_txt::task::Note::Long {
+                filename: filename.to_string(),
                 content: new_note.clone(),
             },
             _ => if new_note.is_empty() {
-                ::tasks::Note::None
+                ::todo_txt::task::Note::None
             } else {
-                ::tasks::Note::Short(new_note.clone())
+                ::todo_txt::task::Note::Short(new_note.clone())
             },
         };
 
@@ -115,7 +115,7 @@ impl Widget {
         }
     }
 
-    fn update_repeat(&mut self, recurrence: &Option<::tasks::Recurrence>) {
+    fn update_repeat(&mut self, recurrence: &Option<::todo_txt::task::Recurrence>) {
         self.model.task.recurrence = recurrence.clone();
     }
 

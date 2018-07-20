@@ -11,7 +11,7 @@ pub struct Model {
 
 #[derive(Msg)]
 pub enum Msg {
-    Add(::tasks::Period),
+    Add(::todo_txt::task::Period),
     DateSelected,
     DateUpdated,
     Sensitive,
@@ -21,7 +21,7 @@ pub enum Msg {
 }
 
 impl Calendar {
-    fn add(&self, period: ::tasks::Period) {
+    fn add(&self, period: ::todo_txt::task::Period) {
         let mut date = ::date::today();
 
         let text = self.entry.get_text().unwrap();
@@ -182,7 +182,7 @@ impl ::relm::Widget for Calendar {
                         },
                         label: "+1y",
                         tooltip_text: "Add one year",
-                        clicked => Msg::Add(::tasks::Period::Year),
+                        clicked => Msg::Add(::todo_txt::task::Period::Year),
                     },
                     gtk::Button {
                         child: {
@@ -190,7 +190,7 @@ impl ::relm::Widget for Calendar {
                         },
                         label: "+1m",
                         tooltip_text: "Add one month",
-                        clicked => Msg::Add(::tasks::Period::Month),
+                        clicked => Msg::Add(::todo_txt::task::Period::Month),
                     },
                     gtk::Button {
                         child: {
@@ -198,7 +198,7 @@ impl ::relm::Widget for Calendar {
                         },
                         label: "+1w",
                         tooltip_text: "Add one month",
-                        clicked => Msg::Add(::tasks::Period::Week),
+                        clicked => Msg::Add(::todo_txt::task::Period::Week),
                     },
                     gtk::Button {
                         child: {
@@ -206,7 +206,7 @@ impl ::relm::Widget for Calendar {
                         },
                         label: "+1d",
                         tooltip_text: "Add one month",
-                        clicked => Msg::Add(::tasks::Period::Day),
+                        clicked => Msg::Add(::todo_txt::task::Period::Day),
                     },
                 },
             },

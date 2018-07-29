@@ -1,5 +1,6 @@
 #![feature(use_extern_macros)]
 #![feature(slice_concat_ext)]
+#![allow(redundant_field_names)]
 
 extern crate cairo;
 extern crate chrono;

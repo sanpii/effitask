@@ -47,7 +47,7 @@ impl ::relm::Widget for Task {
             self.note_button.hide();
         }
 
-        if task.tags.len() > 0 {
+        if !task.tags.is_empty() {
             let text = task.tags
                 .iter()
                 .map(|(k, v)| format!("{}: {}", k, v))

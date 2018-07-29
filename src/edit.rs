@@ -102,14 +102,14 @@ impl Widget {
         self.model.task.flagged = self.flag.get_active();
     }
 
-    fn update_date(&mut self, date_type: &DateType, date: &Option<::chrono::NaiveDate>) {
+    fn update_date(&mut self, date_type: DateType, date: Option<::chrono::NaiveDate>) {
         use self::DateType::*;
 
-        match *date_type {
-            Due => self.model.task.due_date = *date,
-            Threshold => self.model.task.threshold_date = *date,
+        match date_type {
+            Due => self.model.task.due_date = date,
+            Threshold => self.model.task.threshold_date = date,
             Finish => {
-                self.model.task.finish_date = *date;
+                self.model.task.finish_date = date;
                 self.model.task.finished = date.is_some();
             }
         }
@@ -151,7 +151,7 @@ impl ::relm::Widget for Widget {
                 .stream()
                 .emit(Msg::Done(Box::new(self.get_task()))),
             Set(task) => self.set_task(&task),
-            UpdateDate(ref date_type, ref date) => self.update_date(date_type, &date),
+            UpdateDate(ref date_type, ref date) => self.update_date(*date_type, *date),
             UpdateRepeat(ref recurrence) => self.update_repeat(&recurrence),
             UpdatePriority(priority) => self.update_priority(priority),
         }

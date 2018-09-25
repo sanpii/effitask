@@ -1,5 +1,3 @@
-#![allow(many_single_char_names)]
-
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;

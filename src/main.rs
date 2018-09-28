@@ -1,5 +1,3 @@
-#![feature(slice_concat_ext)]
-
 extern crate cairo;
 extern crate chrono;
 extern crate gdk;

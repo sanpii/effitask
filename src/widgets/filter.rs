@@ -58,7 +58,6 @@ impl Filter {
         filter: (String, (u32, u32)),
     ) {
         use gtk::ToValue;
-        use std::slice::SliceConcatExt;
 
         let separator = '\\';
         let (filter, (done, total)) = filter;

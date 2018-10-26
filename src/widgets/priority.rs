@@ -59,7 +59,7 @@ impl ::relm::Widget for Priority {
         self.z.join_group(Some(&self.a));
     }
 
-    fn model(_: ()) -> () {}
+    fn model(_: ()) {}
 
     fn update(&mut self, event: Msg) {
         use self::Msg::*;

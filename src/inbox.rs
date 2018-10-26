@@ -31,7 +31,7 @@ impl Widget {
 
 #[widget]
 impl ::relm::Widget for Widget {
-    fn model() -> () {}
+    fn model() {}
 
     fn update(&mut self, event: Msg) {
         use self::Msg::*;

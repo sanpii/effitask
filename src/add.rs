@@ -9,7 +9,7 @@ pub enum Msg {
 
 #[widget]
 impl ::relm::Widget for Widget {
-    fn model(_: ()) -> () {}
+    fn model(_: ()) {}
 
     fn update(&mut self, event: Msg) {
         use self::Msg::*;

@@ -1,23 +1,11 @@
-extern crate cairo;
-extern crate chrono;
-extern crate gdk;
-extern crate gdk_sys;
-extern crate glib;
-extern crate gtk;
 #[macro_use]
 extern crate human_panic;
 #[macro_use]
 extern crate log;
-extern crate pulldown_cmark;
-extern crate rand;
-extern crate regex;
 #[macro_use]
 extern crate relm;
-extern crate relm_attributes;
 #[macro_use]
 extern crate relm_derive;
-extern crate todo_txt;
-extern crate xdg;
 
 use relm::Widget;
 

@@ -1,6 +1,6 @@
 #[derive(Clone, Debug)]
 pub struct List {
-    pub tasks: Vec<::tasks::Task>,
+    pub tasks: Vec<crate::tasks::Task>,
     todo: String,
     done: String,
 }
@@ -37,7 +37,7 @@ impl List {
         self.tasks.extend(tasks);
     }
 
-    fn load_file(&self, path: &str) -> Vec<::tasks::Task> {
+    fn load_file(&self, path: &str) -> Vec<crate::tasks::Task> {
         use std::io::BufRead;
         use std::str::FromStr;
 
@@ -60,7 +60,7 @@ impl List {
                 continue;
             }
 
-            match ::tasks::Task::from_str(line.as_str()) {
+            match crate::tasks::Task::from_str(line.as_str()) {
                 Ok(mut task) => {
                     task.id = last_id + id;
                     tasks.push(task);
@@ -73,7 +73,7 @@ impl List {
     }
 
     pub fn projects(&self) -> Vec<String> {
-        let today = ::date::today();
+        let today = crate::date::today();
 
         let mut projects = self.tasks
             .iter()
@@ -95,7 +95,7 @@ impl List {
     }
 
     pub fn contexts(&self) -> Vec<String> {
-        let today = ::date::today();
+        let today = crate::date::today();
 
         let mut contexts = self.tasks
             .iter()
@@ -126,7 +126,7 @@ impl List {
         Ok(())
     }
 
-    fn write_tasks(&self, file: &str, tasks: Vec<::tasks::Task>) -> Result<(), String> {
+    fn write_tasks(&self, file: &str, tasks: Vec<crate::tasks::Task>) -> Result<(), String> {
         use std::io::Write;
 
         self.backup(file)?;
@@ -160,18 +160,18 @@ impl List {
     pub fn add(&mut self, text: &str) -> Result<(), String> {
         use std::str::FromStr;
 
-        let mut task = match ::tasks::Task::from_str(text) {
+        let mut task = match crate::tasks::Task::from_str(text) {
             Ok(task) => task,
             Err(_) => return Err(format!("Unable to convert task: '{}'", text)),
         };
 
-        (*task).create_date = Some(::date::today());
+        (*task).create_date = Some(crate::date::today());
 
         self.append(task);
         self.write()
     }
 
-    pub fn append(&mut self, task: ::tasks::Task) {
+    pub fn append(&mut self, task: crate::tasks::Task) {
         self.tasks.push(task);
     }
 }

@@ -1,13 +1,13 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::Circle;
+use crate::widgets::Circle;
 
 #[derive(Msg)]
 pub enum Msg {
     Click(::gdk::EventButton),
-    Complete(Box<::tasks::Task>),
-    Edit(Box<::tasks::Task>),
+    Complete(Box<crate::tasks::Task>),
+    Edit(Box<crate::tasks::Task>),
     ShowNote,
     Toggle,
 }
@@ -15,7 +15,7 @@ pub enum Msg {
 pub struct Model {
     note_label: ::gtk::Label,
     note: ::gtk::Popover,
-    task: ::tasks::Task,
+    task: crate::tasks::Task,
     relm: ::relm::Relm<Task>,
 }
 
@@ -85,7 +85,7 @@ impl ::relm::Widget for Task {
 
             let date = self.date_alias(due);
 
-            let today = ::date::today();
+            let today = crate::date::today();
 
             if due < today {
                 context.add_class("past");
@@ -98,7 +98,7 @@ impl ::relm::Widget for Task {
     }
 
     fn date_alias(&self, date: ::chrono::NaiveDate) -> String {
-        let today = ::date::today();
+        let today = crate::date::today();
 
         if date == today {
             String::from("today")
@@ -111,8 +111,8 @@ impl ::relm::Widget for Task {
         }
     }
 
-    fn model(relm: &::relm::Relm<Self>, task: ::tasks::Task) -> Model {
-        use tasks::Markup;
+    fn model(relm: &::relm::Relm<Self>, task: crate::tasks::Task) -> Model {
+        use crate::tasks::Markup;
 
         let note_label = ::gtk::Label::new(None);
         note_label.show();

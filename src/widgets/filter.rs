@@ -1,16 +1,16 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::tasks::Msg::{Complete, Edit};
-use widgets::Tasks;
+use crate::widgets::tasks::Msg::{Complete, Edit};
+use crate::widgets::Tasks;
 
 #[derive(Msg)]
 pub enum Msg {
-    Complete(Box<::tasks::Task>),
-    Edit(Box<::tasks::Task>),
+    Complete(Box<crate::tasks::Task>),
+    Edit(Box<crate::tasks::Task>),
     Filters(Vec<String>),
     UpdateFilters(Vec<(String, (u32, u32))>),
-    UpdateTasks(Vec<::tasks::Task>),
+    UpdateTasks(Vec<crate::tasks::Task>),
 }
 
 #[repr(u32)]
@@ -89,8 +89,8 @@ impl Filter {
         root.insert(filter, row);
     }
 
-    fn update_tasks(&self, tasks: Vec<::tasks::Task>) {
-        self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
+    fn update_tasks(&self, tasks: Vec<crate::tasks::Task>) {
+        self.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
     }
 
     fn select_range(treeview: &::gtk::TreeView, path: &::gtk::TreePath) {

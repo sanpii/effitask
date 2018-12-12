@@ -22,7 +22,7 @@ pub enum Msg {
 
 impl Calendar {
     fn add(&self, period: ::todo_txt::task::Period) {
-        let mut date = ::date::today();
+        let mut date = crate::date::today();
 
         let text = self.entry.get_text().unwrap();
 

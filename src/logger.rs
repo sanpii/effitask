@@ -25,7 +25,7 @@ impl Log {
 
 impl ::log::Log for Log {
     fn enabled(&self, metadata: &::log::Metadata) -> bool {
-        metadata.target() == ::application::NAME && metadata.level() >= ::log::Level::Info
+        metadata.target() == crate::application::NAME && metadata.level() >= ::log::Level::Info
     }
 
     fn log(&self, record: &::log::Record) {

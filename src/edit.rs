@@ -1,27 +1,27 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::calendar::Msg::Updated as CalendarUpdated;
-use widgets::keywords::Msg::Updated as KeywordsUpdated;
-use widgets::priority::Msg::Updated as PriorityUpdated;
-use widgets::repeat::Msg::Updated as RepeatUpdated;
-use widgets::{Calendar, Keywords, Priority, Repeat};
+use crate::widgets::calendar::Msg::Updated as CalendarUpdated;
+use crate::widgets::keywords::Msg::Updated as KeywordsUpdated;
+use crate::widgets::priority::Msg::Updated as PriorityUpdated;
+use crate::widgets::repeat::Msg::Updated as RepeatUpdated;
+use crate::widgets::{Calendar, Keywords, Priority, Repeat};
 
 #[derive(Msg)]
 pub enum Msg {
     Cancel,
     EditKeyword(::std::collections::BTreeMap<String, String>),
     Flag,
-    Done(Box<::tasks::Task>),
+    Done(Box<crate::tasks::Task>),
     Ok,
-    Set(Box<::tasks::Task>),
+    Set(Box<crate::tasks::Task>),
     UpdateDate(DateType, Option<::chrono::NaiveDate>),
     UpdateRepeat(Option<::todo_txt::task::Recurrence>),
     UpdatePriority(u8),
 }
 
 pub struct Model {
-    task: ::tasks::Task,
+    task: crate::tasks::Task,
     relm: ::relm::Relm<Widget>,
 }
 
@@ -33,36 +33,36 @@ pub enum DateType {
 }
 
 impl Widget {
-    fn set_task(&mut self, task: &::tasks::Task) {
+    fn set_task(&mut self, task: &crate::tasks::Task) {
         self.model.task = task.clone();
 
         self.subject.set_text(task.subject.as_str());
         self.priority
-            .emit(::widgets::priority::Msg::Set(task.priority));
+            .emit(crate::widgets::priority::Msg::Set(task.priority));
         self.flag.set_active(task.flagged);
-        self.due.emit(::widgets::calendar::Msg::Set(task.due_date));
+        self.due.emit(crate::widgets::calendar::Msg::Set(task.due_date));
         self.threshold
-            .emit(::widgets::calendar::Msg::Set(task.threshold_date));
+            .emit(crate::widgets::calendar::Msg::Set(task.threshold_date));
         if task.create_date.is_some() {
             self.created
-                .emit(::widgets::calendar::Msg::Set(task.create_date));
+                .emit(crate::widgets::calendar::Msg::Set(task.create_date));
             self.created.widget().show();
         } else {
             self.created.widget().hide();
         }
         self.repeat
-            .emit(::widgets::repeat::Msg::Set(task.recurrence.clone()));
+            .emit(crate::widgets::repeat::Msg::Set(task.recurrence.clone()));
         self.finish
-            .emit(::widgets::calendar::Msg::Set(task.finish_date));
+            .emit(crate::widgets::calendar::Msg::Set(task.finish_date));
         self.keywords
-            .emit(::widgets::keywords::Msg::Set(task.tags.clone()));
+            .emit(crate::widgets::keywords::Msg::Set(task.tags.clone()));
 
         let note = task.note.content().unwrap_or_default();
         let buffer = self.note.get_buffer().unwrap();
         buffer.set_text(note.as_str());
     }
 
-    fn get_task(&self) -> ::tasks::Task {
+    fn get_task(&self) -> crate::tasks::Task {
         let mut task = self.model.task.clone();
 
         task.subject = self.subject.get_text().unwrap();
@@ -133,7 +133,7 @@ impl ::relm::Widget for Widget {
 
     fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
         Model {
-            task: ::tasks::Task::new(),
+            task: crate::tasks::Task::new(),
             relm: relm.clone(),
         }
     }

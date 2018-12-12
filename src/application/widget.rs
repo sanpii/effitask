@@ -2,27 +2,27 @@ use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
-use agenda::Msg::Complete as AgendaComplete;
-use agenda::Msg::Edit as AgendaEdit;
-use agenda::Widget as AgendaWidget;
-use done::Msg::Complete as DoneComplete;
-use done::Msg::Edit as DoneEdit;
-use done::Widget as DoneWidget;
-use edit::Msg::{Cancel, Done};
-use edit::Widget as EditWidget;
-use flag::Msg::Complete as FlagComplete;
-use flag::Msg::Edit as FlagEdit;
-use flag::Widget as FlagWidget;
-use inbox::Msg::Complete as InboxComplete;
-use inbox::Msg::Edit as InboxEdit;
-use inbox::Widget as InboxWidget;
-use logger::Widget as LoggerWidget;
-use search::Msg::Complete as SearchComplete;
-use search::Msg::Edit as SearchEdit;
-use search::Widget as SearchWidget;
-use widgets::tags::Msg::Complete as TagsComplete;
-use widgets::tags::Msg::Edit as TagsEdit;
-use widgets::Tags as TagsWidget;
+use crate::agenda::Msg::Complete as AgendaComplete;
+use crate::agenda::Msg::Edit as AgendaEdit;
+use crate::agenda::Widget as AgendaWidget;
+use crate::done::Msg::Complete as DoneComplete;
+use crate::done::Msg::Edit as DoneEdit;
+use crate::done::Widget as DoneWidget;
+use crate::edit::Msg::{Cancel, Done};
+use crate::edit::Widget as EditWidget;
+use crate::flag::Msg::Complete as FlagComplete;
+use crate::flag::Msg::Edit as FlagEdit;
+use crate::flag::Widget as FlagWidget;
+use crate::inbox::Msg::Complete as InboxComplete;
+use crate::inbox::Msg::Edit as InboxEdit;
+use crate::inbox::Widget as InboxWidget;
+use crate::logger::Widget as LoggerWidget;
+use crate::search::Msg::Complete as SearchComplete;
+use crate::search::Msg::Edit as SearchEdit;
+use crate::search::Widget as SearchWidget;
+use crate::widgets::tags::Msg::Complete as TagsComplete;
+use crate::widgets::tags::Msg::Edit as TagsEdit;
+use crate::widgets::Tags as TagsWidget;
 
 #[repr(u32)]
 enum Page {
@@ -70,10 +70,10 @@ pub struct Model {
 pub enum Msg {
     Add,
     Create(Option<String>),
-    Complete(Box<::tasks::Task>),
-    Edit(Box<::tasks::Task>),
+    Complete(Box<crate::tasks::Task>),
+    Edit(Box<crate::tasks::Task>),
     EditCancel,
-    EditDone(Box<::tasks::Task>),
+    EditDone(Box<crate::tasks::Task>),
     Preferences,
     Refresh,
     Search(String),
@@ -131,8 +131,8 @@ impl Widget {
     fn init_add_popover(&self) {
         use relm::ContainerWidget;
 
-        let add = self.model.add_popover.add_widget::<::add::Widget>(());
-        connect!(add@::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
+        let add = self.model.add_popover.add_widget::<crate::add::Widget>(());
+        connect!(add@crate::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
         self.model.add_popover.set_relative_to(&self.add_button);
         self.model.add_popover.hide();
@@ -217,7 +217,7 @@ impl Widget {
         self.model.add_popover.popdown();
     }
 
-    fn complete(&mut self, task: &::tasks::Task) {
+    fn complete(&mut self, task: &crate::tasks::Task) {
         let id = task.id;
         let mut list = super::tasks();
 
@@ -238,12 +238,12 @@ impl Widget {
                 let due = if recurrence.strict && t.due_date.is_some() {
                     t.due_date.unwrap()
                 } else {
-                    ::date::today()
+                    crate::date::today()
                 };
 
-                let mut new: ::tasks::Task = t.clone();
+                let mut new: crate::tasks::Task = t.clone();
                 new.uncomplete();
-                new.create_date = Some(::date::today());
+                new.create_date = Some(crate::date::today());
                 new.due_date = Some(recurrence.clone() + due);
 
                 if let Some(threshold_date) = t.threshold_date {
@@ -266,17 +266,17 @@ impl Widget {
         self.update_tasks();
     }
 
-    fn edit(&mut self, task: &::tasks::Task) {
+    fn edit(&mut self, task: &crate::tasks::Task) {
         use relm::Widget;
 
-        self.edit.emit(::edit::Msg::Set(Box::new(task.clone())));
+        self.edit.emit(crate::edit::Msg::Set(Box::new(task.clone())));
         self.edit.widget().show();
 
         let (width, _) = self.root().get_size();
         self.paned.set_position(width - 436);
     }
 
-    fn save(&mut self, task: &::tasks::Task) {
+    fn save(&mut self, task: &crate::tasks::Task) {
         let id = task.id;
         let mut list = super::tasks();
 
@@ -305,7 +305,7 @@ impl Widget {
         }
 
         self.search
-            .emit(::search::Msg::UpdateFilter(text.to_string()));
+            .emit(crate::search::Msg::UpdateFilter(text.to_string()));
     }
 
     fn update_tasks(&mut self) {
@@ -325,7 +325,7 @@ impl Widget {
             }
         };
 
-        let list = ::tasks::List::from_files(&todo_file, &done_file);
+        let list = crate::tasks::List::from_files(&todo_file, &done_file);
 
         super::globals::TASKS.with(|t| {
             *t.borrow_mut() = list.clone();
@@ -336,13 +336,13 @@ impl Widget {
             (*p.borrow_mut()).done = self.model.done_button.get_active();
         });
 
-        self.inbox.emit(::inbox::Msg::Update);
-        self.projects.emit(::widgets::tags::Msg::Update);
-        self.contexts.emit(::widgets::tags::Msg::Update);
-        self.agenda.emit(::agenda::Msg::Update);
-        self.done.emit(::done::Msg::Update);
-        self.flag.emit(::flag::Msg::Update);
-        self.search.emit(::search::Msg::Update);
+        self.inbox.emit(crate::inbox::Msg::Update);
+        self.projects.emit(crate::widgets::tags::Msg::Update);
+        self.contexts.emit(crate::widgets::tags::Msg::Update);
+        self.agenda.emit(crate::agenda::Msg::Update);
+        self.done.emit(crate::done::Msg::Update);
+        self.flag.emit(crate::flag::Msg::Update);
+        self.search.emit(crate::search::Msg::Update);
     }
 
     fn preferences(&self) {
@@ -445,12 +445,12 @@ impl ::relm::Widget for Widget {
                             InboxEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="projects"]
-                        TagsWidget(::widgets::tags::Type::Projects) {
+                        TagsWidget(crate::widgets::tags::Type::Projects) {
                             TagsComplete(ref task) => Msg::Complete(task.clone()),
                             TagsEdit(ref task) => Msg::Edit(task.clone()),
                         },
                         #[name="contexts"]
-                        TagsWidget(::widgets::tags::Type::Contexts) {
+                        TagsWidget(crate::widgets::tags::Type::Contexts) {
                             TagsComplete(ref task) => Msg::Complete(task.clone()),
                             TagsEdit(ref task) => Msg::Edit(task.clone()),
                         },

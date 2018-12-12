@@ -1,6 +1,6 @@
 use relm_attributes::widget;
-use widgets::filter::Msg::{Complete, Edit, Filters};
-use widgets::Filter;
+use crate::widgets::filter::Msg::{Complete, Edit, Filters};
+use crate::widgets::Filter;
 
 #[derive(Clone, Copy)]
 pub enum Type {
@@ -10,15 +10,15 @@ pub enum Type {
 
 #[derive(Msg)]
 pub enum Msg {
-    Complete(Box<::tasks::Task>),
-    Edit(Box<::tasks::Task>),
+    Complete(Box<crate::tasks::Task>),
+    Edit(Box<crate::tasks::Task>),
     UpdateFilters(Vec<String>),
     Update,
 }
 
 impl Tags {
     fn update_tags(&self, tag: Type) {
-        let list = ::application::tasks();
+        let list = crate::application::tasks();
         let tags = match tag {
             Type::Projects => list.projects(),
             Type::Contexts => list.contexts(),
@@ -30,10 +30,10 @@ impl Tags {
             .collect();
 
         self.filter
-            .emit(::widgets::filter::Msg::UpdateFilters(tags));
+            .emit(crate::widgets::filter::Msg::UpdateFilters(tags));
     }
 
-    fn get_progress(&self, tag: Type, list: &::tasks::List, current: &str) -> (u32, u32) {
+    fn get_progress(&self, tag: Type, list: &crate::tasks::List, current: &str) -> (u32, u32) {
         list.tasks
             .iter()
             .filter(|x| {
@@ -55,9 +55,9 @@ impl Tags {
     }
 
     fn update_tasks(&self, tag: Type, filters: &[String]) {
-        let today = ::date::today();
-        let preferences = ::application::preferences();
-        let list = ::application::tasks();
+        let today = crate::date::today();
+        let preferences = crate::application::preferences();
+        let list = crate::application::tasks();
 
         let tasks = list.tasks
             .iter()
@@ -72,10 +72,10 @@ impl Tags {
             .cloned()
             .collect();
 
-        self.filter.emit(::widgets::filter::Msg::UpdateTasks(tasks));
+        self.filter.emit(crate::widgets::filter::Msg::UpdateTasks(tasks));
     }
 
-    fn get_tags<'a>(&self, tag: Type, task: &'a ::tasks::Task) -> &'a Vec<String> {
+    fn get_tags<'a>(&self, tag: Type, task: &'a crate::tasks::Task) -> &'a Vec<String> {
         match tag {
             Type::Projects => &task.projects,
             Type::Contexts => &task.contexts,

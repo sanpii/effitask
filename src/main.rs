@@ -43,7 +43,7 @@ fn main() {
         ::std::process::exit(0);
     }
 
-    ::application::Widget::run(()).unwrap();
+    crate::application::Widget::run(()).unwrap();
 }
 
 fn usage(program: &str) {

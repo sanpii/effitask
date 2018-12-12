@@ -1,13 +1,13 @@
 use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use widgets::tasks::Msg::{Complete, Edit};
-use widgets::Tasks;
+use crate::widgets::tasks::Msg::{Complete, Edit};
+use crate::widgets::Tasks;
 
 #[derive(Msg)]
 pub enum Msg {
-    Complete(Box<::tasks::Task>),
-    Edit(Box<::tasks::Task>),
+    Complete(Box<crate::tasks::Task>),
+    Edit(Box<crate::tasks::Task>),
     Selected,
     Select(::chrono::DateTime<::chrono::Local>),
     Update,
@@ -19,7 +19,7 @@ macro_rules! update {
 
         $self.$exp.set_expanded(!tasks.is_empty());
         $self.$exp.set_sensitive(!tasks.is_empty());
-        $self.$task.emit(::widgets::tasks::Msg::Update(tasks));
+        $self.$task.emit(crate::widgets::tasks::Msg::Update(tasks));
     };
 }
 
@@ -27,7 +27,7 @@ impl Widget {
     fn update_tasks(&self) {
         self.calendar.clear_marks();
 
-        let list = ::application::tasks();
+        let list = crate::application::tasks();
         let (y, m, d) = self.calendar.get_date();
         let date = ::chrono::naive::NaiveDate::from_ymd(y as i32, m + 1, d);
 
@@ -40,25 +40,25 @@ impl Widget {
 
     fn get_past_tasks(
         &self,
-        list: &::tasks::List,
+        list: &crate::tasks::List,
         date: ::chrono::naive::NaiveDate,
-    ) -> Vec<::tasks::Task> {
+    ) -> Vec<crate::tasks::Task> {
         self.get_tasks(list, None, Some(date))
     }
 
     fn get_today_tasks(
         &self,
-        list: &::tasks::List,
+        list: &crate::tasks::List,
         date: ::chrono::naive::NaiveDate,
-    ) -> Vec<::tasks::Task> {
+    ) -> Vec<crate::tasks::Task> {
         self.get_tasks(list, Some(date), Some(date.succ()))
     }
 
     fn get_tomorrow_tasks(
         &self,
-        list: &::tasks::List,
+        list: &crate::tasks::List,
         date: ::chrono::naive::NaiveDate,
-    ) -> Vec<::tasks::Task> {
+    ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
             Some(date.succ()),
@@ -68,9 +68,9 @@ impl Widget {
 
     fn get_week_tasks(
         &self,
-        list: &::tasks::List,
+        list: &crate::tasks::List,
         date: ::chrono::naive::NaiveDate,
-    ) -> Vec<::tasks::Task> {
+    ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
             Some(date + ::chrono::Duration::days(2)),
@@ -80,9 +80,9 @@ impl Widget {
 
     fn get_month_tasks(
         &self,
-        list: &::tasks::List,
+        list: &crate::tasks::List,
         date: ::chrono::naive::NaiveDate,
-    ) -> Vec<::tasks::Task> {
+    ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
             Some(date + ::chrono::Duration::weeks(1)),
@@ -92,14 +92,14 @@ impl Widget {
 
     fn get_tasks(
         &self,
-        list: &::tasks::List,
+        list: &crate::tasks::List,
         start: Option<::chrono::naive::NaiveDate>,
         end: Option<::chrono::naive::NaiveDate>,
-    ) -> Vec<::tasks::Task> {
+    ) -> Vec<crate::tasks::Task> {
         let (_, month, _) = self.calendar.get_date();
-        let preferences = ::application::preferences();
+        let preferences = crate::application::preferences();
 
-        let tasks: Vec<::tasks::Task> = list.tasks
+        let tasks: Vec<crate::tasks::Task> = list.tasks
             .iter()
             .filter(|x| {
                 if let Some(due_date) = x.due_date {

@@ -5,9 +5,9 @@ use relm_attributes::widget;
 
 #[derive(Msg)]
 pub enum Msg {
-    Edit(Box<::tasks::Task>),
-    Complete(Box<::tasks::Task>),
-    Update(Vec<::tasks::Task>),
+    Edit(Box<crate::tasks::Task>),
+    Complete(Box<crate::tasks::Task>),
+    Update(Vec<crate::tasks::Task>),
 }
 
 pub struct Model {
@@ -16,7 +16,7 @@ pub struct Model {
 }
 
 impl Tasks {
-    fn update_tasks(&mut self, tasks: &[::tasks::Task]) {
+    fn update_tasks(&mut self, tasks: &[crate::tasks::Task]) {
         self.clear();
 
         if tasks.is_empty() {
@@ -34,12 +34,12 @@ impl Tasks {
                 let child = self.list_box.add_widget::<super::Task>(task.clone());
 
                 connect!(
-                    child@::widgets::task::Msg::Complete(ref task),
+                    child@crate::widgets::task::Msg::Complete(ref task),
                     self.model.relm,
                     Msg::Complete(task.clone())
                 );
                 connect!(
-                    child@::widgets::task::Msg::Edit(ref task),
+                    child@crate::widgets::task::Msg::Edit(ref task),
                     self.model.relm,
                     Msg::Edit(task.clone())
                 );

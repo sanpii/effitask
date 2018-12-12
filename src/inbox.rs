@@ -1,20 +1,20 @@
 use relm_attributes::widget;
-use widgets::tasks::Msg::{Complete, Edit};
-use widgets::Tasks;
+use crate::widgets::tasks::Msg::{Complete, Edit};
+use crate::widgets::Tasks;
 
 #[derive(Msg)]
 pub enum Msg {
-    Complete(Box<::tasks::Task>),
-    Edit(Box<::tasks::Task>),
+    Complete(Box<crate::tasks::Task>),
+    Edit(Box<crate::tasks::Task>),
     Update,
 }
 
 impl Widget {
     fn update_tasks(&self) {
-        let today = ::date::today();
+        let today = crate::date::today();
 
-        let list = ::application::tasks();
-        let preferences = ::application::preferences();
+        let list = crate::application::tasks();
+        let preferences = crate::application::preferences();
         let tasks = list.tasks
             .iter()
             .filter(|x| {
@@ -25,7 +25,7 @@ impl Widget {
             .cloned()
             .collect();
 
-        self.tasks.emit(::widgets::tasks::Msg::Update(tasks));
+        self.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
     }
 }
 

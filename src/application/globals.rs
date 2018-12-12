@@ -1,8 +1,8 @@
 thread_local!(
     pub static PREFERENCES: ::std::cell::RefCell<super::Preferences>
         = ::std::cell::RefCell::new(super::Preferences::new());
-    pub static TASKS: ::std::cell::RefCell<::tasks::List>
-        = ::std::cell::RefCell::new(::tasks::List::new());
+    pub static TASKS: ::std::cell::RefCell<crate::tasks::List>
+        = ::std::cell::RefCell::new(crate::tasks::List::new());
 );
 
 pub fn preferences() -> super::Preferences {
@@ -15,8 +15,8 @@ pub fn preferences() -> super::Preferences {
     preferences
 }
 
-pub fn tasks() -> ::tasks::List {
-    let mut list = ::tasks::List::new();
+pub fn tasks() -> crate::tasks::List {
+    let mut list = crate::tasks::List::new();
 
     TASKS.with(|t| {
         list = t.borrow().clone();

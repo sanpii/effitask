@@ -17,7 +17,7 @@ impl Circle {
             context.set_source_rgb(0.8, 0.8, 0.8);
         } else {
             let due_date = task.due_date.unwrap();
-            let today = ::date::today();
+            let today = crate::date::today();
 
             if due_date < today {
                 context.set_source_rgb(1., 0.4, 0.5);
@@ -99,7 +99,7 @@ impl Circle {
 
 #[widget]
 impl ::relm::Widget for Circle {
-    fn model(task: ::tasks::Task) -> ::tasks::Task {
+    fn model(task: crate::tasks::Task) -> crate::tasks::Task {
         task
     }
 

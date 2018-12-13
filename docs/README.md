@@ -80,7 +80,7 @@ add-ons:
 <https://github.com/todotxt/todo.txt-cli/wiki/Creating-and-Installing-Add-ons>.
 
 ```bash
-ln -s "$(pwd)/target/release/effitask" ~/.todo.actions.d/et
+ln -s /usr/bin/effitask ~/.todo.actions.d/et
 todo.sh et
 ```
 
@@ -91,7 +91,7 @@ export TODO_DIR="$HOME/.local/opt/share/todo"
 export TODO_FILE="$TODO_DIR/todo.txt"
 export DONE_FILE="$TODO_DIR/done.txt"
 
-./target/release/effitask
+/usr/bin/effitask
 ```
 
 ## Configuration

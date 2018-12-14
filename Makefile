@@ -1,5 +1,6 @@
 CARGO=cargo
 CARGO_FLAGS=
+PREFIX?=/usr
 
 ifneq ($(MODE),debug)
 	TARGET=target/release/effitask
@@ -20,11 +21,11 @@ gtk+-3.0:
 	fi
 
 install:
-	install --directory $(PREFIX)/usr/bin
-	install $(TARGET) $(PREFIX)/usr/bin/
-	install --directory $(PREFIX)/usr/share/effitask
-	install --mode 644 resources/*.png $(PREFIX)/usr/share/effitask/
-	install --mode 644 resources/*.css $(PREFIX)/usr/share/effitask/
+	install --directory $(PREFIX)/bin
+	install $(TARGET) $(PREFIX)/bin/
+	install --directory $(PREFIX)/share/effitask
+	install --mode 644 resources/*.png $(PREFIX)/share/effitask/
+	install --mode 644 resources/*.css $(PREFIX)/share/effitask/
 
 test:
 	$(CARGO) test $(CARGO_FLAGS)

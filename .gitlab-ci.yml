@@ -16,7 +16,7 @@ lint:clippy:
         - rustup install nightly
         - cargo +nightly install clippy
     script: cargo +nightly clippy -- --deny warnings
-    allow_faiture: true
+    allow_failure: true
 
 test:debug:
     script: make MODE=debug test

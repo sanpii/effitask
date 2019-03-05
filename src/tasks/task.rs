@@ -88,8 +88,16 @@ impl ::std::cmp::PartialOrd for Task {
 
 impl ::std::cmp::Ord for Task {
     fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
-        if self.inner.due_date != other.inner.due_date {
-            return self.inner.due_date.cmp(&other.inner.due_date);
+        if self.finished {
+           if self.inner.finish_date != other.inner.finish_date {
+               return self.inner.finish_date.cmp(&other.inner.finish_date).reverse();
+           }
+        } else if self.inner.due_date != other.inner.due_date {
+            if self.inner.due_date.is_none() || other.inner.due_date.is_none() {
+                return self.inner.due_date.cmp(&other.inner.due_date).reverse();
+            } else {
+                return self.inner.due_date.cmp(&other.inner.due_date);
+            }
         }
 
         if self.inner.priority != other.inner.priority {

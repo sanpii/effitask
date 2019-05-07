@@ -48,7 +48,7 @@ impl Filter {
         self.filters.expand_all();
 
         for path in paths {
-            self.filters.set_cursor(&path, None, false);
+            self.filters.set_cursor(&path, None as Option<&gtk::TreeViewColumn>, false);
         }
     }
 
@@ -57,8 +57,6 @@ impl Filter {
         root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>,
         filter: (String, (u32, u32)),
     ) {
-        use gtk::ToValue;
-
         let separator = '\\';
         let (filter, (done, total)) = filter;
         let progress = (done as f32 / total as f32) * 100.;

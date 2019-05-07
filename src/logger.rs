@@ -54,7 +54,7 @@ impl Widget {
         self.revealer.set_border_width(10);
         self.revealer.show();
 
-        let context = self.revealer.get_style_context().unwrap();
+        let context = self.revealer.get_style_context();
         context.add_class("log");
 
         let list_box = ::gtk::ListBox::new();
@@ -88,13 +88,11 @@ impl Widget {
     }
 
     fn add_message(list_box: &::gtk::ListBox, level: ::log::Level, text: &str) {
-        use gtk::StyleContextExt;
-
         let label = ::gtk::Label::new(Some(text));
         label.show();
         list_box.add(&label);
 
-        let context = label.get_style_context().unwrap();
+        let context = label.get_style_context();
 
         for class in context.list_classes() {
             context.remove_class(&class);

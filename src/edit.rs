@@ -65,7 +65,7 @@ impl Widget {
     fn get_task(&self) -> crate::tasks::Task {
         let mut task = self.model.task.clone();
 
-        task.subject = self.subject.get_text().unwrap();
+        task.subject = self.subject.get_text().unwrap().to_string();
 
         let new_note = self.get_note();
         task.note = match task.note {
@@ -91,7 +91,7 @@ impl Widget {
         let start = buffer.get_start_iter();
         let end = buffer.get_end_iter();
 
-        buffer.get_text(&start, &end, false).unwrap_or_default()
+        buffer.get_text(&start, &end, false).expect("").to_string()
     }
 
     fn edit_keywords(&mut self, keywords: &::std::collections::BTreeMap<String, String>) {

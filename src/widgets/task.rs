@@ -26,7 +26,7 @@ impl ::relm::Widget for Task {
 
         let task = &self.model.task;
 
-        let context = self.root().get_style_context().unwrap();
+        let context = self.root().get_style_context();
 
         context.add_class("task");
 
@@ -59,11 +59,11 @@ impl ::relm::Widget for Task {
             self.keywords.hide();
         }
 
-        let context = self.date.get_style_context().unwrap();
+        let context = self.date.get_style_context();
         context.add_class("date");
 
         if let Some(threshold) = task.threshold_date {
-            let context = self.threshold_label.get_style_context().unwrap();
+            let context = self.threshold_label.get_style_context();
             context.add_class("threshold");
 
             let date = self.date_alias(threshold);
@@ -80,7 +80,7 @@ impl ::relm::Widget for Task {
         }
 
         if let Some(due) = task.due_date {
-            let context = self.due_label.get_style_context().unwrap();
+            let context = self.due_label.get_style_context();
             context.add_class("due");
 
             let date = self.date_alias(due);

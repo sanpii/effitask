@@ -25,7 +25,7 @@ impl ::relm::Widget for Widget {
             orientation: ::gtk::Orientation::Vertical,
             #[name="entry"]
             gtk::Entry {
-                activate(entry) => Msg::Add(entry.get_text()),
+                activate(entry) => Msg::Add(entry.get_text().map(|x| x.as_str().to_string())),
             },
             gtk::Label {
                 text: "Create a new task +project @context due:2042-01-01",

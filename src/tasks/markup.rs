@@ -31,10 +31,10 @@ impl Markup for ::todo_txt::task::Note {
                 Event::Start(Tag::Paragraph) => markup.push_str("<span>"),
                 Event::End(Tag::Paragraph) => markup.push_str("</span>\n"),
 
-                Event::Start(Tag::Code) | Event::Start(Tag::CodeBlock(_)) => {
+                Event::Start(Tag::CodeBlock(_)) => {
                     markup.push_str("<tt>")
                 }
-                Event::End(Tag::Code) | Event::End(Tag::CodeBlock(_)) => markup.push_str("</tt>"),
+                Event::End(Tag::CodeBlock(_)) => markup.push_str("</tt>"),
 
                 Event::Start(Tag::Emphasis) => markup.push_str("<i>"),
                 Event::End(Tag::Emphasis) => markup.push_str("</i>"),
@@ -45,10 +45,10 @@ impl Markup for ::todo_txt::task::Note {
                 Event::Start(Tag::Item) => markup.push_str("· "),
                 Event::End(Tag::Item) | Event::SoftBreak => markup.push_str("\n"),
 
-                Event::Start(Tag::Link(link, title)) => {
+                Event::Start(Tag::Link(_, link, title)) => {
                     markup.push_str(&format!("<a href='{}' title='{}'>", link, title))
                 }
-                Event::End(Tag::Link(_, _)) => markup.push_str("</a>"),
+                Event::End(Tag::Link(_, _, _)) => markup.push_str("</a>"),
 
                 Event::Text(t) => markup.push_str(&t.replace("&", "&amp;")),
 

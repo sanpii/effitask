@@ -28,7 +28,6 @@ impl Tasks {
 
             let mut sorted_tasks = tasks.to_owned();
             sorted_tasks.sort();
-            //sorted_tasks.reverse();
 
             for task in &sorted_tasks {
                 let child = self.list_box.add_widget::<super::Task>(task.clone());

@@ -164,14 +164,14 @@ impl ::relm::Widget for Widget {
                 orientation: ::gtk::Orientation::Vertical,
                 spacing: 10,
                 gtk::Frame {
-                    label: "Subject",
+                    label: Some("Subject"),
                     #[name="subject"]
                     gtk::Entry {
                         activate => Msg::Ok,
                     },
                 },
                 gtk::Frame {
-                    label: "Priority",
+                    label: Some("Priority"),
                     gtk::Box {
                         orientation: ::gtk::Orientation::Horizontal,
                         #[name="priority"]
@@ -184,14 +184,14 @@ impl ::relm::Widget for Widget {
                                 expand: true,
                             },
                             halign: ::gtk::Align::Center,
-                            image: &::gtk::Image::new_from_icon_name("emblem-favorite", ::gtk::IconSize::SmallToolbar.into()),
-                            tooltip_text: "Flag",
+                            image: Some(&::gtk::Image::new_from_icon_name(Some("emblem-favorite"), ::gtk::IconSize::SmallToolbar.into())),
+                            tooltip_text: Some("Flag"),
                             toggled => Msg::Flag,
                         },
                     },
                 },
                 gtk::Frame {
-                    label: "Date",
+                    label: Some("Date"),
                     gtk::Box {
                         spacing: 10,
                         orientation: ::gtk::Orientation::Vertical,
@@ -212,21 +212,21 @@ impl ::relm::Widget for Widget {
                     },
                 },
                 gtk::Frame {
-                    label: "Repeat",
+                    label: Some("Repeat"),
                     #[name="repeat"]
                     Repeat {
                         RepeatUpdated(ref recurrence) => Msg::UpdateRepeat(recurrence.clone()),
                     },
                 },
                 gtk::Frame {
-                    label: "Keywords",
+                    label: Some("Keywords"),
                     #[name="keywords"]
                     Keywords {
                         KeywordsUpdated(ref keywords) => Msg::EditKeyword(keywords.clone()),
                     },
                 },
                 gtk::Frame {
-                    label: "Note",
+                    label: Some("Note"),
                     #[name="note"]
                     gtk::TextView {
                     },

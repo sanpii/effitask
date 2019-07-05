@@ -134,7 +134,7 @@ impl Widget {
         let add = self.model.add_popover.add_widget::<crate::add::Widget>(());
         connect!(add@crate::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
-        self.model.add_popover.set_relative_to(&self.add_button);
+        self.model.add_popover.set_relative_to(Some(&self.add_button));
         self.model.add_popover.hide();
     }
 
@@ -160,7 +160,7 @@ impl Widget {
         vbox.add(&self.model.done_button);
         self.model.done_button.show();
 
-        self.model.pref_popover.set_relative_to(&self.pref_button);
+        self.model.pref_popover.set_relative_to(Some(&self.pref_button));
         self.model.pref_popover.add(&vbox);
         self.model.pref_popover.hide();
     }
@@ -400,23 +400,23 @@ impl ::relm::Widget for Widget {
             gtk::Box {
                 orientation: ::gtk::Orientation::Vertical,
                 gtk::HeaderBar {
-                    title: super::NAME,
+                    title: Some(super::NAME),
                     show_close_button: true,
                     gtk::ToolButton {
-                        icon_name: "view-refresh",
-                        label: "Refresh",
+                        icon_name: Some("view-refresh"),
+                        label: Some("Refresh"),
                         clicked => Msg::Refresh,
                     },
                     #[name="add_button"]
                     gtk::ToolButton {
-                        icon_name: "list-add",
-                        label: "Add",
+                        icon_name: Some("list-add"),
+                        label: Some("Add"),
                         clicked => Msg::Add,
                     },
                     #[name="pref_button"]
                     gtk::ToolButton {
-                        icon_name: "preferences-system",
-                        label: "Preferences",
+                        icon_name: Some("preferences-system"),
+                        label: Some("Preferences"),
                         clicked => Msg::Preferences,
                     },
                     gtk::SearchEntry {

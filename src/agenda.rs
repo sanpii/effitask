@@ -178,7 +178,7 @@ impl ::relm::Widget for Widget {
                     orientation: ::gtk::Orientation::Vertical,
                     #[name="past_exp"]
                     gtk::Expander {
-                        label: "Past due",
+                        label: Some("Past due"),
                         #[name="past"]
                         Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
@@ -188,7 +188,7 @@ impl ::relm::Widget for Widget {
                     },
                     #[name="today_exp"]
                     gtk::Expander {
-                        label: "Today",
+                        label: Some("Today"),
                         #[name="today"]
                         Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
@@ -198,7 +198,7 @@ impl ::relm::Widget for Widget {
                     },
                     #[name="tomorrow_exp"]
                     gtk::Expander {
-                        label: "Tomorrow",
+                        label: Some("Tomorrow"),
                         #[name="tomorrow"]
                         Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
@@ -208,7 +208,7 @@ impl ::relm::Widget for Widget {
                     },
                     #[name="week_exp"]
                     gtk::Expander {
-                        label: "This week",
+                        label: Some("This week"),
                         #[name="week"]
                         Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,
@@ -218,7 +218,7 @@ impl ::relm::Widget for Widget {
                     },
                     #[name="month_exp"]
                     gtk::Expander {
-                        label: "This month",
+                        label: Some("This month"),
                         #[name="month"]
                         Tasks {
                             property_vscrollbar_policy: ::gtk::PolicyType::Never,

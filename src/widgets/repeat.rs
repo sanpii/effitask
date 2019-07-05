@@ -118,28 +118,28 @@ impl ::relm::Widget for Repeat {
                 #[name="day"]
                 gtk::RadioButton {
                     label: "d",
-                    tooltip_text: "Day",
+                    tooltip_text: Some("Day"),
                     mode: false,
                     toggled => Msg::UpdatePeriod,
                 },
                 #[name="week"]
                 gtk::RadioButton {
                     label: "w",
-                    tooltip_text: "Week",
+                    tooltip_text: Some("Week"),
                     mode: false,
                     toggled => Msg::UpdatePeriod,
                 },
                 #[name="month"]
                 gtk::RadioButton {
                     label: "m",
-                    tooltip_text: "Month",
+                    tooltip_text: Some("Month"),
                     mode: false,
                     toggled => Msg::UpdatePeriod,
                 },
                 #[name="year"]
                 gtk::RadioButton {
                     label: "y",
-                    tooltip_text: "Year",
+                    tooltip_text: Some("Year"),
                     mode: false,
                     toggled => Msg::UpdatePeriod,
                 },
@@ -150,7 +150,7 @@ impl ::relm::Widget for Repeat {
                     },
                     halign: ::gtk::Align::Center,
                     label: "Strict",
-                    tooltip_text: "Use real due date as offset, not today",
+                    tooltip_text: Some("Use real due date as offset, not today"),
                     toggled => Msg::UpdateStrict,
                 },
             },

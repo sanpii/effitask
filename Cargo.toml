@@ -6,22 +6,22 @@ homepage = "https://github.com/sanpii/effitask"
 edition = "2018"
 
 [dependencies]
-cairo-rs = "^0.6"
+cairo-rs = "^0.7"
 chrono = "^0.4"
-gdk = "^0.10"
-gdk-sys = "^0.8"
-glib = "^0.7"
+gdk = "^0.11"
+gdk-sys = "^0.9"
+glib = "^0.8"
 human-panic = "^1.0"
 pulldown-cmark = "^0.5"
 rand = "^0.6"
 regex = "^1.0"
-relm = "^0.16"
+relm = "^0.17"
 relm-attributes = "^0.16"
-relm-derive = "^0.16"
+relm-derive = "^0.17"
 xdg = "^2.1"
 
 [dependencies.gtk]
-version = "0.6"
+version = "0.7"
 features = ["v3_22"]
 
 [dependencies.log]
@@ -33,7 +33,7 @@ version = "^1.2"
 features = ["extended"]
 
 [features]
-default = ["relm/unstable", "relm-attributes/unstable", "relm-derive/unstable"]
+default = ["relm-attributes/unstable"]
 
 [badges]
 gitlab = { repository = "sanpi/effitask", branch = "master" }

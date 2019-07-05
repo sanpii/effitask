@@ -98,7 +98,7 @@ impl Calendar {
 impl ::relm::Widget for Calendar {
     fn init_view(&mut self) {
         self.entry
-            .set_icon_from_icon_name(::gtk::EntryIconPosition::Primary, "x-office-calendar");
+            .set_icon_from_icon_name(::gtk::EntryIconPosition::Primary, Some("x-office-calendar"));
 
         self.label.set_size_request(200, -1);
         self.label.set_text(self.model.label.as_str());
@@ -110,7 +110,7 @@ impl ::relm::Widget for Calendar {
             Msg::DateSelected
         );
         self.model.calendar.show();
-        self.model.popover.set_relative_to(&self.entry);
+        self.model.popover.set_relative_to(Some(&self.entry));
         self.model.popover.set_pointing_to(&::gdk::Rectangle {
             x: 15,
             y: 15,
@@ -181,7 +181,7 @@ impl ::relm::Widget for Calendar {
                             pack_type: ::gtk::PackType::End,
                         },
                         label: "+1y",
-                        tooltip_text: "Add one year",
+                        tooltip_text: Some("Add one year"),
                         clicked => Msg::Add(::todo_txt::task::Period::Year),
                     },
                     gtk::Button {
@@ -189,7 +189,7 @@ impl ::relm::Widget for Calendar {
                             pack_type: ::gtk::PackType::End,
                         },
                         label: "+1m",
-                        tooltip_text: "Add one month",
+                        tooltip_text: Some("Add one month"),
                         clicked => Msg::Add(::todo_txt::task::Period::Month),
                     },
                     gtk::Button {
@@ -197,7 +197,7 @@ impl ::relm::Widget for Calendar {
                             pack_type: ::gtk::PackType::End,
                         },
                         label: "+1w",
-                        tooltip_text: "Add one month",
+                        tooltip_text: Some("Add one month"),
                         clicked => Msg::Add(::todo_txt::task::Period::Week),
                     },
                     gtk::Button {
@@ -205,7 +205,7 @@ impl ::relm::Widget for Calendar {
                             pack_type: ::gtk::PackType::End,
                         },
                         label: "+1d",
-                        tooltip_text: "Add one month",
+                        tooltip_text: Some("Add one month"),
                         clicked => Msg::Add(::todo_txt::task::Period::Day),
                     },
                 },

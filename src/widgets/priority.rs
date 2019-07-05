@@ -110,7 +110,7 @@ impl ::relm::Widget for Priority {
                 },
                 gtk::Button {
                     label: "…",
-                    tooltip_text: "More",
+                    tooltip_text: Some("More"),
                     clicked => Msg::More,
                 },
                 #[name="z"]

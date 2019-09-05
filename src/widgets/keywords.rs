@@ -137,7 +137,7 @@ impl relm::Widget for Keywords {
             self.model.relm,
             cell,
             connect_edited(_, path, new_text),
-            Msg::Edit(Column::Name, path, new_text.to_owned())
+            Msg::Edit(Column::Name, path, new_text.to_string())
         );
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Name.into());
@@ -152,7 +152,7 @@ impl relm::Widget for Keywords {
             self.model.relm,
             cell,
             connect_edited(_, path, new_text),
-            Msg::Edit(Column::Value, path, new_text.to_owned())
+            Msg::Edit(Column::Value, path, new_text.to_string())
         );
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Value.into());

@@ -195,19 +195,19 @@ impl relm::Widget for Widget {
                         spacing: 10,
                         orientation: gtk::Orientation::Vertical,
                         #[name="threshold"]
-                        Calendar("Defer until".to_owned()) {
+                        Calendar("Defer until".to_string()) {
                             CalendarUpdated(date) => Msg::UpdateDate(DateType::Threshold, date),
                         },
                         #[name="due"]
-                        Calendar("Due".to_owned()) {
+                        Calendar("Due".to_string()) {
                             CalendarUpdated(date) => Msg::UpdateDate(DateType::Due, date),
                         },
                         #[name="finish"]
-                        Calendar("Completed".to_owned()) {
+                        Calendar("Completed".to_string()) {
                             CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
                         },
                         #[name="created"]
-                        Calendar("Created".to_owned()),
+                        Calendar("Created".to_string()),
                     },
                 },
                 gtk::Frame {

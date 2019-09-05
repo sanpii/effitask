@@ -13,7 +13,6 @@ lint:fmt:
 
 lint:clippy:
     before_script:
-        - rustup update stable
         - rustup component add clippy
     script: cargo clippy -- --deny warnings
     allow_failure: true

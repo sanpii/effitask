@@ -33,13 +33,10 @@ impl Task {
         subject
     }
 
-    /* TODO: use `glib:functions:markup_escape_text` */
     fn markup_escape(text: &str) -> String {
-        text.replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace("'", "&apos;")
-            .replace("\"", "&quot;")
+        glib::markup_escape_text(text)
+            .as_str()
+            .to_string()
     }
 }
 

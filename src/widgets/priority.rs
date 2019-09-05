@@ -70,8 +70,7 @@ impl relm::Widget for Priority {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::Box {
             orientation: gtk::Orientation::Vertical,
             #[name="hbox"]

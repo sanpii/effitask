@@ -1,6 +1,6 @@
-use relm_attributes::widget;
 use crate::widgets::filter::Msg::{Complete, Edit, Filters};
 use crate::widgets::Filter;
+use relm_attributes::widget;
 
 #[derive(Clone, Copy)]
 pub enum Type {
@@ -24,7 +24,8 @@ impl Tags {
             Type::Contexts => list.contexts(),
         };
 
-        let tags = tags.iter()
+        let tags = tags
+            .iter()
             .map(|x| (x.clone(), self.get_progress(tag, &list, x)))
             .filter(|&(_, (done, total))| done != total)
             .collect();
@@ -59,20 +60,24 @@ impl Tags {
         let preferences = crate::application::preferences();
         let list = crate::application::tasks();
 
-        let tasks = list.tasks
+        let tasks = list
+            .tasks
             .iter()
             .filter(|x| {
                 let tags = self.get_tags(tag, x);
 
-                (preferences.done || !x.finished) && !tags.is_empty()
+                (preferences.done || !x.finished)
+                    && !tags.is_empty()
                     && Self::has_filter(tags, filters)
-                    && (preferences.defered || x.threshold_date.is_none()
+                    && (preferences.defered
+                        || x.threshold_date.is_none()
                         || x.threshold_date.unwrap() <= today)
             })
             .cloned()
             .collect();
 
-        self.filter.emit(crate::widgets::filter::Msg::UpdateTasks(tasks));
+        self.filter
+            .emit(crate::widgets::filter::Msg::UpdateTasks(tasks));
     }
 
     fn get_tags<'a>(&self, tag: Type, task: &'a crate::tasks::Task) -> &'a Vec<String> {
@@ -113,8 +118,7 @@ impl relm::Widget for Tags {
         }
     }
 
-    view!
-    {
+    view! {
         #[name="filter"]
         Filter {
             Complete(ref task) => Msg::Complete(task.clone()),

@@ -31,9 +31,7 @@ impl Markup for todo_txt::task::Note {
                 Event::Start(Tag::Paragraph) => markup.push_str("<span>"),
                 Event::End(Tag::Paragraph) => markup.push_str("</span>\n"),
 
-                Event::Start(Tag::CodeBlock(_)) => {
-                    markup.push_str("<tt>")
-                }
+                Event::Start(Tag::CodeBlock(_)) => markup.push_str("<tt>"),
                 Event::End(Tag::CodeBlock(_)) => markup.push_str("</tt>"),
 
                 Event::Start(Tag::Emphasis) => markup.push_str("<i>"),

@@ -110,8 +110,7 @@ impl relm::Widget for Circle {
         }
     }
 
-    view!
-    {
+    view! {
         #[name="drawing_area"]
         gtk::DrawingArea {
             property_height_request: 60,

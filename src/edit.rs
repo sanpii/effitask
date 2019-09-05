@@ -1,10 +1,10 @@
-use gtk::prelude::*;
-use relm_attributes::widget;
 use crate::widgets::calendar::Msg::Updated as CalendarUpdated;
 use crate::widgets::keywords::Msg::Updated as KeywordsUpdated;
 use crate::widgets::priority::Msg::Updated as PriorityUpdated;
 use crate::widgets::repeat::Msg::Updated as RepeatUpdated;
 use crate::widgets::{Calendar, Keywords, Priority, Repeat};
+use gtk::prelude::*;
+use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -39,7 +39,8 @@ impl Widget {
         self.priority
             .emit(crate::widgets::priority::Msg::Set(task.priority));
         self.flag.set_active(task.flagged);
-        self.due.emit(crate::widgets::calendar::Msg::Set(task.due_date));
+        self.due
+            .emit(crate::widgets::calendar::Msg::Set(task.due_date));
         self.threshold
             .emit(crate::widgets::calendar::Msg::Set(task.threshold_date));
         if task.create_date.is_some() {
@@ -72,11 +73,13 @@ impl Widget {
                 filename: filename.to_string(),
                 content: new_note.clone(),
             },
-            _ => if new_note.is_empty() {
-                todo_txt::task::Note::None
-            } else {
-                todo_txt::task::Note::Short(new_note.clone())
-            },
+            _ => {
+                if new_note.is_empty() {
+                    todo_txt::task::Note::None
+                } else {
+                    todo_txt::task::Note::Short(new_note.clone())
+                }
+            }
         };
 
         task
@@ -145,7 +148,8 @@ impl relm::Widget for Widget {
             Done(_) => (),
             EditKeyword(ref keywords) => self.edit_keywords(keywords),
             Flag => self.flag(),
-            Ok => self.model
+            Ok => self
+                .model
                 .relm
                 .stream()
                 .emit(Msg::Done(Box::new(self.get_task()))),
@@ -156,8 +160,7 @@ impl relm::Widget for Widget {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::ScrolledWindow {
             gtk::Box {
                 orientation: gtk::Orientation::Vertical,

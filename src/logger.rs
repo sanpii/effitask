@@ -138,8 +138,7 @@ impl relm::Widget for Widget {
         }
     }
 
-    view!
-    {
+    view! {
         #[name="revealer"]
         gtk::Revealer {
         }

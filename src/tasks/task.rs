@@ -34,9 +34,7 @@ impl Task {
     }
 
     fn markup_escape(text: &str) -> String {
-        glib::markup_escape_text(text)
-            .as_str()
-            .to_string()
+        glib::markup_escape_text(text).as_str().to_string()
     }
 }
 
@@ -46,10 +44,7 @@ impl std::str::FromStr for Task {
     fn from_str(s: &str) -> Result<Self, ()> {
         let inner = todo_txt::task::Extended::from_str(s)?;
 
-        Ok(Self {
-            inner,
-            id: 0,
-        })
+        Ok(Self { inner, id: 0 })
     }
 }
 

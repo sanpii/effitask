@@ -18,8 +18,7 @@ impl relm::Widget for Widget {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::Box {
             orientation: gtk::Orientation::Vertical,
             #[name="entry"]

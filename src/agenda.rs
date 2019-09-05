@@ -1,7 +1,7 @@
-use gtk::prelude::*;
-use relm_attributes::widget;
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
+use gtk::prelude::*;
+use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -98,12 +98,15 @@ impl Widget {
         let (_, month, _) = self.calendar.get_date();
         let preferences = crate::application::preferences();
 
-        let tasks: Vec<crate::tasks::Task> = list.tasks
+        let tasks: Vec<crate::tasks::Task> = list
+            .tasks
             .iter()
             .filter(|x| {
                 if let Some(due_date) = x.due_date {
                     (preferences.done || !x.finished)
-                        && (preferences.defered || x.threshold_date.is_none() || start.is_none()
+                        && (preferences.defered
+                            || x.threshold_date.is_none()
+                            || start.is_none()
                             || x.threshold_date.unwrap() <= start.unwrap())
                         && (start.is_none() || due_date >= start.unwrap())
                         && (end.is_none() || due_date < end.unwrap())
@@ -150,8 +153,7 @@ impl relm::Widget for Widget {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::Box {
             orientation: gtk::Orientation::Horizontal,
             spacing: 10,

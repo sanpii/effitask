@@ -1,6 +1,6 @@
+use crate::widgets::Circle;
 use gtk::prelude::*;
 use relm_attributes::widget;
-use crate::widgets::Circle;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -47,7 +47,8 @@ impl relm::Widget for Task {
         }
 
         if !task.tags.is_empty() {
-            let text = task.tags
+            let text = task
+                .tags
                 .iter()
                 .map(|(k, v)| format!("{}: {}", k, v))
                 .collect::<Vec<String>>()
@@ -135,24 +136,26 @@ impl relm::Widget for Task {
         use self::Msg::*;
 
         match event {
-            Click(event) => if event.get_event_type() == gdk::EventType::DoubleButtonPress {
-                self.model
-                    .relm
-                    .stream()
-                    .emit(Edit(Box::new(self.model.task.clone())))
-            },
+            Click(event) => {
+                if event.get_event_type() == gdk::EventType::DoubleButtonPress {
+                    self.model
+                        .relm
+                        .stream()
+                        .emit(Edit(Box::new(self.model.task.clone())))
+                }
+            }
             Complete(_) => (),
             Edit(_) => (),
             ShowNote => self.model.note.popup(),
-            Toggle => self.model
+            Toggle => self
+                .model
                 .relm
                 .stream()
                 .emit(Complete(Box::new(self.model.task.clone()))),
         }
     }
 
-    view!
-    {
+    view! {
         gtk::EventBox {
             button_press_event(_, event) => (Msg::Click(event.clone()), gtk::Inhibit(false)),
             gtk::Box {

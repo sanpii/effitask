@@ -75,8 +75,7 @@ impl relm::Widget for Tasks {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::ScrolledWindow {
             gtk::Box {
                 #[name="list_box"]

@@ -1,7 +1,7 @@
-use gtk::prelude::*;
-use relm_attributes::widget;
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
+use gtk::prelude::*;
+use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -47,7 +47,8 @@ impl Filter {
         self.filters.expand_all();
 
         for path in paths {
-            self.filters.set_cursor(&path, None as Option<&gtk::TreeViewColumn>, false);
+            self.filters
+                .set_cursor(&path, None as Option<&gtk::TreeViewColumn>, false);
         }
     }
 
@@ -155,8 +156,7 @@ impl relm::Widget for Filter {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::Paned {
             orientation: gtk::Orientation::Horizontal,
             wide_handle: true,

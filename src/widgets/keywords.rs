@@ -46,7 +46,8 @@ impl Keywords {
     fn delete(&mut self) {
         let selection = self.tree_view.get_selection();
         let (rows, _) = selection.get_selected_rows();
-        let references: Vec<_> = rows.iter()
+        let references: Vec<_> = rows
+            .iter()
             .map(|x| gtk::TreeRowReference::new(&self.model.store, x))
             .collect();
 
@@ -82,7 +83,8 @@ impl Keywords {
         };
 
         while let Some(name) = self.model.store.get_value(&iter, Column::Name.into()).get() {
-            let value = match self.model
+            let value = match self
+                .model
                 .store
                 .get_value(&iter, Column::Value.into())
                 .get()
@@ -179,8 +181,7 @@ impl relm::Widget for Keywords {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::Box {
             orientation: gtk::Orientation::Vertical,
             #[name="scroll"]

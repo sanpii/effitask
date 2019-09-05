@@ -104,8 +104,7 @@ impl relm::Widget for Repeat {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::Box {
             orientation: gtk::Orientation::Vertical,
             #[name="num"]

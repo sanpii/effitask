@@ -1,6 +1,6 @@
-use relm_attributes::widget;
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
+use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -15,11 +15,14 @@ impl Widget {
 
         let list = crate::application::tasks();
         let preferences = crate::application::preferences();
-        let tasks = list.tasks
+        let tasks = list
+            .tasks
             .iter()
             .filter(|x| {
-                !x.finished && x.projects.is_empty()
-                    && (preferences.defered || x.threshold_date.is_none()
+                !x.finished
+                    && x.projects.is_empty()
+                    && (preferences.defered
+                        || x.threshold_date.is_none()
                         || x.threshold_date.unwrap() <= today)
             })
             .cloned()
@@ -43,8 +46,7 @@ impl relm::Widget for Widget {
         }
     }
 
-    view!
-    {
+    view! {
         #[name="tasks"]
         Tasks {
             Complete(ref task) => Msg::Complete(task.clone()),

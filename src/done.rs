@@ -1,6 +1,6 @@
-use relm_attributes::widget;
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
+use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -32,8 +32,7 @@ impl relm::Widget for Widget {
         }
     }
 
-    view!
-    {
+    view! {
         #[name="tasks"]
         Tasks {
             Complete(ref task) => Msg::Complete(task.clone()),

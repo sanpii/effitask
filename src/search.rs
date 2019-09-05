@@ -1,6 +1,6 @@
-use relm_attributes::widget;
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
+use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -24,7 +24,8 @@ impl Widget {
         let filter = self.model.to_lowercase();
         let list = crate::application::tasks();
 
-        let tasks = list.tasks
+        let tasks = list
+            .tasks
             .iter()
             .filter(|x| x.subject.to_lowercase().contains(filter.as_str()))
             .cloned()
@@ -51,8 +52,7 @@ impl relm::Widget for Widget {
         }
     }
 
-    view!
-    {
+    view! {
         #[name="tasks"]
         Tasks {
             Complete(ref task) => Msg::Complete(task.clone()),

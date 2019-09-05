@@ -133,7 +133,9 @@ impl Widget {
         let add = self.model.add_popover.add_widget::<crate::add::Widget>(());
         relm::connect!(add@crate::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
-        self.model.add_popover.set_relative_to(Some(&self.add_button));
+        self.model
+            .add_popover
+            .set_relative_to(Some(&self.add_button));
         self.model.add_popover.hide();
     }
 
@@ -159,7 +161,9 @@ impl Widget {
         vbox.add(&self.model.done_button);
         self.model.done_button.show();
 
-        self.model.pref_popover.set_relative_to(Some(&self.pref_button));
+        self.model
+            .pref_popover
+            .set_relative_to(Some(&self.pref_button));
         self.model.pref_popover.add(&vbox);
         self.model.pref_popover.hide();
     }
@@ -254,11 +258,13 @@ impl Widget {
         }
 
         match list.write() {
-            Ok(_) => if list.tasks[id].finished {
-                log::info!("Task done");
-            } else {
-                log::info!("Task undone");
-            },
+            Ok(_) => {
+                if list.tasks[id].finished {
+                    log::info!("Task done");
+                } else {
+                    log::info!("Task undone");
+                }
+            }
             Err(err) => log::error!("Unable to save tasks: {}", err),
         };
 
@@ -268,7 +274,8 @@ impl Widget {
     fn edit(&mut self, task: &crate::tasks::Task) {
         use relm::Widget;
 
-        self.edit.emit(crate::edit::Msg::Set(Box::new(task.clone())));
+        self.edit
+            .emit(crate::edit::Msg::Set(Box::new(task.clone())));
         self.edit.widget().show();
 
         let (width, _) = self.root().get_size();
@@ -391,8 +398,7 @@ impl relm::Widget for Widget {
         }
     }
 
-    view!
-    {
+    view! {
         #[name="window"]
         gtk::Window {
             title: super::NAME,

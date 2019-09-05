@@ -1,8 +1,8 @@
 thread_local!(
-    pub static PREFERENCES: ::std::cell::RefCell<super::Preferences>
-        = ::std::cell::RefCell::new(super::Preferences::new());
-    pub static TASKS: ::std::cell::RefCell<crate::tasks::List>
-        = ::std::cell::RefCell::new(crate::tasks::List::new());
+    pub static PREFERENCES: ::std::cell::RefCell<super::Preferences> =
+        ::std::cell::RefCell::new(super::Preferences::new());
+    pub static TASKS: ::std::cell::RefCell<crate::tasks::List> =
+        ::std::cell::RefCell::new(crate::tasks::List::new());
 );
 
 pub fn preferences() -> super::Preferences {

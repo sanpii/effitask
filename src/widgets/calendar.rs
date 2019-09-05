@@ -143,8 +143,7 @@ impl relm::Widget for Calendar {
         }
     }
 
-    view!
-    {
+    view! {
         gtk::Box {
             orientation: gtk::Orientation::Horizontal,
             spacing: 10,

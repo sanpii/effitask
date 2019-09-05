@@ -186,7 +186,7 @@ impl relm::Widget for Widget {
                                 expand: true,
                             },
                             halign: gtk::Align::Center,
-                            image: Some(&::gtk::Image::new_from_icon_name(Some("emblem-favorite"), gtk::IconSize::SmallToolbar.into())),
+                            image: Some(&::gtk::Image::new_from_icon_name(Some("emblem-favorite"), gtk::IconSize::SmallToolbar)),
                             tooltip_text: Some("Flag"),
                             toggled => Msg::Flag,
                         },

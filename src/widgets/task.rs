@@ -188,7 +188,7 @@ impl relm::Widget for Task {
                         orientation: gtk::Orientation::Horizontal,
                         #[name="note_button"]
                         gtk::Button {
-                            image: Some(&::gtk::Image::new_from_icon_name(Some("text-x-generic"), gtk::IconSize::LargeToolbar.into())),
+                            image: Some(&::gtk::Image::new_from_icon_name(Some("text-x-generic"), gtk::IconSize::LargeToolbar)),
                             clicked => Msg::ShowNote,
                         },
                         #[name="keywords"]

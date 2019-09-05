@@ -201,11 +201,11 @@ impl relm::Widget for Keywords {
                     fill: true,
                 },
                 gtk::Button {
-                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-add"), gtk::IconSize::SmallToolbar.into())),
+                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-add"), gtk::IconSize::SmallToolbar)),
                     clicked => Msg::Add,
                 },
                 gtk::Button {
-                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-remove"), gtk::IconSize::SmallToolbar.into())),
+                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-remove"), gtk::IconSize::SmallToolbar)),
                     clicked => Msg::Delete,
                 },
             },

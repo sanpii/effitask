@@ -54,9 +54,8 @@ If you use Arch Linux, effitask is available in
 
 ### Manually
 
-Compiling effitask requires rust **nightly**. I recommend to use
-[rustup](https://rustup.rs/) the `rust-toolchain` file sets the right version
-automatically.
+Compiling effitask requires rust. I recommend to use
+[rustup](https://rustup.rs/).
 
 You also need `gtk+ 3.0` on your system. Depending of your distribution, run:
 

@@ -1,4 +1,3 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
@@ -35,7 +34,7 @@ enum Page {
     Search,
 }
 
-impl ::std::convert::From<u32> for Page {
+impl std::convert::From<u32> for Page {
     fn from(n: u32) -> Self {
         match n {
             0 => Page::Inbox,
@@ -50,23 +49,23 @@ impl ::std::convert::From<u32> for Page {
     }
 }
 
-impl ::std::convert::Into<i32> for Page {
+impl std::convert::Into<i32> for Page {
     fn into(self) -> i32 {
-        unsafe { ::std::mem::transmute(self) }
+        unsafe { std::mem::transmute(self) }
     }
 }
 
 pub struct Model {
-    relm: ::relm::Relm<Widget>,
-    add_popover: ::gtk::Popover,
-    pref_popover: ::gtk::Popover,
-    defered_button: ::gtk::CheckButton,
-    done_button: ::gtk::CheckButton,
+    relm: relm::Relm<Widget>,
+    add_popover: gtk::Popover,
+    pref_popover: gtk::Popover,
+    defered_button: gtk::CheckButton,
+    done_button: gtk::CheckButton,
     #[allow(dead_code)]
-    xdg: ::xdg::BaseDirectories,
+    xdg: xdg::BaseDirectories,
 }
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Add,
     Create(Option<String>),
@@ -84,27 +83,27 @@ pub enum Msg {
 impl Widget {
     fn load_style(&self) {
         let screen = self.window.get_screen().unwrap();
-        let css = ::gtk::CssProvider::new();
+        let css = gtk::CssProvider::new();
         if let Some(stylesheet) = self.get_stylesheet() {
             match css.load_from_path(stylesheet.to_str().unwrap()) {
                 Ok(_) => (),
-                Err(err) => error!("Invalid CSS: {}", err),
+                Err(err) => log::error!("Invalid CSS: {}", err),
             }
 
-            ::gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
+            gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
         } else {
-            error!("Unable to find stylesheet");
+            log::error!("Unable to find stylesheet");
         }
     }
 
-    fn get_stylesheet(&self) -> Option<::std::path::PathBuf> {
+    fn get_stylesheet(&self) -> Option<std::path::PathBuf> {
         let mut stylesheet = "style_light.css";
 
-        if let Ok(theme) = ::std::env::var("GTK_THEME") {
+        if let Ok(theme) = std::env::var("GTK_THEME") {
             if theme.ends_with(":dark") {
                 stylesheet = "style_dark.css";
             }
-        } else if let Some(setting) = ::gtk::Settings::get_default() {
+        } else if let Some(setting) = gtk::Settings::get_default() {
             if setting.get_property_gtk_application_prefer_dark_theme() {
                 stylesheet = "style_dark.css";
             }
@@ -114,13 +113,13 @@ impl Widget {
     }
 
     #[cfg(not(debug_assertions))]
-    fn find_data_file(&self, stylesheet: &str) -> Option<::std::path::PathBuf> {
+    fn find_data_file(&self, stylesheet: &str) -> Option<std::path::PathBuf> {
         self.model.xdg.find_data_file(stylesheet)
     }
 
     #[cfg(debug_assertions)]
-    fn find_data_file(&self, stylesheet: &str) -> Option<::std::path::PathBuf> {
-        let mut path = ::std::path::PathBuf::new();
+    fn find_data_file(&self, stylesheet: &str) -> Option<std::path::PathBuf> {
+        let mut path = std::path::PathBuf::new();
 
         path.push("resources");
         path.push(stylesheet);
@@ -132,17 +131,17 @@ impl Widget {
         use relm::ContainerWidget;
 
         let add = self.model.add_popover.add_widget::<crate::add::Widget>(());
-        connect!(add@crate::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
+        relm::connect!(add@crate::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
         self.model.add_popover.set_relative_to(Some(&self.add_button));
         self.model.add_popover.hide();
     }
 
     fn init_pref_popover(&self) {
-        let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
+        let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
         vbox.show();
 
-        connect!(
+        relm::connect!(
             self.model.relm,
             self.model.defered_button,
             connect_toggled(_),
@@ -151,7 +150,7 @@ impl Widget {
         vbox.add(&self.model.defered_button);
         self.model.defered_button.show();
 
-        connect!(
+        relm::connect!(
             self.model.relm,
             self.model.done_button,
             connect_toggled(_),
@@ -176,8 +175,8 @@ impl Widget {
         }
     }
 
-    fn get_tab_widget(&self, n: u32) -> ::gtk::Box {
-        let vbox = ::gtk::Box::new(::gtk::Orientation::Vertical, 0);
+    fn get_tab_widget(&self, n: u32) -> gtk::Box {
+        let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
         let title = match n.into() {
             Page::Inbox => "inbox",
             Page::Projects => "projects",
@@ -189,13 +188,13 @@ impl Widget {
         };
 
         if let Some(filename) = self.find_data_file(format!("{}.png", title).as_str()) {
-            let image = ::gtk::Image::new_from_file(filename);
+            let image = gtk::Image::new_from_file(filename);
             vbox.pack_start(&image, false, false, 0);
         } else {
-            error!("Unable to find resource '{}.png'", title);
+            log::error!("Unable to find resource '{}.png'", title);
         }
 
-        let label = ::gtk::Label::new(Some(title));
+        let label = gtk::Label::new(Some(title));
         vbox.pack_start(&label, false, false, 0);
 
         vbox.show_all();
@@ -211,7 +210,7 @@ impl Widget {
         if let Some(text) = text {
             match super::add_task(&text) {
                 Ok(_) => self.update_tasks(),
-                Err(err) => error!("Unable to create task: '{}'", err),
+                Err(err) => log::error!("Unable to create task: '{}'", err),
             }
         }
         self.model.add_popover.popdown();
@@ -256,11 +255,11 @@ impl Widget {
 
         match list.write() {
             Ok(_) => if list.tasks[id].finished {
-                info!("Task done");
+                log::info!("Task done");
             } else {
-                info!("Task undone");
+                log::info!("Task undone");
             },
-            Err(err) => error!("Unable to save tasks: {}", err),
+            Err(err) => log::error!("Unable to save tasks: {}", err),
         };
 
         self.update_tasks();
@@ -281,15 +280,15 @@ impl Widget {
         let mut list = super::tasks();
 
         if list.tasks.get_mut(id).is_some() {
-            ::std::mem::replace(&mut list.tasks[id], task.clone());
+            std::mem::replace(&mut list.tasks[id], task.clone());
         }
 
         match list.write() {
             Ok(_) => (),
-            Err(err) => error!("Unable to save tasks: {}", err),
+            Err(err) => log::error!("Unable to save tasks: {}", err),
         };
 
-        info!("Task updated");
+        log::info!("Task updated");
 
         self.update_tasks();
         self.edit.widget().hide();
@@ -309,19 +308,19 @@ impl Widget {
     }
 
     fn update_tasks(&mut self) {
-        let todo_file = match ::std::env::var("TODO_FILE") {
+        let todo_file = match std::env::var("TODO_FILE") {
             Ok(todo_file) => todo_file,
             Err(err) => {
                 eprintln!("Launch this program via todo.sh: {}", err);
-                ::std::process::exit(1);
+                std::process::exit(1);
             }
         };
 
-        let done_file = match ::std::env::var("DONE_FILE") {
+        let done_file = match std::env::var("DONE_FILE") {
             Ok(done_file) => done_file,
             Err(err) => {
                 eprintln!("Launch this program via todo.sh: {}", err);
-                ::std::process::exit(1);
+                std::process::exit(1);
             }
         };
 
@@ -351,7 +350,7 @@ impl Widget {
 }
 
 #[widget]
-impl ::relm::Widget for Widget {
+impl relm::Widget for Widget {
     fn init_view(&mut self) {
         self.edit.widget().hide();
         self.search.widget().hide();
@@ -366,11 +365,11 @@ impl ::relm::Widget for Widget {
     fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
         Model {
             relm: relm.clone(),
-            add_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
-            pref_popover: ::gtk::Popover::new(None::<&::gtk::Button>),
-            defered_button: ::gtk::CheckButton::new_with_label("Display defered tasks"),
-            done_button: ::gtk::CheckButton::new_with_label("Display done tasks"),
-            xdg: ::xdg::BaseDirectories::with_prefix(super::NAME.to_lowercase()).unwrap(),
+            add_popover: gtk::Popover::new(None::<&::gtk::Button>),
+            pref_popover: gtk::Popover::new(None::<&::gtk::Button>),
+            defered_button: gtk::CheckButton::new_with_label("Display defered tasks"),
+            done_button: gtk::CheckButton::new_with_label("Display done tasks"),
+            xdg: xdg::BaseDirectories::with_prefix(super::NAME.to_lowercase()).unwrap(),
         }
     }
 
@@ -388,7 +387,7 @@ impl ::relm::Widget for Widget {
             Refresh => self.update_tasks(),
             Search(text) => self.search(&text),
             SwitchPage => self.edit.widget().hide(),
-            Quit => ::gtk::main_quit(),
+            Quit => gtk::main_quit(),
         }
     }
 
@@ -398,7 +397,7 @@ impl ::relm::Widget for Widget {
         gtk::Window {
             title: super::NAME,
             gtk::Box {
-                orientation: ::gtk::Orientation::Vertical,
+                orientation: gtk::Orientation::Vertical,
                 gtk::HeaderBar {
                     title: Some(super::NAME),
                     show_close_button: true,
@@ -421,7 +420,7 @@ impl ::relm::Widget for Widget {
                     },
                     gtk::SearchEntry {
                         child: {
-                            pack_type: ::gtk::PackType::End,
+                            pack_type: gtk::PackType::End,
                         },
                         search_changed(entry) => Msg::Search(entry.get_text().unwrap().to_string()),
                     },
@@ -434,11 +433,11 @@ impl ::relm::Widget for Widget {
                         expand: true,
                         fill: true,
                     },
-                    orientation: ::gtk::Orientation::Horizontal,
+                    orientation: gtk::Orientation::Horizontal,
                     wide_handle: true,
                     #[name="notebook"]
                     gtk::Notebook {
-                        tab_pos: ::gtk::PositionType::Left,
+                        tab_pos: gtk::PositionType::Left,
                         #[name="inbox"]
                         InboxWidget {
                             InboxComplete(ref task) => Msg::Complete(task.clone()),
@@ -483,7 +482,7 @@ impl ::relm::Widget for Widget {
                     },
                 },
             },
-            delete_event(_, _) => (Msg::Quit, ::gtk::Inhibit(false)),
+            delete_event(_, _) => (Msg::Quit, gtk::Inhibit(false)),
         }
     }
 }

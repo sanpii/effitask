@@ -1,8 +1,7 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Draw,
 }
@@ -27,7 +26,7 @@ impl Circle {
         }
 
         context.set_line_width(8.);
-        context.arc(center, center, center - 5., 0., 2. * ::std::f64::consts::PI);
+        context.arc(center, center, center - 5., 0., 2. * std::f64::consts::PI);
         context.close_path();
 
         if task.finished {
@@ -37,7 +36,7 @@ impl Circle {
             context.save();
             context.fill();
             context.translate(f64::from(width) as f64 / -4., f64::from(height) as f64 / 2.);
-            context.rotate(::std::f64::consts::PI / -4.);
+            context.rotate(std::f64::consts::PI / -4.);
             context.set_source_rgb(0., 0., 0.);
             context.rectangle(20., 30., 40., 10.);
             context.rectangle(20., 20., 10., 10.);
@@ -49,7 +48,7 @@ impl Circle {
 
         if !task.finished && task.flagged {
             let angle = if task.due_date.is_some() {
-                ::std::f64::consts::PI
+                std::f64::consts::PI
             } else {
                 0.
             };
@@ -60,7 +59,7 @@ impl Circle {
                 center,
                 center - 5.,
                 angle,
-                2. * ::std::f64::consts::PI,
+                2. * std::f64::consts::PI,
             );
             context.stroke();
         }
@@ -69,7 +68,7 @@ impl Circle {
             context.set_line_width(2.);
 
             for dx in &[-12., 0., 12.] {
-                context.arc(center + dx, center, 4., 0., 2. * ::std::f64::consts::PI);
+                context.arc(center + dx, center, 4., 0., 2. * std::f64::consts::PI);
                 context.close_path();
                 context.stroke();
             }
@@ -83,22 +82,22 @@ impl Circle {
         )
     }
 
-    fn create_context(&self) -> ::cairo::Context {
+    fn create_context(&self) -> cairo::Context {
         let window = self.drawing_area.get_window().unwrap();
 
         unsafe {
             use glib::translate::FromGlibPtrNone;
             use glib::translate::ToGlibPtr;
 
-            let ptr = ::gdk_sys::gdk_cairo_create(window.to_glib_none().0);
+            let ptr = gdk_sys::gdk_cairo_create(window.to_glib_none().0);
 
-            ::cairo::Context::from_glib_none(ptr)
+            cairo::Context::from_glib_none(ptr)
         }
     }
 }
 
 #[widget]
-impl ::relm::Widget for Circle {
+impl relm::Widget for Circle {
     fn model(task: crate::tasks::Task) -> crate::tasks::Task {
         task
     }
@@ -117,7 +116,7 @@ impl ::relm::Widget for Circle {
         gtk::DrawingArea {
             property_height_request: 60,
             property_width_request: 60,
-            draw(_, _) => (Msg::Draw, ::gtk::Inhibit(false)),
+            draw(_, _) => (Msg::Draw, gtk::Inhibit(false)),
         }
     }
 }

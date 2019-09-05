@@ -1,18 +1,17 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
-    Set(Option<::todo_txt::task::Recurrence>),
-    Updated(Option<::todo_txt::task::Recurrence>),
+    Set(Option<todo_txt::task::Recurrence>),
+    Updated(Option<todo_txt::task::Recurrence>),
     UpdateNum,
     UpdatePeriod,
     UpdateStrict,
 }
 
 impl Repeat {
-    fn set_recurrence(&self, recurrence: Option<::todo_txt::task::Recurrence>) {
+    fn set_recurrence(&self, recurrence: Option<todo_txt::task::Recurrence>) {
         self.day.set_active(false);
         self.week.set_active(false);
         self.month.set_active(false);
@@ -42,7 +41,7 @@ impl Repeat {
         self.model.stream().emit(Msg::Updated(recurrence));
     }
 
-    fn get_recurrence(&self) -> Option<::todo_txt::task::Recurrence> {
+    fn get_recurrence(&self) -> Option<todo_txt::task::Recurrence> {
         let num = self.num.get_value() as i64;
 
         if num == 0 {
@@ -52,18 +51,18 @@ impl Repeat {
         let strict = self.strict.get_active();
 
         let period = if self.day.get_active() {
-            ::todo_txt::task::Period::Day
+            todo_txt::task::Period::Day
         } else if self.week.get_active() {
-            ::todo_txt::task::Period::Week
+            todo_txt::task::Period::Week
         } else if self.month.get_active() {
-            ::todo_txt::task::Period::Month
+            todo_txt::task::Period::Month
         } else if self.year.get_active() {
-            ::todo_txt::task::Period::Year
+            todo_txt::task::Period::Year
         } else {
             return None;
         };
 
-        Some(::todo_txt::task::Recurrence {
+        Some(todo_txt::task::Recurrence {
             num,
             period,
             strict,
@@ -72,12 +71,12 @@ impl Repeat {
 }
 
 #[widget]
-impl ::relm::Widget for Repeat {
+impl relm::Widget for Repeat {
     fn init_view(&mut self) {
         self.num.set_adjustment(&::gtk::Adjustment::new(
             0.,
             0.,
-            ::std::usize::MAX as f64,
+            std::usize::MAX as f64,
             1.,
             5.,
             1.,
@@ -89,7 +88,7 @@ impl ::relm::Widget for Repeat {
         self.year.join_group(Some(&self.day));
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> ::relm::Relm<Repeat> {
+    fn model(relm: &::relm::Relm<Self>, _: ()) -> relm::Relm<Repeat> {
         relm.clone()
     }
 
@@ -108,13 +107,13 @@ impl ::relm::Widget for Repeat {
     view!
     {
         gtk::Box {
-            orientation: ::gtk::Orientation::Vertical,
+            orientation: gtk::Orientation::Vertical,
             #[name="num"]
             gtk::SpinButton {
-                focus_out_event(_, _) => (Msg::UpdateNum, ::gtk::Inhibit(false)),
+                focus_out_event(_, _) => (Msg::UpdateNum, gtk::Inhibit(false)),
             },
             gtk::Box {
-                orientation: ::gtk::Orientation::Horizontal,
+                orientation: gtk::Orientation::Horizontal,
                 #[name="day"]
                 gtk::RadioButton {
                     label: "d",
@@ -148,7 +147,7 @@ impl ::relm::Widget for Repeat {
                     child: {
                         expand: true,
                     },
-                    halign: ::gtk::Align::Center,
+                    halign: gtk::Align::Center,
                     label: "Strict",
                     tooltip_text: Some("Use real due date as offset, not today"),
                     toggled => Msg::UpdateStrict,

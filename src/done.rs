@@ -2,7 +2,7 @@ use relm_attributes::widget;
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Complete(Box<crate::tasks::Task>),
     Edit(Box<crate::tasks::Task>),
@@ -19,7 +19,7 @@ impl Widget {
 }
 
 #[widget]
-impl ::relm::Widget for Widget {
+impl relm::Widget for Widget {
     fn model(_: ()) {}
 
     fn update(&mut self, event: Msg) {

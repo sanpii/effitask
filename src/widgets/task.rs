@@ -1,11 +1,10 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 use crate::widgets::Circle;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
-    Click(::gdk::EventButton),
+    Click(gdk::EventButton),
     Complete(Box<crate::tasks::Task>),
     Edit(Box<crate::tasks::Task>),
     ShowNote,
@@ -13,14 +12,14 @@ pub enum Msg {
 }
 
 pub struct Model {
-    note_label: ::gtk::Label,
-    note: ::gtk::Popover,
+    note_label: gtk::Label,
+    note: gtk::Popover,
     task: crate::tasks::Task,
-    relm: ::relm::Relm<Task>,
+    relm: relm::Relm<Task>,
 }
 
 #[widget]
-impl ::relm::Widget for Task {
+impl relm::Widget for Task {
     fn init_view(&mut self) {
         use gtk::StyleContextExt;
 
@@ -97,7 +96,7 @@ impl ::relm::Widget for Task {
         }
     }
 
-    fn date_alias(&self, date: ::chrono::NaiveDate) -> String {
+    fn date_alias(&self, date: chrono::NaiveDate) -> String {
         let today = crate::date::today();
 
         if date == today {
@@ -114,15 +113,15 @@ impl ::relm::Widget for Task {
     fn model(relm: &::relm::Relm<Self>, task: crate::tasks::Task) -> Model {
         use crate::tasks::Markup;
 
-        let note_label = ::gtk::Label::new(None);
+        let note_label = gtk::Label::new(None);
         note_label.show();
 
         if let Some(ref note) = task.note.markup() {
             note_label.set_markup(note);
         }
 
-        let note = ::gtk::Popover::new(None::<&::gtk::Button>);
-        note.set_position(::gtk::PositionType::Right);
+        let note = gtk::Popover::new(None::<&::gtk::Button>);
+        note.set_position(gtk::PositionType::Right);
 
         Model {
             note_label,
@@ -136,7 +135,7 @@ impl ::relm::Widget for Task {
         use self::Msg::*;
 
         match event {
-            Click(event) => if event.get_event_type() == ::gdk::EventType::DoubleButtonPress {
+            Click(event) => if event.get_event_type() == gdk::EventType::DoubleButtonPress {
                 self.model
                     .relm
                     .stream()
@@ -155,19 +154,19 @@ impl ::relm::Widget for Task {
     view!
     {
         gtk::EventBox {
-            button_press_event(_, event) => (Msg::Click(event.clone()), ::gtk::Inhibit(false)),
+            button_press_event(_, event) => (Msg::Click(event.clone()), gtk::Inhibit(false)),
             gtk::Box {
-                orientation: ::gtk::Orientation::Horizontal,
+                orientation: gtk::Orientation::Horizontal,
                 spacing: 5,
                 gtk::Box {
-                    orientation: ::gtk::Orientation::Vertical,
+                    orientation: gtk::Orientation::Vertical,
                     child: {
                         expand: true,
                         fill: true,
                     },
                     gtk::Box {
                         spacing: 5,
-                        orientation: ::gtk::Orientation::Horizontal,
+                        orientation: gtk::Orientation::Horizontal,
                         gtk::CheckButton {
                             active: self.model.task.finished,
                             toggled => Msg::Toggle,
@@ -183,10 +182,10 @@ impl ::relm::Widget for Task {
                     },
                     gtk::Box {
                         spacing: 5,
-                        orientation: ::gtk::Orientation::Horizontal,
+                        orientation: gtk::Orientation::Horizontal,
                         #[name="note_button"]
                         gtk::Button {
-                            image: Some(&::gtk::Image::new_from_icon_name(Some("text-x-generic"), ::gtk::IconSize::LargeToolbar.into())),
+                            image: Some(&::gtk::Image::new_from_icon_name(Some("text-x-generic"), gtk::IconSize::LargeToolbar.into())),
                             clicked => Msg::ShowNote,
                         },
                         #[name="keywords"]
@@ -202,7 +201,7 @@ impl ::relm::Widget for Task {
                         gtk::Box {
                             spacing: 5,
                             child: {
-                                pack_type: ::gtk::PackType::End,
+                                pack_type: gtk::PackType::End,
                             },
                             #[name="threshold_label"]
                             gtk::Label {

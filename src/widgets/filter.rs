@@ -1,10 +1,9 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Complete(Box<crate::tasks::Task>),
     Edit(Box<crate::tasks::Task>),
@@ -21,15 +20,15 @@ enum Column {
     Tooltip = 3,
 }
 
-impl ::std::convert::Into<u32> for Column {
+impl std::convert::Into<u32> for Column {
     fn into(self) -> u32 {
-        unsafe { ::std::mem::transmute(self) }
+        unsafe { std::mem::transmute(self) }
     }
 }
 
-impl ::std::convert::Into<i32> for Column {
+impl std::convert::Into<i32> for Column {
     fn into(self) -> i32 {
-        unsafe { ::std::mem::transmute(self) }
+        unsafe { std::mem::transmute(self) }
     }
 }
 
@@ -39,7 +38,7 @@ impl Filter {
         let (paths, _) = selection.get_selected_rows();
 
         self.model.clear();
-        let mut root = ::std::collections::HashMap::new();
+        let mut root = std::collections::HashMap::new();
 
         for filter in filters {
             self.append(&mut root, filter);
@@ -54,7 +53,7 @@ impl Filter {
 
     fn append(
         &self,
-        root: &mut ::std::collections::HashMap<String, ::gtk::TreeIter>,
+        root: &mut std::collections::HashMap<String, gtk::TreeIter>,
         filter: (String, (u32, u32)),
     ) {
         let separator = '\\';
@@ -111,20 +110,20 @@ impl Filter {
 }
 
 #[widget]
-impl ::relm::Widget for Filter {
+impl relm::Widget for Filter {
     fn init_view(&mut self) {
         self.filters.set_size_request(200, -1);
         self.scroll
-            .set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
+            .set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
         self.filters.set_model(Some(&self.model));
         self.filters
             .get_selection()
-            .set_mode(::gtk::SelectionMode::Multiple);
+            .set_mode(gtk::SelectionMode::Multiple);
 
-        let column = ::gtk::TreeViewColumn::new();
+        let column = gtk::TreeViewColumn::new();
         self.filters.append_column(&column);
 
-        let cell = ::gtk::CellRendererProgress::new();
+        let cell = gtk::CellRendererProgress::new();
         cell.set_property_text_xalign(0.);
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Title.into());
@@ -133,15 +132,15 @@ impl ::relm::Widget for Filter {
         self.filters.set_tooltip_column(Column::Tooltip.into());
     }
 
-    fn model(_: ()) -> ::gtk::TreeStore {
+    fn model(_: ()) -> gtk::TreeStore {
         let columns = vec![
-            ::gtk::Type::String,
-            ::gtk::Type::String,
-            ::gtk::Type::U32,
-            ::gtk::Type::String,
+            gtk::Type::String,
+            gtk::Type::String,
+            gtk::Type::U32,
+            gtk::Type::String,
         ];
 
-        ::gtk::TreeStore::new(&columns)
+        gtk::TreeStore::new(&columns)
     }
 
     fn update(&mut self, event: Msg) {
@@ -159,7 +158,7 @@ impl ::relm::Widget for Filter {
     view!
     {
         gtk::Paned {
-            orientation: ::gtk::Orientation::Horizontal,
+            orientation: gtk::Orientation::Horizontal,
             wide_handle: true,
             #[name="scroll"]
             gtk::ScrolledWindow {

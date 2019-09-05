@@ -1,14 +1,13 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Add(Option<String>),
 }
 
 #[widget]
-impl ::relm::Widget for Widget {
+impl relm::Widget for Widget {
     fn model(_: ()) {}
 
     fn update(&mut self, event: Msg) {
@@ -22,7 +21,7 @@ impl ::relm::Widget for Widget {
     view!
     {
         gtk::Box {
-            orientation: ::gtk::Orientation::Vertical,
+            orientation: gtk::Orientation::Vertical,
             #[name="entry"]
             gtk::Entry {
                 activate(entry) => Msg::Add(entry.get_text().map(|x| x.as_str().to_string())),

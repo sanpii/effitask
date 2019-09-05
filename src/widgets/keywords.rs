@@ -1,19 +1,18 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Add,
     Delete,
-    Edit(Column, ::gtk::TreePath, String),
-    Set(::std::collections::BTreeMap<String, String>),
-    Updated(::std::collections::BTreeMap<String, String>),
+    Edit(Column, gtk::TreePath, String),
+    Set(std::collections::BTreeMap<String, String>),
+    Updated(std::collections::BTreeMap<String, String>),
 }
 
 pub struct Model {
-    store: ::gtk::ListStore,
-    relm: ::relm::Relm<Keywords>,
+    store: gtk::ListStore,
+    relm: relm::Relm<Keywords>,
 }
 
 #[repr(u32)]
@@ -23,15 +22,15 @@ pub enum Column {
     Value = 1,
 }
 
-impl ::std::convert::Into<u32> for Column {
+impl std::convert::Into<u32> for Column {
     fn into(self) -> u32 {
-        unsafe { ::std::mem::transmute(self) }
+        unsafe { std::mem::transmute(self) }
     }
 }
 
-impl ::std::convert::Into<i32> for Column {
+impl std::convert::Into<i32> for Column {
     fn into(self) -> i32 {
-        unsafe { ::std::mem::transmute(self) }
+        unsafe { std::mem::transmute(self) }
     }
 }
 
@@ -48,7 +47,7 @@ impl Keywords {
         let selection = self.tree_view.get_selection();
         let (rows, _) = selection.get_selected_rows();
         let references: Vec<_> = rows.iter()
-            .map(|x| ::gtk::TreeRowReference::new(&self.model.store, x))
+            .map(|x| gtk::TreeRowReference::new(&self.model.store, x))
             .collect();
 
         for reference in references {
@@ -74,8 +73,8 @@ impl Keywords {
         self.model.relm.stream().emit(Msg::Updated(self.keywords()));
     }
 
-    fn keywords(&self) -> ::std::collections::BTreeMap<String, String> {
-        let mut keywords = ::std::collections::BTreeMap::new();
+    fn keywords(&self) -> std::collections::BTreeMap<String, String> {
+        let mut keywords = std::collections::BTreeMap::new();
 
         let iter = match self.model.store.get_iter_first() {
             Some(iter) => iter,
@@ -118,23 +117,23 @@ impl Keywords {
 }
 
 #[widget]
-impl ::relm::Widget for Keywords {
+impl relm::Widget for Keywords {
     fn init_view(&mut self) {
         self.scroll
-            .set_policy(::gtk::PolicyType::Never, ::gtk::PolicyType::Automatic);
+            .set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
         self.scroll.set_property_height_request(150);
         self.tree_view.set_model(Some(&self.model.store));
         self.tree_view
             .get_selection()
-            .set_mode(::gtk::SelectionMode::Multiple);
+            .set_mode(gtk::SelectionMode::Multiple);
 
-        let column = ::gtk::TreeViewColumn::new();
+        let column = gtk::TreeViewColumn::new();
         column.set_title("name");
         self.tree_view.append_column(&column);
 
-        let cell = ::gtk::CellRendererText::new();
+        let cell = gtk::CellRendererText::new();
         cell.set_property_editable(true);
-        connect!(
+        relm::connect!(
             self.model.relm,
             cell,
             connect_edited(_, path, new_text),
@@ -143,13 +142,13 @@ impl ::relm::Widget for Keywords {
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Name.into());
 
-        let column = ::gtk::TreeViewColumn::new();
+        let column = gtk::TreeViewColumn::new();
         column.set_title("value");
         self.tree_view.append_column(&column);
 
-        let cell = ::gtk::CellRendererText::new();
+        let cell = gtk::CellRendererText::new();
         cell.set_property_editable(true);
-        connect!(
+        relm::connect!(
             self.model.relm,
             cell,
             connect_edited(_, path, new_text),
@@ -160,10 +159,10 @@ impl ::relm::Widget for Keywords {
     }
 
     fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
-        let columns = vec![::gtk::Type::String, ::gtk::Type::String];
+        let columns = vec![::gtk::Type::String, gtk::Type::String];
 
         Model {
-            store: ::gtk::ListStore::new(&columns),
+            store: gtk::ListStore::new(&columns),
             relm: relm.clone(),
         }
     }
@@ -183,7 +182,7 @@ impl ::relm::Widget for Keywords {
     view!
     {
         gtk::Box {
-            orientation: ::gtk::Orientation::Vertical,
+            orientation: gtk::Orientation::Vertical,
             #[name="scroll"]
             gtk::ScrolledWindow {
                 child: {
@@ -201,11 +200,11 @@ impl ::relm::Widget for Keywords {
                     fill: true,
                 },
                 gtk::Button {
-                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-add"), ::gtk::IconSize::SmallToolbar.into())),
+                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-add"), gtk::IconSize::SmallToolbar.into())),
                     clicked => Msg::Add,
                 },
                 gtk::Button {
-                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-remove"), ::gtk::IconSize::SmallToolbar.into())),
+                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-remove"), gtk::IconSize::SmallToolbar.into())),
                     clicked => Msg::Delete,
                 },
             },

@@ -42,10 +42,10 @@ impl List {
         use std::str::FromStr;
 
         let mut tasks = Vec::new();
-        let file = match ::std::fs::File::open(path) {
+        let file = match std::fs::File::open(path) {
             Ok(file) => file,
             Err(_) => {
-                error!("Unable to open {:?}", path);
+                log::error!("Unable to open {:?}", path);
 
                 return tasks;
             }
@@ -53,7 +53,7 @@ impl List {
 
         let last_id = self.tasks.len();
 
-        for (id, line) in ::std::io::BufReader::new(file).lines().enumerate() {
+        for (id, line) in std::io::BufReader::new(file).lines().enumerate() {
             let line = line.unwrap();
 
             if line.is_empty() {
@@ -65,7 +65,7 @@ impl List {
                     task.id = last_id + id;
                     tasks.push(task);
                 }
-                Err(_) => error!("Invalid tasks: '{}'", line),
+                Err(_) => log::error!("Invalid tasks: '{}'", line),
             };
         }
 
@@ -131,7 +131,7 @@ impl List {
 
         self.backup(file)?;
 
-        let mut f = match ::std::fs::File::create(file) {
+        let mut f = match std::fs::File::create(file) {
             Ok(f) => f,
             Err(err) => return Err(format!("Unable to write tasks: {}", err)),
         };
@@ -151,7 +151,7 @@ impl List {
     fn backup(&self, file: &str) -> Result<(), String> {
         let bak = format!("{}.bak", file);
 
-        match ::std::fs::copy(file, bak) {
+        match std::fs::copy(file, bak) {
             Ok(_) => Ok(()),
             Err(_) => Err(format!("Unable to backup {}", file)),
         }

@@ -2,14 +2,14 @@ pub trait Markup {
     fn markup(&self) -> Option<String>;
 }
 
-impl Markup for ::todo_txt::task::Note {
+impl Markup for todo_txt::task::Note {
     fn markup(&self) -> Option<String> {
         let content = match self.content() {
             Some(content) => content,
             None => return None,
         };
 
-        let parser = ::pulldown_cmark::Parser::new(&content);
+        let parser = pulldown_cmark::Parser::new(&content);
 
         let mut markup = String::from("<markup>");
 

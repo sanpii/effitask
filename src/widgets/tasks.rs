@@ -1,9 +1,8 @@
-use gtk;
 use gtk::prelude::*;
 use relm::ContainerWidget;
 use relm_attributes::widget;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Edit(Box<crate::tasks::Task>),
     Complete(Box<crate::tasks::Task>),
@@ -11,8 +10,8 @@ pub enum Msg {
 }
 
 pub struct Model {
-    children: Vec<::relm::Component<super::Task>>,
-    relm: ::relm::Relm<Tasks>,
+    children: Vec<relm::Component<super::Task>>,
+    relm: relm::Relm<Tasks>,
 }
 
 impl Tasks {
@@ -33,12 +32,12 @@ impl Tasks {
             for task in &sorted_tasks {
                 let child = self.list_box.add_widget::<super::Task>(task.clone());
 
-                connect!(
+                relm::connect!(
                     child@crate::widgets::task::Msg::Complete(ref task),
                     self.model.relm,
                     Msg::Complete(task.clone())
                 );
-                connect!(
+                relm::connect!(
                     child@crate::widgets::task::Msg::Edit(ref task),
                     self.model.relm,
                     Msg::Edit(task.clone())
@@ -58,7 +57,7 @@ impl Tasks {
 }
 
 #[widget]
-impl ::relm::Widget for Tasks {
+impl relm::Widget for Tasks {
     fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
         Model {
             children: Vec::new(),

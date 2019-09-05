@@ -8,7 +8,7 @@ pub enum Type {
     Contexts,
 }
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Complete(Box<crate::tasks::Task>),
     Edit(Box<crate::tasks::Task>),
@@ -94,7 +94,7 @@ impl Tags {
 }
 
 #[widget]
-impl ::relm::Widget for Tags {
+impl relm::Widget for Tags {
     fn model(tag: Type) -> Type {
         tag
     }

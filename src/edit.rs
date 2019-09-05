@@ -1,4 +1,3 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 use crate::widgets::calendar::Msg::Updated as CalendarUpdated;
@@ -7,22 +6,22 @@ use crate::widgets::priority::Msg::Updated as PriorityUpdated;
 use crate::widgets::repeat::Msg::Updated as RepeatUpdated;
 use crate::widgets::{Calendar, Keywords, Priority, Repeat};
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Cancel,
-    EditKeyword(::std::collections::BTreeMap<String, String>),
+    EditKeyword(std::collections::BTreeMap<String, String>),
     Flag,
     Done(Box<crate::tasks::Task>),
     Ok,
     Set(Box<crate::tasks::Task>),
-    UpdateDate(DateType, Option<::chrono::NaiveDate>),
-    UpdateRepeat(Option<::todo_txt::task::Recurrence>),
+    UpdateDate(DateType, Option<chrono::NaiveDate>),
+    UpdateRepeat(Option<todo_txt::task::Recurrence>),
     UpdatePriority(u8),
 }
 
 pub struct Model {
     task: crate::tasks::Task,
-    relm: ::relm::Relm<Widget>,
+    relm: relm::Relm<Widget>,
 }
 
 #[derive(Clone, Copy)]
@@ -69,14 +68,14 @@ impl Widget {
 
         let new_note = self.get_note();
         task.note = match task.note {
-            ::todo_txt::task::Note::Long { ref filename, .. } => ::todo_txt::task::Note::Long {
+            todo_txt::task::Note::Long { ref filename, .. } => todo_txt::task::Note::Long {
                 filename: filename.to_string(),
                 content: new_note.clone(),
             },
             _ => if new_note.is_empty() {
-                ::todo_txt::task::Note::None
+                todo_txt::task::Note::None
             } else {
-                ::todo_txt::task::Note::Short(new_note.clone())
+                todo_txt::task::Note::Short(new_note.clone())
             },
         };
 
@@ -102,7 +101,7 @@ impl Widget {
         self.model.task.flagged = self.flag.get_active();
     }
 
-    fn update_date(&mut self, date_type: DateType, date: Option<::chrono::NaiveDate>) {
+    fn update_date(&mut self, date_type: DateType, date: Option<chrono::NaiveDate>) {
         use self::DateType::*;
 
         match date_type {
@@ -115,7 +114,7 @@ impl Widget {
         }
     }
 
-    fn update_repeat(&mut self, recurrence: &Option<::todo_txt::task::Recurrence>) {
+    fn update_repeat(&mut self, recurrence: &Option<todo_txt::task::Recurrence>) {
         self.model.task.recurrence = recurrence.clone();
     }
 
@@ -125,7 +124,7 @@ impl Widget {
 }
 
 #[widget]
-impl ::relm::Widget for Widget {
+impl relm::Widget for Widget {
     fn init_view(&mut self) {
         self.note.set_property_height_request(150);
         self.created.widget().set_sensitive(false);
@@ -161,7 +160,7 @@ impl ::relm::Widget for Widget {
     {
         gtk::ScrolledWindow {
             gtk::Box {
-                orientation: ::gtk::Orientation::Vertical,
+                orientation: gtk::Orientation::Vertical,
                 spacing: 10,
                 gtk::Frame {
                     label: Some("Subject"),
@@ -173,7 +172,7 @@ impl ::relm::Widget for Widget {
                 gtk::Frame {
                     label: Some("Priority"),
                     gtk::Box {
-                        orientation: ::gtk::Orientation::Horizontal,
+                        orientation: gtk::Orientation::Horizontal,
                         #[name="priority"]
                         Priority {
                             PriorityUpdated(priority) => Msg::UpdatePriority(priority),
@@ -183,8 +182,8 @@ impl ::relm::Widget for Widget {
                             child: {
                                 expand: true,
                             },
-                            halign: ::gtk::Align::Center,
-                            image: Some(&::gtk::Image::new_from_icon_name(Some("emblem-favorite"), ::gtk::IconSize::SmallToolbar.into())),
+                            halign: gtk::Align::Center,
+                            image: Some(&::gtk::Image::new_from_icon_name(Some("emblem-favorite"), gtk::IconSize::SmallToolbar.into())),
                             tooltip_text: Some("Flag"),
                             toggled => Msg::Flag,
                         },
@@ -194,7 +193,7 @@ impl ::relm::Widget for Widget {
                     label: Some("Date"),
                     gtk::Box {
                         spacing: 10,
-                        orientation: ::gtk::Orientation::Vertical,
+                        orientation: gtk::Orientation::Vertical,
                         #[name="threshold"]
                         Calendar("Defer until".to_owned()) {
                             CalendarUpdated(date) => Msg::UpdateDate(DateType::Threshold, date),
@@ -233,10 +232,10 @@ impl ::relm::Widget for Widget {
                 },
                 gtk::ActionBar {
                     child: {
-                        pack_type: ::gtk::PackType::End,
+                        pack_type: gtk::PackType::End,
                     },
                     gtk::ButtonBox {
-                        orientation: ::gtk::Orientation::Horizontal,
+                        orientation: gtk::Orientation::Horizontal,
                         gtk::Button {
                             label: "Ok",
                             clicked => Msg::Ok,

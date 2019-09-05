@@ -1,8 +1,7 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     More,
     Set(u8),
@@ -46,7 +45,7 @@ impl Priority {
 }
 
 #[widget]
-impl ::relm::Widget for Priority {
+impl relm::Widget for Priority {
     fn init_view(&mut self) {
         self.button
             .set_adjustment(&::gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
@@ -124,7 +123,7 @@ impl ::relm::Widget for Priority {
             gtk::SpinButton {
                 focus_out_event(button, _) => (
                     Msg::Updated(button.get_value() as u8),
-                    ::gtk::Inhibit(false)
+                    gtk::Inhibit(false)
                 ),
             },
         }

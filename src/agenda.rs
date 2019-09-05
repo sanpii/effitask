@@ -1,15 +1,14 @@
-use gtk;
 use gtk::prelude::*;
 use relm_attributes::widget;
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
 
-#[derive(Msg)]
+#[derive(relm_derive::Msg)]
 pub enum Msg {
     Complete(Box<crate::tasks::Task>),
     Edit(Box<crate::tasks::Task>),
     Selected,
-    Select(::chrono::DateTime<::chrono::Local>),
+    Select(chrono::DateTime<chrono::Local>),
     Update,
 }
 
@@ -29,7 +28,7 @@ impl Widget {
 
         let list = crate::application::tasks();
         let (y, m, d) = self.calendar.get_date();
-        let date = ::chrono::naive::NaiveDate::from_ymd(y as i32, m + 1, d);
+        let date = chrono::naive::NaiveDate::from_ymd(y as i32, m + 1, d);
 
         update!(self, past_exp, past, get_past_tasks, list, date);
         update!(self, today_exp, today, get_today_tasks, list, date);
@@ -41,7 +40,7 @@ impl Widget {
     fn get_past_tasks(
         &self,
         list: &crate::tasks::List,
-        date: ::chrono::naive::NaiveDate,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
         self.get_tasks(list, None, Some(date))
     }
@@ -49,7 +48,7 @@ impl Widget {
     fn get_today_tasks(
         &self,
         list: &crate::tasks::List,
-        date: ::chrono::naive::NaiveDate,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
         self.get_tasks(list, Some(date), Some(date.succ()))
     }
@@ -57,44 +56,44 @@ impl Widget {
     fn get_tomorrow_tasks(
         &self,
         list: &crate::tasks::List,
-        date: ::chrono::naive::NaiveDate,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
             Some(date.succ()),
-            Some(date + ::chrono::Duration::days(2)),
+            Some(date + chrono::Duration::days(2)),
         )
     }
 
     fn get_week_tasks(
         &self,
         list: &crate::tasks::List,
-        date: ::chrono::naive::NaiveDate,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
-            Some(date + ::chrono::Duration::days(2)),
-            Some(date + ::chrono::Duration::weeks(1)),
+            Some(date + chrono::Duration::days(2)),
+            Some(date + chrono::Duration::weeks(1)),
         )
     }
 
     fn get_month_tasks(
         &self,
         list: &crate::tasks::List,
-        date: ::chrono::naive::NaiveDate,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
-            Some(date + ::chrono::Duration::weeks(1)),
-            Some(date + ::chrono::Duration::weeks(4)),
+            Some(date + chrono::Duration::weeks(1)),
+            Some(date + chrono::Duration::weeks(4)),
         )
     }
 
     fn get_tasks(
         &self,
         list: &crate::tasks::List,
-        start: Option<::chrono::naive::NaiveDate>,
-        end: Option<::chrono::naive::NaiveDate>,
+        start: Option<chrono::naive::NaiveDate>,
+        end: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
         let (_, month, _) = self.calendar.get_date();
         let preferences = crate::application::preferences();
@@ -130,7 +129,7 @@ impl Widget {
 }
 
 #[widget]
-impl ::relm::Widget for Widget {
+impl relm::Widget for Widget {
     fn model(_: ()) {}
 
     fn update(&mut self, event: Msg) {
@@ -154,10 +153,10 @@ impl ::relm::Widget for Widget {
     view!
     {
         gtk::Box {
-            orientation: ::gtk::Orientation::Horizontal,
+            orientation: gtk::Orientation::Horizontal,
             spacing: 10,
             gtk::Box {
-                orientation: ::gtk::Orientation::Vertical,
+                orientation: gtk::Orientation::Vertical,
                 #[name="calendar"]
                 gtk::Calendar {
                     day_selected => Msg::Selected,
@@ -167,7 +166,7 @@ impl ::relm::Widget for Widget {
                         padding: 5,
                     },
                     label: "Today",
-                    clicked => Msg::Select(::chrono::Local::now()),
+                    clicked => Msg::Select(chrono::Local::now()),
                 },
             },
             gtk::ScrolledWindow {
@@ -175,13 +174,13 @@ impl ::relm::Widget for Widget {
                     expand: true,
                 },
                 gtk::Box {
-                    orientation: ::gtk::Orientation::Vertical,
+                    orientation: gtk::Orientation::Vertical,
                     #[name="past_exp"]
                     gtk::Expander {
                         label: Some("Past due"),
                         #[name="past"]
                         Tasks {
-                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
+                            property_vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -191,7 +190,7 @@ impl ::relm::Widget for Widget {
                         label: Some("Today"),
                         #[name="today"]
                         Tasks {
-                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
+                            property_vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -201,7 +200,7 @@ impl ::relm::Widget for Widget {
                         label: Some("Tomorrow"),
                         #[name="tomorrow"]
                         Tasks {
-                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
+                            property_vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -211,7 +210,7 @@ impl ::relm::Widget for Widget {
                         label: Some("This week"),
                         #[name="week"]
                         Tasks {
-                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
+                            property_vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -221,7 +220,7 @@ impl ::relm::Widget for Widget {
                         label: Some("This month"),
                         #[name="month"]
                         Tasks {
-                            property_vscrollbar_policy: ::gtk::PolicyType::Never,
+                            property_vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         }

@@ -103,7 +103,7 @@ impl Widget {
             if theme.ends_with(":dark") {
                 stylesheet = "style_dark.css";
             }
-        } else if let Some(setting) = gtk::Settings::get_default() {
+        } else if let Some(setting) = self.window.get_settings() {
             if setting.get_property_gtk_application_prefer_dark_theme() {
                 stylesheet = "style_dark.css";
             }

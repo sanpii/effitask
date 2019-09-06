@@ -111,7 +111,7 @@ impl relm::Widget for Task {
         }
     }
 
-    fn model(relm: &::relm::Relm<Self>, task: crate::tasks::Task) -> Model {
+    fn model(relm: &relm::Relm<Self>, task: crate::tasks::Task) -> Model {
         use crate::tasks::Markup;
 
         let note_label = gtk::Label::new(None);
@@ -121,7 +121,7 @@ impl relm::Widget for Task {
             note_label.set_markup(note);
         }
 
-        let note = gtk::Popover::new(None::<&::gtk::Button>);
+        let note = gtk::Popover::new(None::<&gtk::Button>);
         note.set_position(gtk::PositionType::Right);
 
         Model {
@@ -188,7 +188,7 @@ impl relm::Widget for Task {
                         orientation: gtk::Orientation::Horizontal,
                         #[name="note_button"]
                         gtk::Button {
-                            image: Some(&::gtk::Image::new_from_icon_name(Some("text-x-generic"), gtk::IconSize::LargeToolbar)),
+                            image: Some(&gtk::Image::new_from_icon_name(Some("text-x-generic"), gtk::IconSize::LargeToolbar)),
                             clicked => Msg::ShowNote,
                         },
                         #[name="keywords"]

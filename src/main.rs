@@ -20,7 +20,7 @@ fn main() {
     human_panic::setup_panic!();
 
     if std::env::args().nth(1) == Some("usage".to_string()) {
-        usage(&::std::env::args().nth(0).unwrap());
+        usage(&std::env::args().nth(0).unwrap());
 
         std::process::exit(0);
     }

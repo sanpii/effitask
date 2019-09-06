@@ -96,7 +96,7 @@ impl Widget {
         buffer.get_text(&start, &end, false).expect("").to_string()
     }
 
-    fn edit_keywords(&mut self, keywords: &::std::collections::BTreeMap<String, String>) {
+    fn edit_keywords(&mut self, keywords: &std::collections::BTreeMap<String, String>) {
         self.model.task.tags = keywords.clone();
     }
 
@@ -133,7 +133,7 @@ impl relm::Widget for Widget {
         self.created.widget().set_sensitive(false);
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
+    fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
         Model {
             task: crate::tasks::Task::new(),
             relm: relm.clone(),
@@ -186,7 +186,7 @@ impl relm::Widget for Widget {
                                 expand: true,
                             },
                             halign: gtk::Align::Center,
-                            image: Some(&::gtk::Image::new_from_icon_name(Some("emblem-favorite"), gtk::IconSize::SmallToolbar)),
+                            image: Some(&gtk::Image::new_from_icon_name(Some("emblem-favorite"), gtk::IconSize::SmallToolbar)),
                             tooltip_text: Some("Flag"),
                             toggled => Msg::Flag,
                         },

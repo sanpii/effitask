@@ -91,7 +91,7 @@ impl Filter {
         self.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
     }
 
-    fn select_range(treeview: &::gtk::TreeView, path: &::gtk::TreePath) {
+    fn select_range(treeview: &gtk::TreeView, path: &gtk::TreePath) {
         let model = treeview.get_model().unwrap();
 
         let start = path;

@@ -73,7 +73,7 @@ impl Repeat {
 #[widget]
 impl relm::Widget for Repeat {
     fn init_view(&mut self) {
-        self.num.set_adjustment(&::gtk::Adjustment::new(
+        self.num.set_adjustment(&gtk::Adjustment::new(
             0.,
             0.,
             std::usize::MAX as f64,
@@ -88,7 +88,7 @@ impl relm::Widget for Repeat {
         self.year.join_group(Some(&self.day));
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> relm::Relm<Repeat> {
+    fn model(relm: &relm::Relm<Self>, _: ()) -> relm::Relm<Repeat> {
         relm.clone()
     }
 

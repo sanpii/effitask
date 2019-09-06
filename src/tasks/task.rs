@@ -17,7 +17,7 @@ impl Task {
 
         let regex = regex::Regex::new(r"(?P<url>[\w]+://[^\s]+)").unwrap();
         subject = regex
-            .replace_all(&subject, |caps: &::regex::Captures| {
+            .replace_all(&subject, |caps: &regex::Captures| {
                 format!(
                     "<a href=\"{url}\">{url}</a>",
                     url = caps[1].replace("&", "&amp;")

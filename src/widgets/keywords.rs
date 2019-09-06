@@ -64,7 +64,7 @@ impl Keywords {
         self.model.relm.stream().emit(Msg::Updated(self.keywords()));
     }
 
-    fn edit(&mut self, column: Column, path: &::gtk::TreePath, new_text: &str) {
+    fn edit(&mut self, column: Column, path: &gtk::TreePath, new_text: &str) {
         let iter = self.model.store.get_iter(path).unwrap();
 
         self.model
@@ -103,7 +103,7 @@ impl Keywords {
         keywords
     }
 
-    fn set(&mut self, keywords: &::std::collections::BTreeMap<String, String>) {
+    fn set(&mut self, keywords: &std::collections::BTreeMap<String, String>) {
         self.model.store.clear();
 
         for (name, value) in keywords {
@@ -160,7 +160,7 @@ impl relm::Widget for Keywords {
         column.add_attribute(&cell, "text", Column::Value.into());
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
+    fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
         let columns = vec![::gtk::Type::String, gtk::Type::String];
 
         Model {
@@ -201,11 +201,11 @@ impl relm::Widget for Keywords {
                     fill: true,
                 },
                 gtk::Button {
-                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-add"), gtk::IconSize::SmallToolbar)),
+                    image: Some(&gtk::Image::new_from_icon_name(Some("list-add"), gtk::IconSize::SmallToolbar)),
                     clicked => Msg::Add,
                 },
                 gtk::Button {
-                    image: Some(&::gtk::Image::new_from_icon_name(Some("list-remove"), gtk::IconSize::SmallToolbar)),
+                    image: Some(&gtk::Image::new_from_icon_name(Some("list-remove"), gtk::IconSize::SmallToolbar)),
                     clicked => Msg::Delete,
                 },
             },

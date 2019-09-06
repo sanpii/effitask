@@ -58,7 +58,7 @@ impl Tasks {
 
 #[widget]
 impl relm::Widget for Tasks {
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
+    fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
         Model {
             children: Vec::new(),
             relm: relm.clone(),

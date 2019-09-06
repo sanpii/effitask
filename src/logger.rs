@@ -23,11 +23,11 @@ impl Log {
 }
 
 impl log::Log for Log {
-    fn enabled(&self, metadata: &::log::Metadata) -> bool {
+    fn enabled(&self, metadata: &log::Metadata) -> bool {
         metadata.target() == crate::application::NAME && metadata.level() >= log::Level::Info
     }
 
-    fn log(&self, record: &::log::Record) {
+    fn log(&self, record: &log::Record) {
         if let Ok(tx) = self.tx.lock() {
             tx.send((record.level(), format!("{}", record.args())))
                 .unwrap_or_default();
@@ -86,7 +86,7 @@ impl Widget {
         glib::Continue(false)
     }
 
-    fn add_message(list_box: &::gtk::ListBox, level: log::Level, text: &str) {
+    fn add_message(list_box: &gtk::ListBox, level: log::Level, text: &str) {
         let label = gtk::Label::new(Some(text));
         label.show();
         list_box.add(&label);
@@ -126,7 +126,7 @@ impl relm::Widget for Widget {
         self.init();
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> relm::Relm<Widget> {
+    fn model(relm: &relm::Relm<Self>, _: ()) -> relm::Relm<Widget> {
         relm.clone()
     }
 

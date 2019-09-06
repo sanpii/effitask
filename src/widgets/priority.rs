@@ -48,7 +48,7 @@ impl Priority {
 impl relm::Widget for Priority {
     fn init_view(&mut self) {
         self.button
-            .set_adjustment(&::gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
+            .set_adjustment(&gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
         self.button.hide();
 
         self.b.join_group(Some(&self.a));

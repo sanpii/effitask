@@ -110,7 +110,7 @@ impl relm::Widget for Calendar {
         );
         self.model.calendar.show();
         self.model.popover.set_relative_to(Some(&self.entry));
-        self.model.popover.set_pointing_to(&::gdk::Rectangle {
+        self.model.popover.set_pointing_to(&gdk::Rectangle {
             x: 15,
             y: 15,
             width: 0,
@@ -120,10 +120,10 @@ impl relm::Widget for Calendar {
         self.model.popover.hide();
     }
 
-    fn model(relm: &::relm::Relm<Self>, label: String) -> Model {
+    fn model(relm: &relm::Relm<Self>, label: String) -> Model {
         Model {
             label: label.clone(),
-            popover: gtk::Popover::new(None::<&::gtk::Calendar>),
+            popover: gtk::Popover::new(None::<&gtk::Calendar>),
             calendar: gtk::Calendar::new(),
             relm: relm.clone(),
         }

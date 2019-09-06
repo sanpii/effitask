@@ -369,11 +369,11 @@ impl relm::Widget for Widget {
         self.update_tasks();
     }
 
-    fn model(relm: &::relm::Relm<Self>, _: ()) -> Model {
+    fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
         Model {
             relm: relm.clone(),
-            add_popover: gtk::Popover::new(None::<&::gtk::Button>),
-            pref_popover: gtk::Popover::new(None::<&::gtk::Button>),
+            add_popover: gtk::Popover::new(None::<&gtk::Button>),
+            pref_popover: gtk::Popover::new(None::<&gtk::Button>),
             defered_button: gtk::CheckButton::new_with_label("Display defered tasks"),
             done_button: gtk::CheckButton::new_with_label("Display done tasks"),
             xdg: xdg::BaseDirectories::with_prefix(super::NAME.to_lowercase()).unwrap(),

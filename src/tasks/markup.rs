@@ -22,11 +22,11 @@ impl Markup for todo_txt::task::Note {
             use pulldown_cmark::Tag;
 
             match event {
-                Event::Start(Tag::Header(level)) => markup.push_str(&format!(
+                Event::Start(Tag::Heading(level)) => markup.push_str(&format!(
                     "<span font_size='{}'><u>",
                     headers[level as usize]
                 )),
-                Event::End(Tag::Header(_)) => markup.push_str("</u></span>\n\n"),
+                Event::End(Tag::Heading(_)) => markup.push_str("</u></span>\n\n"),
 
                 Event::Start(Tag::Paragraph) => markup.push_str("<span>"),
                 Event::End(Tag::Paragraph) => markup.push_str("</span>\n"),

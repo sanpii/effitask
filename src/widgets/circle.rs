@@ -6,10 +6,15 @@ pub enum Msg {
     Draw,
 }
 
+pub struct Model {
+    draw_handler: relm::DrawHandler<gtk::DrawingArea>,
+    task: crate::tasks::Task,
+}
+
 impl Circle {
-    fn draw(&self) {
-        let context = self.create_context();
-        let task = &self.model;
+    fn draw(&mut self) {
+        let context = self.model.draw_handler.get_context();
+        let task = &self.model.task;
         let center = self.center();
 
         if task.finished || task.due_date.is_none() {
@@ -81,25 +86,19 @@ impl Circle {
             f64::from(self.drawing_area.get_property_height_request()) / 2.,
         )
     }
-
-    fn create_context(&self) -> cairo::Context {
-        let window = self.drawing_area.get_window().unwrap();
-
-        unsafe {
-            use glib::translate::FromGlibPtrNone;
-            use glib::translate::ToGlibPtr;
-
-            let ptr = gdk_sys::gdk_cairo_create(window.to_glib_none().0);
-
-            cairo::Context::from_glib_none(ptr)
-        }
-    }
 }
 
 #[widget]
 impl relm::Widget for Circle {
-    fn model(task: crate::tasks::Task) -> crate::tasks::Task {
-        task
+    fn init_view(&mut self) {
+        self.model.draw_handler.init(&self.drawing_area);
+    }
+
+    fn model(task: crate::tasks::Task) -> Model {
+        Model {
+            draw_handler: relm::DrawHandler::new().expect("draw handler"),
+            task
+        }
     }
 
     fn update(&mut self, event: Msg) {

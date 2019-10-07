@@ -1,36 +1,51 @@
-thread_local!(
-    pub static PREFERENCES: ::std::cell::RefCell<super::Preferences> =
-        ::std::cell::RefCell::new(super::Preferences::new());
-    pub static TASKS: ::std::cell::RefCell<crate::tasks::List> =
-        ::std::cell::RefCell::new(crate::tasks::List::new());
-);
+pub mod preferences {
+    use crate::application::Preferences;
 
-pub fn preferences() -> super::Preferences {
-    let mut preferences = super::Preferences::new();
+    lazy_static::lazy_static! {
+        static ref PREFERENCES: std::sync::RwLock<Preferences> =
+            std::sync::RwLock::new(Preferences::new());
+    }
 
-    PREFERENCES.with(|p| {
-        preferences = p.borrow().clone();
-    });
+    pub fn get() -> Preferences {
+        PREFERENCES.read()
+            .expect("Unable to rlock preferences")
+            .clone()
+    }
 
-    preferences
+    pub fn replace(new: Preferences) {
+        let mut preferences = PREFERENCES.write()
+            .expect("Unable to wlock preferences");
+
+        *preferences = new;
+    }
 }
 
-pub fn tasks() -> crate::tasks::List {
-    let mut list = crate::tasks::List::new();
+pub mod tasks {
+    use crate::tasks::List;
 
-    TASKS.with(|t| {
-        list = t.borrow().clone();
-    });
+    lazy_static::lazy_static! {
+        static ref TASKS: std::sync::RwLock<List> =
+            std::sync::RwLock::new(List::new());
+    }
 
-    list
-}
+    pub fn get() -> List {
+        TASKS.read()
+            .expect("Unable to rlock tasks")
+            .clone()
+    }
 
-pub fn add_task(text: &str) -> Result<(), String> {
-    let mut result = Ok(());
+    pub fn add(text: &str) -> Result<(), String> {
+        let mut tasks = TASKS.write()
+            .expect("Unable to wlock tasks");
 
-    TASKS.with(|t| {
-        result = t.borrow_mut().add(text);
-    });
+        (*tasks).add(text)
+    }
 
-    result
+
+    pub fn replace(new: List) {
+        let mut tasks = TASKS.write()
+            .expect("Unable to wlock tasks");
+
+        *tasks = new;
+    }
 }

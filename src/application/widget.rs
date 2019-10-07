@@ -332,14 +332,11 @@ impl Widget {
         };
 
         let list = crate::tasks::List::from_files(&todo_file, &done_file);
+        super::globals::tasks::replace(list);
 
-        super::globals::TASKS.with(|t| {
-            *t.borrow_mut() = list.clone();
-        });
-
-        super::globals::PREFERENCES.with(|p| {
-            (*p.borrow_mut()).defered = self.model.defered_button.get_active();
-            (*p.borrow_mut()).done = self.model.done_button.get_active();
+        super::globals::preferences::replace(crate::application::Preferences {
+            defered: self.model.defered_button.get_active(),
+            done: self.model.done_button.get_active(),
         });
 
         self.inbox.emit(crate::inbox::Msg::Update);

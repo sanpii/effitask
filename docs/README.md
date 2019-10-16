@@ -32,7 +32,7 @@ miss some feature:
 
 * Double click on a feature, *everywhere*, open the edit panel;
 * You can create sub-projects (or sub-contexts) by adding a backslash. For
-* example, the project `+work\admin\automation` create this arborescence:
+  example, the project `+work\admin\automation` create this arborescence:
 
 ```txt
 work

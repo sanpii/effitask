@@ -36,7 +36,7 @@ impl relm::Widget for Widget {
     fn model() {}
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Complete(_) => (),

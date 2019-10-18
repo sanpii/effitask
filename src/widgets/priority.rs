@@ -60,7 +60,7 @@ impl relm::Widget for Priority {
     fn model(_: ()) {}
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             More => self.more(),

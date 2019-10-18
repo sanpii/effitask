@@ -65,7 +65,7 @@ impl relm::Widget for Tasks {
     }
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Complete(_) => (),

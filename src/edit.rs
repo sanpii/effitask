@@ -104,7 +104,7 @@ impl Widget {
     }
 
     fn update_date(&mut self, date_type: DateType, date: Option<chrono::NaiveDate>) {
-        use self::DateType::*;
+        use DateType::*;
 
         match date_type {
             Due => self.model.task.due_date = date,
@@ -140,7 +140,7 @@ impl relm::Widget for Widget {
     }
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Cancel => (),

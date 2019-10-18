@@ -129,7 +129,7 @@ impl relm::Widget for Calendar {
     }
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Add(period) => self.add(period),

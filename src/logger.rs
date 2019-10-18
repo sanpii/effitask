@@ -130,7 +130,7 @@ impl relm::Widget for Widget {
     }
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Hide => self.hide(),

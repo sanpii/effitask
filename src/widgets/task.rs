@@ -132,7 +132,7 @@ impl relm::Widget for Task {
     }
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Click(event) => {

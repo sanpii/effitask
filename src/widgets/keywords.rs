@@ -169,7 +169,7 @@ impl relm::Widget for Keywords {
     }
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Add => self.add(),

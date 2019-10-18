@@ -10,10 +10,8 @@ impl relm::Widget for Widget {
     fn model(_: ()) {}
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
-
         match event {
-            Add(_) => self.entry.set_text(""),
+            Msg::Add(_) => self.entry.set_text(""),
         }
     }
 

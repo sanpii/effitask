@@ -92,7 +92,7 @@ impl relm::Widget for Repeat {
     }
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Set(recurrence) => self.set_recurrence(recurrence),

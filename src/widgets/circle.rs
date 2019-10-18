@@ -101,7 +101,7 @@ impl relm::Widget for Circle {
     }
 
     fn update(&mut self, event: Msg) {
-        use self::Msg::*;
+        use Msg::*;
 
         match event {
             Draw => self.draw(),

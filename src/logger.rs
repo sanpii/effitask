@@ -1,5 +1,4 @@
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 type ChannelData = (log::Level, String);
 type Sender = std::sync::mpsc::Sender<ChannelData>;
@@ -120,7 +119,7 @@ impl Widget {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Widget {
     fn init_view(&mut self) {
         self.init();

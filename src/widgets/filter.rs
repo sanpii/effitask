@@ -1,7 +1,6 @@
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -110,7 +109,7 @@ impl Filter {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Filter {
     fn init_view(&mut self) {
         self.filters.set_size_request(200, -1);

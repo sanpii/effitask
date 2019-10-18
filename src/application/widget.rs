@@ -1,5 +1,4 @@
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 use crate::agenda::Msg::Complete as AgendaComplete;
 use crate::agenda::Msg::Edit as AgendaEdit;
@@ -400,7 +399,7 @@ impl Widget {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Widget {
     fn init_view(&mut self) {
         self.edit.widget().hide();

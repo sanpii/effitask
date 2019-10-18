@@ -1,5 +1,4 @@
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -44,7 +43,7 @@ impl Priority {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Priority {
     fn init_view(&mut self) {
         self.button

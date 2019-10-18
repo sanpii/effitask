@@ -1,5 +1,4 @@
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -88,7 +87,7 @@ impl Circle {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Circle {
     fn init_view(&mut self) {
         self.model.draw_handler.init(&self.drawing_area);

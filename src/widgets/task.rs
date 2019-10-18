@@ -1,6 +1,5 @@
 use crate::widgets::Circle;
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -18,7 +17,7 @@ pub struct Model {
     relm: relm::Relm<Task>,
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Task {
     fn init_view(&mut self) {
         use gtk::StyleContextExt;

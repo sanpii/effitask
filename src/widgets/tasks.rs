@@ -1,6 +1,5 @@
 use gtk::prelude::*;
 use relm::ContainerWidget;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -56,7 +55,7 @@ impl Tasks {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Tasks {
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
         Model {

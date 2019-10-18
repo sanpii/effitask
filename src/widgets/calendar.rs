@@ -1,5 +1,4 @@
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 pub struct Model {
     label: String,
@@ -93,7 +92,7 @@ impl Calendar {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Calendar {
     fn init_view(&mut self) {
         self.entry

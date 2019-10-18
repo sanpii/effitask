@@ -1,12 +1,11 @@
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
     Add(Option<String>),
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Widget {
     fn model(_: ()) {}
 

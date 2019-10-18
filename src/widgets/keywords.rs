@@ -1,5 +1,4 @@
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -118,7 +117,7 @@ impl Keywords {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Keywords {
     fn init_view(&mut self) {
         self.scroll

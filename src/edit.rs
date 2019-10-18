@@ -4,7 +4,6 @@ use crate::widgets::priority::Msg::Updated as PriorityUpdated;
 use crate::widgets::repeat::Msg::Updated as RepeatUpdated;
 use crate::widgets::{Calendar, Keywords, Priority, Repeat};
 use gtk::prelude::*;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -126,7 +125,7 @@ impl Widget {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Widget {
     fn init_view(&mut self) {
         self.note.set_property_height_request(150);

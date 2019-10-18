@@ -1,6 +1,5 @@
 use crate::widgets::tasks::Msg::{Complete, Edit};
 use crate::widgets::Tasks;
-use relm_attributes::widget;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
@@ -35,7 +34,7 @@ impl Widget {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Widget {
     fn model(_: ()) -> String {
         String::new()

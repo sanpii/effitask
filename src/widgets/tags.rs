@@ -1,6 +1,5 @@
 use crate::widgets::filter::Msg::{Complete, Edit, Filters};
 use crate::widgets::Filter;
-use relm_attributes::widget;
 
 #[derive(Clone, Copy)]
 pub enum Type {
@@ -98,7 +97,7 @@ impl Tags {
     }
 }
 
-#[widget]
+#[relm_attributes::widget]
 impl relm::Widget for Tags {
     fn model(tag: Type) -> Type {
         tag

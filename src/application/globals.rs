@@ -7,14 +7,14 @@ pub mod preferences {
     }
 
     pub fn get() -> Preferences {
-        PREFERENCES.read()
+        PREFERENCES
+            .read()
             .expect("Unable to rlock preferences")
             .clone()
     }
 
     pub fn replace(new: Preferences) {
-        let mut preferences = PREFERENCES.write()
-            .expect("Unable to wlock preferences");
+        let mut preferences = PREFERENCES.write().expect("Unable to wlock preferences");
 
         *preferences = new;
     }
@@ -29,22 +29,17 @@ pub mod tasks {
     }
 
     pub fn get() -> List {
-        TASKS.read()
-            .expect("Unable to rlock tasks")
-            .clone()
+        TASKS.read().expect("Unable to rlock tasks").clone()
     }
 
     pub fn add(text: &str) -> Result<(), String> {
-        let mut tasks = TASKS.write()
-            .expect("Unable to wlock tasks");
+        let mut tasks = TASKS.write().expect("Unable to wlock tasks");
 
         (*tasks).add(text)
     }
 
-
     pub fn replace(new: List) {
-        let mut tasks = TASKS.write()
-            .expect("Unable to wlock tasks");
+        let mut tasks = TASKS.write().expect("Unable to wlock tasks");
 
         *tasks = new;
     }

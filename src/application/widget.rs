@@ -372,12 +372,12 @@ impl Widget {
             };
 
             let timeout = std::time::Duration::from_secs(2);
-            let mut watcher = notify::watcher(tx, timeout)
-                .unwrap();
+            let mut watcher = notify::watcher(tx, timeout).unwrap();
 
             log::debug!("watching {} for changes", todo_dir);
 
-            watcher.watch(todo_dir, notify::RecursiveMode::Recursive)
+            watcher
+                .watch(todo_dir, notify::RecursiveMode::Recursive)
                 .unwrap();
 
             loop {
@@ -388,8 +388,7 @@ impl Widget {
 
                 match rx.recv_timeout(timeout) {
                     Ok(_) => {
-                        sender.send(())
-                            .expect("send message");
+                        sender.send(()).expect("send message");
                     }
                     Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {}
                     Err(e) => log::warn!("watch error: {:?}", e),

@@ -96,7 +96,7 @@ impl relm::Widget for Circle {
     fn model(task: crate::tasks::Task) -> Model {
         Model {
             draw_handler: relm::DrawHandler::new().expect("draw handler"),
-            task
+            task,
         }
     }
 

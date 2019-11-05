@@ -17,6 +17,7 @@ pub struct Model {
     relm: relm::Relm<Task>,
 }
 
+#[allow(clippy::cognitive_complexity)]
 #[relm_attributes::widget]
 impl relm::Widget for Task {
     fn init_view(&mut self) {

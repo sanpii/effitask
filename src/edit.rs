@@ -125,6 +125,7 @@ impl Widget {
     }
 }
 
+#[allow(clippy::cognitive_complexity)]
 #[relm_attributes::widget]
 impl relm::Widget for Widget {
     fn init_view(&mut self) {

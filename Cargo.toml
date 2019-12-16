@@ -23,7 +23,7 @@ relm-derive = "^0.18"
 xdg = "^2.1"
 
 [dependencies.gtk]
-version = "0.7"
+version = "0.8"
 features = ["v3_22"]
 
 [dependencies.log]

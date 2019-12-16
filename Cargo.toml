@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 cairo-rs = "^0.7"
 chrono = "^0.4"
-gdk = "^0.11"
+gdk = "^0.12"
 gdk-sys = "^0.9"
 glib = "^0.8"
 human-panic = "^1.0"

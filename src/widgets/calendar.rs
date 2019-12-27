@@ -121,7 +121,7 @@ impl relm::Widget for Calendar {
 
     fn model(relm: &relm::Relm<Self>, label: String) -> Model {
         Model {
-            label: label.clone(),
+            label,
             popover: gtk::Popover::new(None::<&gtk::Calendar>),
             calendar: gtk::Calendar::new(),
             relm: relm.clone(),

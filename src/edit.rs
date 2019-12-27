@@ -70,13 +70,13 @@ impl Widget {
         task.note = match task.note {
             todo_txt::task::Note::Long { ref filename, .. } => todo_txt::task::Note::Long {
                 filename: filename.to_string(),
-                content: new_note.clone(),
+                content: new_note,
             },
             _ => {
                 if new_note.is_empty() {
                     todo_txt::task::Note::None
                 } else {
-                    todo_txt::task::Note::Short(new_note.clone())
+                    todo_txt::task::Note::Short(new_note)
                 }
             }
         };

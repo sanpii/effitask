@@ -126,7 +126,7 @@ impl Widget {
             })
             .collect();
 
-        tasks.clone()
+        tasks
     }
 }
 

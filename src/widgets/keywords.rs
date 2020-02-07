@@ -81,15 +81,15 @@ impl Keywords {
             None => return keywords,
         };
 
-        while let Some(name) = self.model.store.get_value(&iter, Column::Name.into()).get() {
+        while let Ok(Some(name)) = self.model.store.get_value(&iter, Column::Name.into()).get() {
             let value = match self
                 .model
                 .store
                 .get_value(&iter, Column::Value.into())
                 .get()
             {
-                Some(value) => value,
-                None => break,
+                Ok(Some(value)) => value,
+                Ok(None) | Err(_) => break,
             };
 
             keywords.insert(name, value);
@@ -117,7 +117,7 @@ impl Keywords {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Keywords {
     fn init_view(&mut self) {
         self.scroll
@@ -160,7 +160,7 @@ impl relm::Widget for Keywords {
     }
 
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
-        let columns = vec![::gtk::Type::String, gtk::Type::String];
+        let columns = vec![glib::types::Type::String, glib::types::Type::String];
 
         Model {
             store: gtk::ListStore::new(&columns),

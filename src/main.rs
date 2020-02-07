@@ -1,5 +1,3 @@
-#[macro_use]
-extern crate relm;
 
 use relm::Widget;
 

@@ -109,7 +109,7 @@ impl Filter {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Filter {
     fn init_view(&mut self) {
         self.filters.set_size_request(200, -1);
@@ -134,10 +134,10 @@ impl relm::Widget for Filter {
 
     fn model(_: ()) -> gtk::TreeStore {
         let columns = vec![
-            gtk::Type::String,
-            gtk::Type::String,
-            gtk::Type::U32,
-            gtk::Type::String,
+            glib::types::Type::String,
+            glib::types::Type::String,
+            glib::types::Type::U32,
+            glib::types::Type::String,
         ];
 
         gtk::TreeStore::new(&columns)
@@ -177,8 +177,8 @@ impl relm::Widget for Filter {
                             };
 
                             match list_model.get_value(&iter, Column::Raw.into()).get() {
-                                Some(value) => filters.push(value),
-                                None => continue,
+                                Ok(Some(value)) => filters.push(value),
+                                Ok(None) | Err(_) => continue,
                             };
                         }
 

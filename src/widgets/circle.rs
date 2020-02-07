@@ -87,7 +87,7 @@ impl Circle {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Circle {
     fn init_view(&mut self) {
         self.model.draw_handler.init(&self.drawing_area);

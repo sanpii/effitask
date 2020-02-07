@@ -43,7 +43,7 @@ impl Priority {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Priority {
     fn init_view(&mut self) {
         self.button

@@ -18,7 +18,7 @@ pub struct Model {
 }
 
 #[allow(clippy::cognitive_complexity)]
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Task {
     fn init_view(&mut self) {
         use gtk::StyleContextExt;

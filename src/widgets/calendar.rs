@@ -92,7 +92,7 @@ impl Calendar {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Calendar {
     fn init_view(&mut self) {
         self.entry

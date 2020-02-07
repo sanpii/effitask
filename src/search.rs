@@ -34,7 +34,7 @@ impl Widget {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Widget {
     fn model(_: ()) -> String {
         String::new()

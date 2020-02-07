@@ -69,7 +69,7 @@ impl Repeat {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Repeat {
     fn init_view(&mut self) {
         self.num.set_adjustment(&gtk::Adjustment::new(

@@ -97,7 +97,7 @@ impl Tags {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Tags {
     fn model(tag: Type) -> Type {
         tag

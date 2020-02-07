@@ -55,7 +55,7 @@ impl Tasks {
     }
 }
 
-#[relm_attributes::widget]
+#[relm_derive::widget]
 impl relm::Widget for Tasks {
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
         Model {

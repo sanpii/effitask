@@ -1,3 +1,5 @@
+/.env
+/example/*.bak
 /Cargo.lock
 /target/
 **/*.rs.bk

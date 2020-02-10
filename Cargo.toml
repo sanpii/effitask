@@ -19,7 +19,7 @@ rand = "^0.7"
 regex = "^1.0"
 relm = "^0.18"
 relm-attributes = "^0.16"
-relm-derive = "^0.18"
+relm-derive = "^0.19"
 xdg = "^2.1"
 
 [dependencies.gtk]

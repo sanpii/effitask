@@ -22,11 +22,11 @@ impl Log {
 }
 
 impl log::Log for Log {
-    fn enabled(&self, metadata: &log::Metadata) -> bool {
+    fn enabled(&self, metadata: &log::Metadata<'_>) -> bool {
         metadata.target() == crate::application::NAME && metadata.level() >= log::Level::Info
     }
 
-    fn log(&self, record: &log::Record) {
+    fn log(&self, record: &log::Record<'_>) {
         if let Ok(tx) = self.tx.lock() {
             tx.send((record.level(), format!("{}", record.args())))
                 .unwrap_or_default();

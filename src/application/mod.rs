@@ -8,4 +8,4 @@ pub use globals::tasks::get as tasks;
 pub use preferences::Preferences;
 pub use widget::Widget;
 
-pub const NAME: &str = "Effitask";
+pub const NAME: &str = env!("CARGO_PKG_NAME");

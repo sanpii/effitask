@@ -76,7 +76,6 @@ pub enum Msg {
     Refresh,
     Search(String),
     SwitchPage,
-    Quit,
 }
 
 impl Widget {
@@ -438,7 +437,6 @@ impl relm::Widget for Widget {
             Refresh => self.update_tasks(),
             Search(text) => self.search(&text),
             SwitchPage => self.edit.widget().hide(),
-            Quit => gtk::main_quit(),
         }
     }
 
@@ -532,7 +530,7 @@ impl relm::Widget for Widget {
                     },
                 },
             },
-            delete_event(_, _) => (Msg::Quit, gtk::Inhibit(false)),
+            delete_event(_, _) => (gtk::main_quit(), gtk::Inhibit(false)),
         }
     }
 }

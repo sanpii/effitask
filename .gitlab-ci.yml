@@ -9,7 +9,13 @@ lint:fmt:
         - rustup component add rustfmt-preview
     script:
         - cargo fmt
-        - test $(git ls-files --modified | wc -l) -eq 0 || (echo 'You have introduced some unformated code:'; git ls-files --modified | sed 's/^/* /'; echo 'Please run `cargo fmt` and amend your PR.'; exit 1)
+        - if $(git ls-files --modified | wc -l) -ne 0
+          then
+            echo 'You have introduced some unformated code:';
+            git ls-files --modified | sed 's/^/* /';
+            echo 'Please run `cargo fmt` and amend your PR.';
+            exit 1;
+          fi
 
 lint:clippy:
     script:

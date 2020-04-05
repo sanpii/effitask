@@ -1,10 +1,15 @@
 image: "rust:latest"
 
+stages:
+    - lint
+    - test
+
 before_script:
     - apt update -yqq
     - apt install -yqq --no-install-recommends libgtk-3-dev
 
 lint:fmt:
+    stage: lint
     before_script:
         - rustup component add rustfmt-preview
     script:
@@ -18,12 +23,15 @@ lint:fmt:
           fi
 
 lint:clippy:
+    stage: lint
     script:
         - rustup component add clippy
         - cargo clippy -- --deny warnings
 
 test:debug:
+    stage: test
     script: make MODE=debug test
 
 test:release:
+    stage: test
     script: make MODE=release test

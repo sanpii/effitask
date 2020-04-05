@@ -19,8 +19,7 @@ fn main() {
     human_panic::setup_panic!();
 
     #[cfg(debug_assertions)]
-    dotenv::dotenv()
-        .ok();
+    dotenv::dotenv().ok();
 
     if std::env::args().nth(1) == Some("usage".to_string()) {
         usage(&std::env::args().nth(0).unwrap());

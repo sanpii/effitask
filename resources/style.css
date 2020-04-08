@@ -2,8 +2,17 @@ calendar *:active {
     color: #3C92CA;
 }
 
-.log label {
-    font-size: 30px;
+.log .count {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.log list row label {
+    font-size: 20px;
+}
+
+.log list row, .log label, .log count {
+    border-radius: 3px;
 }
 
 expander {

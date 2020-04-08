@@ -472,8 +472,11 @@ impl relm::Widget for Widget {
                         },
                         search_changed(entry) => Msg::Search(entry.get_text().unwrap().to_string()),
                     },
-                },
-                LoggerWidget {
+                    LoggerWidget {
+                        child: {
+                            pack_type: gtk::PackType::End,
+                        },
+                    },
                 },
                 #[name="paned"]
                 gtk::Paned {

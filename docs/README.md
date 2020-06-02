@@ -79,6 +79,7 @@ add-ons:
 <https://github.com/todotxt/todo.txt-cli/wiki/Creating-and-Installing-Add-ons>.
 
 ```bash
+mkdir ~/.todo.actions.d
 ln -s /usr/bin/effitask ~/.todo.actions.d/et
 todo.sh et
 ```

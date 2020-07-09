@@ -101,8 +101,8 @@ impl Widget {
         );
         scrolled_window.add(&list_box);
 
-        let clear = gtk::Button::new_with_label("Clear all");
-        clear.set_image(Some(&gtk::Image::new_from_icon_name(Some("list-remove-all"), gtk::IconSize::SmallToolbar)));
+        let clear = gtk::Button::with_label("Clear all");
+        clear.set_image(Some(&gtk::Image::from_icon_name(Some("list-remove-all"), gtk::IconSize::SmallToolbar)));
         relm::connect!(
             self.model.relm,
             clear,

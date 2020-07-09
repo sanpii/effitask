@@ -2,7 +2,7 @@ use gtk::prelude::*;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
-    Add(Option<String>),
+    Add(String),
 }
 
 #[relm_derive::widget]
@@ -20,7 +20,7 @@ impl relm::Widget for Widget {
             orientation: gtk::Orientation::Vertical,
             #[name="entry"]
             gtk::Entry {
-                activate(entry) => Msg::Add(entry.get_text().map(|x| x.as_str().to_string())),
+                activate(entry) => Msg::Add(entry.get_text().to_string()),
             },
             gtk::Label {
                 text: "Create a new task +project @context due:2042-01-01",

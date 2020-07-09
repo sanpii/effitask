@@ -67,7 +67,7 @@ pub struct Model {
 #[derive(relm_derive::Msg)]
 pub enum Msg {
     Add,
-    Create(Option<String>),
+    Create(String),
     Complete(Box<crate::tasks::Task>),
     Edit(Box<crate::tasks::Task>),
     EditCancel,
@@ -190,7 +190,7 @@ impl Widget {
         };
 
         if let Some(filename) = self.find_data_file(format!("{}.png", title).as_str()) {
-            let image = gtk::Image::new_from_file(filename);
+            let image = gtk::Image::from_file(filename);
             vbox.pack_start(&image, false, false, 0);
         } else {
             log::error!("Unable to find resource '{}.png'", title);
@@ -208,13 +208,12 @@ impl Widget {
         self.model.add_popover.popup();
     }
 
-    fn create(&mut self, text: Option<String>) {
-        if let Some(text) = text {
-            match super::add_task(&text) {
-                Ok(_) => self.update_tasks(),
-                Err(err) => log::error!("Unable to create task: '{}'", err),
-            }
+    fn create(&mut self, text: String) {
+        match super::add_task(&text) {
+            Ok(_) => self.update_tasks(),
+            Err(err) => log::error!("Unable to create task: '{}'", err),
         }
+
         self.model.add_popover.popdown();
     }
 
@@ -417,8 +416,8 @@ impl relm::Widget for Widget {
             relm: relm.clone(),
             add_popover: gtk::Popover::new(None::<&gtk::Button>),
             pref_popover: gtk::Popover::new(None::<&gtk::Button>),
-            defered_button: gtk::CheckButton::new_with_label("Display defered tasks"),
-            done_button: gtk::CheckButton::new_with_label("Display done tasks"),
+            defered_button: gtk::CheckButton::with_label("Display defered tasks"),
+            done_button: gtk::CheckButton::with_label("Display done tasks"),
             xdg: xdg::BaseDirectories::with_prefix(super::NAME.to_lowercase()).unwrap(),
         }
     }
@@ -470,7 +469,7 @@ impl relm::Widget for Widget {
                         child: {
                             pack_type: gtk::PackType::End,
                         },
-                        search_changed(entry) => Msg::Search(entry.get_text().unwrap().to_string()),
+                        search_changed(entry) => Msg::Search(entry.get_text().to_string()),
                     },
                     LoggerWidget {
                         child: {

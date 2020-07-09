@@ -22,7 +22,7 @@ impl Calendar {
     fn add(&self, period: todo_txt::task::Period) {
         let mut date = crate::date::today();
 
-        let text = self.entry.get_text().unwrap();
+        let text = self.entry.get_text();
 
         if !text.is_empty() {
             date = match chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
@@ -51,7 +51,7 @@ impl Calendar {
 
     fn date_updated(&self) {
         let mut date = None;
-        let text = self.entry.get_text().unwrap();
+        let text = self.entry.get_text();
 
         if !text.is_empty() {
             date = match chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {

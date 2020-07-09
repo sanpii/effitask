@@ -64,7 +64,7 @@ impl Widget {
     fn get_task(&self) -> crate::tasks::Task {
         let mut task = self.model.task.clone();
 
-        task.subject = self.subject.get_text().unwrap().to_string();
+        task.subject = self.subject.get_text().to_string();
 
         let new_note = self.get_note();
         task.note = match task.note {
@@ -186,7 +186,7 @@ impl relm::Widget for Widget {
                                 expand: true,
                             },
                             halign: gtk::Align::Center,
-                            image: Some(&gtk::Image::new_from_icon_name(Some("emblem-favorite"), gtk::IconSize::SmallToolbar)),
+                            image: Some(&gtk::Image::from_icon_name(Some("emblem-favorite"), gtk::IconSize::SmallToolbar)),
                             tooltip_text: Some("Flag"),
                             toggled => Msg::Flag,
                         },

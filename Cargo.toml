@@ -20,7 +20,7 @@ pulldown-cmark = "0.7"
 rand = "^0.7"
 regex = "^1.0"
 relm = "^0.19"
-relm-derive = "^0.19"
+relm-derive = "^0.20"
 xdg = "2.1"
 
 [dependencies.gtk]

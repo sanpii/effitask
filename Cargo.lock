@@ -183,7 +183,7 @@ dependencies = [
  "gdk 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gdk-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glib 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "gtk 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gtk 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "human-panic 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -499,7 +499,7 @@ dependencies = [
 
 [[package]]
 name = "gtk"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "atk 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -986,7 +986,7 @@ dependencies = [
  "glib 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "glib-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gobject-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "gtk 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gtk 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.72 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.13 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1345,7 +1345,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum glib-macros 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)" = "41486a26d1366a8032b160b59065a59fb528530a46a49f627e7048fb8c064039"
 "checksum glib-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b6cda4af5c2f4507b7a3535b798dca2135293f4bc3a17f399ce244ef15841c4c"
 "checksum gobject-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "952133b60c318a62bf82ee75b93acc7e84028a093e06b9e27981c2b6fe68218c"
-"checksum gtk 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3adf6adf7ba686d5e4f4dae32edfa12118af9469f67425f0afd075bf4a58ea9d"
+"checksum gtk 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)" = "04e8dfefe08ae2c0e3a8a221a5440a891a5e3402ba7c01078182f700c38ef345"
 "checksum gtk-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "89acda6f084863307d948ba64a4b1ef674e8527dddab147ee4cdcc194c880457"
 "checksum heck 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "20564e78d53d2bb135c343b3f47714a56af2061f1c928fdb541dc7b9fdd94205"
 "checksum human-panic 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "39f357a500abcbd7c5f967c1d45c8838585b36743823b9d43488f24850534e36"

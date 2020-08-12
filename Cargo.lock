@@ -180,7 +180,7 @@ dependencies = [
  "chrono 0.4.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "dirs-sys 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "dotenv 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "gdk 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gdk 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gdk-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glib 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gtk 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -332,7 +332,7 @@ dependencies = [
 
 [[package]]
 name = "gdk"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -507,7 +507,7 @@ dependencies = [
  "cairo-rs 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "cairo-sys-rs 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "cc 1.0.58 (registry+https://github.com/rust-lang/crates.io-index)",
- "gdk 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gdk 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gdk-pixbuf 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gdk-pixbuf-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gdk-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1332,7 +1332,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum futures-sink 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "3f2032893cb734c7a05d85ce0cc8b8c4075278e93b24b66f9de99d6eb0fa8acc"
 "checksum futures-task 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "bdb66b5f09e22019b1ab0830f7785bcea8e7a42148683f99214f73f8ec21a626"
 "checksum futures-util 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "8764574ff08b701a084482c3c7031349104b07ac897393010494beaa18ce32c6"
-"checksum gdk 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7764140c1246a19ce9b5f7e8b760f7d11644651a8e18a64873e9980cd68ba558"
+"checksum gdk 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)" = "5726681d558da88e07e4bffee21d4e7e5b02b4eb2de0b7d995a8b25813a7ed99"
 "checksum gdk-pixbuf 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8f6dae3cb99dd49b758b88f0132f8d401108e63ae8edd45f432d42cdff99998a"
 "checksum gdk-pixbuf-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3bfe468a7f43e97b8d193a762b6c5cf67a7d36cacbc0b9291dbcae24bfea1e8f"
 "checksum gdk-sys 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0a9653cfc500fd268015b1ac055ddbc3df7a5c9ea3f4ccef147b3957bd140d69"

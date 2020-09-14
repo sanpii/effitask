@@ -49,6 +49,8 @@ work
 
 ## Install
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/effitask.svg)](https://repology.org/project/effitask/versions)
+
 If you use Arch Linux, effitask is available in
 [AUR](https://aur.archlinux.org/packages/effitask/).
 

@@ -284,7 +284,7 @@ impl Widget {
         let mut list = super::tasks();
 
         if list.tasks.get_mut(id).is_some() {
-            std::mem::replace(&mut list.tasks[id], task.clone());
+            list.tasks[id] = task.clone();
         }
 
         match list.write() {

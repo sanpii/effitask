@@ -219,7 +219,7 @@ dependencies = [
  "log",
  "notify",
  "pulldown-cmark",
- "rand 0.8.0",
+ "rand 0.8.2",
  "regex",
  "relm",
  "relm-derive",
@@ -1037,9 +1037,9 @@ dependencies = [
 
 [[package]]
 name = "rand"
-version = "0.8.0"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a76330fb486679b4ace3670f117bbc9e16204005c4bde9c4bd372f45bed34f12"
+checksum = "18519b42a40024d661e1714153e9ad0c3de27cd495760ceb09710920f1098b1e"
 dependencies = [
  "libc",
  "rand_chacha 0.3.0",

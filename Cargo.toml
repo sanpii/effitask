@@ -34,6 +34,3 @@ features = ["std"]
 [dependencies.todo-txt]
 version = "2.0"
 features = ["extended"]
-
-[badges]
-gitlab = { repository = "sanpi/effitask", branch = "master" }

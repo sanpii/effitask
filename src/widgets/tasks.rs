@@ -18,18 +18,18 @@ impl Tasks {
         self.clear();
 
         if tasks.is_empty() {
-            self.list_box.hide();
-            self.label.show();
+            self.widgets.list_box.hide();
+            self.widgets.label.show();
         } else {
-            self.list_box.show();
-            self.label.hide();
+            self.widgets.list_box.show();
+            self.widgets.label.hide();
 
             let mut sorted_tasks = tasks.to_owned();
             sorted_tasks.sort();
             sorted_tasks.reverse();
 
             for task in &sorted_tasks {
-                let child = self.list_box.add_widget::<super::Task>(task.clone());
+                let child = self.widgets.list_box.add_widget::<super::Task>(task.clone());
 
                 relm::connect!(
                     child@crate::widgets::task::Msg::Complete(ref task),
@@ -48,8 +48,8 @@ impl Tasks {
     }
 
     fn clear(&mut self) {
-        for child in self.list_box.get_children() {
-            self.list_box.remove(&child);
+        for child in self.widgets.list_box.get_children() {
+            self.widgets.list_box.remove(&child);
         }
         self.model.children = Vec::new();
     }

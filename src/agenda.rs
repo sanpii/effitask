@@ -15,18 +15,18 @@ macro_rules! update {
     ($self:ident, $exp:ident, $task:ident, $get:ident, $list:ident, $date:ident) => {
         let tasks = $self.$get(&$list, $date);
 
-        $self.$exp.set_expanded(!tasks.is_empty());
-        $self.$exp.set_sensitive(!tasks.is_empty());
-        $self.$task.emit(crate::widgets::tasks::Msg::Update(tasks));
+        $self.widgets.$exp.set_expanded(!tasks.is_empty());
+        $self.widgets.$exp.set_sensitive(!tasks.is_empty());
+        $self.components.$task.emit(crate::widgets::tasks::Msg::Update(tasks));
     };
 }
 
 impl Widget {
     fn update_tasks(&self) {
-        self.calendar.clear_marks();
+        self.widgets.calendar.clear_marks();
 
         let list = crate::application::tasks();
-        let (y, m, d) = self.calendar.get_date();
+        let (y, m, d) = self.widgets.calendar.get_date();
         let date = chrono::naive::NaiveDate::from_ymd(y as i32, m + 1, d);
 
         update!(self, past_exp, past, get_past_tasks, list, date);
@@ -94,7 +94,7 @@ impl Widget {
         start: Option<chrono::naive::NaiveDate>,
         end: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
-        let (_, month, _) = self.calendar.get_date();
+        let (_, month, _) = self.widgets.calendar.get_date();
         let preferences = crate::application::preferences();
 
         let tasks: Vec<crate::tasks::Task> = list
@@ -119,7 +119,7 @@ impl Widget {
                 let due_date = x.due_date.unwrap();
 
                 if due_date.month0() == month {
-                    self.calendar.mark_day(due_date.day());
+                    self.widgets.calendar.mark_day(due_date.day());
                 }
 
                 x.clone()
@@ -144,9 +144,9 @@ impl relm::Widget for Widget {
             Select(date) => {
                 use chrono::Datelike;
 
-                self.calendar
+                self.widgets.calendar
                     .select_month(date.month0(), date.year() as u32);
-                self.calendar.select_day(date.day());
+                self.widgets.calendar.select_day(date.day());
             }
             Update => self.update_tasks(),
         }

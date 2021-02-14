@@ -34,37 +34,37 @@ impl Widget {
     fn set_task(&mut self, task: &crate::tasks::Task) {
         self.model.task = task.clone();
 
-        self.subject.set_text(task.subject.as_str());
-        self.priority
+        self.widgets.subject.set_text(task.subject.as_str());
+        self.components.priority
             .emit(crate::widgets::priority::Msg::Set(task.priority));
-        self.flag.set_active(task.flagged);
-        self.due
+        self.widgets.flag.set_active(task.flagged);
+        self.components.due
             .emit(crate::widgets::calendar::Msg::Set(task.due_date));
-        self.threshold
+        self.components.threshold
             .emit(crate::widgets::calendar::Msg::Set(task.threshold_date));
         if task.create_date.is_some() {
-            self.created
+            self.components.created
                 .emit(crate::widgets::calendar::Msg::Set(task.create_date));
-            self.created.widget().show();
+            self.widgets.created.show();
         } else {
-            self.created.widget().hide();
+            self.widgets.created.hide();
         }
-        self.repeat
+        self.components.repeat
             .emit(crate::widgets::repeat::Msg::Set(task.recurrence.clone()));
-        self.finish
+        self.components.finish
             .emit(crate::widgets::calendar::Msg::Set(task.finish_date));
-        self.keywords
+        self.components.keywords
             .emit(crate::widgets::keywords::Msg::Set(task.tags.clone()));
 
         let note = task.note.content().unwrap_or_default();
-        let buffer = self.note.get_buffer().unwrap();
+        let buffer = self.widgets.note.get_buffer().unwrap();
         buffer.set_text(note.as_str());
     }
 
     fn get_task(&self) -> crate::tasks::Task {
         let mut task = self.model.task.clone();
 
-        task.subject = self.subject.get_text().to_string();
+        task.subject = self.widgets.subject.get_text().to_string();
 
         let new_note = self.get_note();
         task.note = match task.note {
@@ -85,7 +85,7 @@ impl Widget {
     }
 
     fn get_note(&self) -> String {
-        let buffer = match self.note.get_buffer() {
+        let buffer = match self.widgets.note.get_buffer() {
             Some(buffer) => buffer,
             None => return String::new(),
         };
@@ -100,7 +100,7 @@ impl Widget {
     }
 
     fn flag(&mut self) {
-        self.model.task.flagged = self.flag.get_active();
+        self.model.task.flagged = self.widgets.flag.get_active();
     }
 
     fn update_date(&mut self, date_type: DateType, date: Option<chrono::NaiveDate>) {
@@ -129,8 +129,8 @@ impl Widget {
 #[relm_derive::widget]
 impl relm::Widget for Widget {
     fn init_view(&mut self) {
-        self.note.set_property_height_request(150);
-        self.created.widget().set_sensitive(false);
+        self.widgets.note.set_property_height_request(150);
+        self.widgets.created.set_sensitive(false);
     }
 
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {

@@ -11,7 +11,7 @@ impl relm::Widget for Widget {
 
     fn update(&mut self, event: Msg) {
         match event {
-            Msg::Add(_) => self.entry.set_text(""),
+            Msg::Add(_) => self.widgets.entry.set_text(""),
         }
     }
 

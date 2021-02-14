@@ -29,7 +29,7 @@ impl Tags {
             .filter(|&(_, (done, total))| done != total)
             .collect();
 
-        self.filter
+        self.components.filter
             .emit(crate::widgets::filter::Msg::UpdateFilters(tags));
     }
 
@@ -75,7 +75,7 @@ impl Tags {
             .cloned()
             .collect();
 
-        self.filter
+        self.components.filter
             .emit(crate::widgets::filter::Msg::UpdateTasks(tasks));
     }
 

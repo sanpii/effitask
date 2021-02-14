@@ -11,26 +11,26 @@ pub enum Msg {
 
 impl Repeat {
     fn set_recurrence(&self, recurrence: Option<todo_txt::task::Recurrence>) {
-        self.day.set_active(false);
-        self.week.set_active(false);
-        self.month.set_active(false);
-        self.year.set_active(false);
+        self.widgets.day.set_active(false);
+        self.widgets.week.set_active(false);
+        self.widgets.month.set_active(false);
+        self.widgets.year.set_active(false);
 
         if let Some(recurrence) = recurrence {
             use todo_txt::task::Period::*;
 
-            self.num.set_text(format!("{}", recurrence.num).as_str());
-            self.strict.set_active(recurrence.strict);
+            self.widgets.num.set_text(format!("{}", recurrence.num).as_str());
+            self.widgets.strict.set_active(recurrence.strict);
 
             match recurrence.period {
-                Day => self.day.set_active(true),
-                Week => self.week.set_active(true),
-                Month => self.month.set_active(true),
-                Year => self.year.set_active(true),
+                Day => self.widgets.day.set_active(true),
+                Week => self.widgets.week.set_active(true),
+                Month => self.widgets.month.set_active(true),
+                Year => self.widgets.year.set_active(true),
             }
         } else {
-            self.num.set_text("");
-            self.strict.set_active(false);
+            self.widgets.num.set_text("");
+            self.widgets.strict.set_active(false);
         }
     }
 
@@ -41,21 +41,21 @@ impl Repeat {
     }
 
     fn get_recurrence(&self) -> Option<todo_txt::task::Recurrence> {
-        let num = self.num.get_value() as i64;
+        let num = self.widgets.num.get_value() as i64;
 
         if num == 0 {
             return None;
         }
 
-        let strict = self.strict.get_active();
+        let strict = self.widgets.strict.get_active();
 
-        let period = if self.day.get_active() {
+        let period = if self.widgets.day.get_active() {
             todo_txt::task::Period::Day
-        } else if self.week.get_active() {
+        } else if self.widgets.week.get_active() {
             todo_txt::task::Period::Week
-        } else if self.month.get_active() {
+        } else if self.widgets.month.get_active() {
             todo_txt::task::Period::Month
-        } else if self.year.get_active() {
+        } else if self.widgets.year.get_active() {
             todo_txt::task::Period::Year
         } else {
             return None;
@@ -72,7 +72,7 @@ impl Repeat {
 #[relm_derive::widget]
 impl relm::Widget for Repeat {
     fn init_view(&mut self) {
-        self.num.set_adjustment(&gtk::Adjustment::new(
+        self.widgets.num.set_adjustment(&gtk::Adjustment::new(
             0.,
             0.,
             std::usize::MAX as f64,
@@ -82,9 +82,9 @@ impl relm::Widget for Repeat {
         ));
         self.set_recurrence(None);
 
-        self.week.join_group(Some(&self.day));
-        self.month.join_group(Some(&self.day));
-        self.year.join_group(Some(&self.day));
+        self.widgets.week.join_group(Some(&self.widgets.day));
+        self.widgets.month.join_group(Some(&self.widgets.day));
+        self.widgets.year.join_group(Some(&self.widgets.day));
     }
 
     fn model(relm: &relm::Relm<Self>, _: ()) -> relm::Relm<Repeat> {

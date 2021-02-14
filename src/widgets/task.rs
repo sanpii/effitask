@@ -40,10 +40,10 @@ impl relm::Widget for Task {
 
         let note = task.note.content();
         if note.is_some() {
-            self.model.note.set_relative_to(Some(&self.note_button));
+            self.model.note.set_relative_to(Some(&self.widgets.note_button));
             self.model.note.add(&self.model.note_label);
         } else {
-            self.note_button.hide();
+            self.widgets.note_button.hide();
         }
 
         if !task.tags.is_empty() {
@@ -54,33 +54,33 @@ impl relm::Widget for Task {
                 .collect::<Vec<String>>()
                 .join(" · ");
 
-            self.keywords_label.set_text(&text);
+            self.widgets.keywords_label.set_text(&text);
         } else {
-            self.keywords.hide();
+            self.widgets.keywords.hide();
         }
 
-        let context = self.date.get_style_context();
+        let context = self.widgets.date.get_style_context();
         context.add_class("date");
 
         if let Some(threshold) = task.threshold_date {
-            let context = self.threshold_label.get_style_context();
+            let context = self.widgets.threshold_label.get_style_context();
             context.add_class("threshold");
 
             let date = self.date_alias(threshold);
-            self.threshold_label
+            self.widgets.threshold_label
                 .set_text(format!("Deferred until {}", date).as_str());
         } else {
-            self.threshold_label.hide();
+            self.widgets.threshold_label.hide();
         }
 
         if task.threshold_date.is_some() && task.due_date.is_some() {
-            self.arrow_label.show();
+            self.widgets.arrow_label.show();
         } else {
-            self.arrow_label.hide();
+            self.widgets.arrow_label.hide();
         }
 
         if let Some(due) = task.due_date {
-            let context = self.due_label.get_style_context();
+            let context = self.widgets.due_label.get_style_context();
             context.add_class("due");
 
             let date = self.date_alias(due);
@@ -91,9 +91,9 @@ impl relm::Widget for Task {
                 context.add_class("past");
             }
 
-            self.due_label.set_text(format!("due: {}", date).as_str());
+            self.widgets.due_label.set_text(format!("due: {}", date).as_str());
         } else {
-            self.due_label.hide();
+            self.widgets.due_label.hide();
         }
     }
 

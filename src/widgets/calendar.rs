@@ -22,7 +22,7 @@ impl Calendar {
     fn add(&self, period: todo_txt::task::Period) {
         let mut date = crate::date::today();
 
-        let text = self.entry.get_text();
+        let text = self.widgets.entry.get_text();
 
         if !text.is_empty() {
             date = match chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
@@ -42,7 +42,7 @@ impl Calendar {
     fn date_selected(&self) {
         let (y, m, d) = self.model.calendar.get_date();
 
-        self.entry
+        self.widgets.entry
             .set_text(format!("{}-{}-{}", y, m + 1, d).as_str());
         self.model.popover.popdown();
 
@@ -51,7 +51,7 @@ impl Calendar {
 
     fn date_updated(&self) {
         let mut date = None;
-        let text = self.entry.get_text();
+        let text = self.widgets.entry.get_text();
 
         if !text.is_empty() {
             date = match chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
@@ -70,14 +70,14 @@ impl Calendar {
         if let Some(date) = date {
             use chrono::Datelike;
 
-            self.entry
+            self.widgets.entry
                 .set_text(date.format("%Y-%m-%d").to_string().as_str());
             self.model
                 .calendar
                 .select_month(date.month() - 1, date.year() as u32);
             self.model.calendar.select_day(date.day());
         } else {
-            self.entry.set_text("");
+            self.widgets.entry.set_text("");
         }
     }
 
@@ -85,9 +85,9 @@ impl Calendar {
         use relm::Widget;
 
         if self.root().get_sensitive() {
-            self.buttons.show();
+            self.widgets.buttons.show();
         } else {
-            self.buttons.hide();
+            self.widgets.buttons.hide();
         }
     }
 }
@@ -95,11 +95,11 @@ impl Calendar {
 #[relm_derive::widget]
 impl relm::Widget for Calendar {
     fn init_view(&mut self) {
-        self.entry
+        self.widgets.entry
             .set_icon_from_icon_name(gtk::EntryIconPosition::Primary, Some("x-office-calendar"));
 
-        self.label.set_size_request(200, -1);
-        self.label.set_text(self.model.label.as_str());
+        self.widgets.label.set_size_request(200, -1);
+        self.widgets.label.set_text(self.model.label.as_str());
 
         relm::connect!(
             self.model.relm,
@@ -108,7 +108,7 @@ impl relm::Widget for Calendar {
             Msg::DateSelected
         );
         self.model.calendar.show();
-        self.model.popover.set_relative_to(Some(&self.entry));
+        self.model.popover.set_relative_to(Some(&self.widgets.entry));
         self.model.popover.set_pointing_to(&gdk::Rectangle {
             x: 15,
             y: 15,

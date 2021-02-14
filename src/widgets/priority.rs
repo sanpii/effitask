@@ -9,25 +9,25 @@ pub enum Msg {
 
 impl Priority {
     fn more(&self) {
-        self.hbox.hide();
-        self.button.show();
+        self.widgets.hbox.hide();
+        self.widgets.button.show();
     }
 
     fn less(&self) {
-        self.hbox.show();
-        self.button.hide();
+        self.widgets.hbox.show();
+        self.widgets.button.hide();
     }
 
     fn set(&self, priority: u8) {
-        self.button.set_value(f64::from(priority));
+        self.widgets.button.set_value(f64::from(priority));
 
         match priority {
-            0 => self.a.set_active(true),
-            1 => self.b.set_active(true),
-            2 => self.c.set_active(true),
-            3 => self.d.set_active(true),
-            4 => self.e.set_active(true),
-            26 => self.z.set_active(true),
+            0 => self.widgets.a.set_active(true),
+            1 => self.widgets.b.set_active(true),
+            2 => self.widgets.c.set_active(true),
+            3 => self.widgets.d.set_active(true),
+            4 => self.widgets.e.set_active(true),
+            26 => self.widgets.z.set_active(true),
             _ => (),
         }
 
@@ -39,22 +39,22 @@ impl Priority {
     }
 
     fn updated(&self, priority: u8) {
-        self.button.set_value(f64::from(priority));
+        self.widgets.button.set_value(f64::from(priority));
     }
 }
 
 #[relm_derive::widget]
 impl relm::Widget for Priority {
     fn init_view(&mut self) {
-        self.button
+        self.widgets.button
             .set_adjustment(&gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
-        self.button.hide();
+        self.widgets.button.hide();
 
-        self.b.join_group(Some(&self.a));
-        self.c.join_group(Some(&self.a));
-        self.d.join_group(Some(&self.a));
-        self.e.join_group(Some(&self.a));
-        self.z.join_group(Some(&self.a));
+        self.widgets.b.join_group(Some(&self.widgets.a));
+        self.widgets.c.join_group(Some(&self.widgets.a));
+        self.widgets.d.join_group(Some(&self.widgets.a));
+        self.widgets.e.join_group(Some(&self.widgets.a));
+        self.widgets.z.join_group(Some(&self.widgets.a));
     }
 
     fn model(_: ()) {}

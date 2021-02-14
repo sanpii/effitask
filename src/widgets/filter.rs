@@ -33,7 +33,7 @@ impl std::convert::Into<i32> for Column {
 
 impl Filter {
     fn update_filters(&mut self, filters: Vec<(String, (u32, u32))>) {
-        let selection = self.filters.get_selection();
+        let selection = self.widgets.filters.get_selection();
         let (paths, _) = selection.get_selected_rows();
 
         self.model.clear();
@@ -43,10 +43,10 @@ impl Filter {
             self.append(&mut root, filter);
         }
 
-        self.filters.expand_all();
+        self.widgets.filters.expand_all();
 
         for path in paths {
-            self.filters
+            self.widgets.filters
                 .set_cursor(&path, None as Option<&gtk::TreeViewColumn>, false);
         }
     }
@@ -87,7 +87,7 @@ impl Filter {
     }
 
     fn update_tasks(&self, tasks: Vec<crate::tasks::Task>) {
-        self.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
+        self.components.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
     }
 
     fn select_range(treeview: &gtk::TreeView, path: &gtk::TreePath) {
@@ -112,16 +112,16 @@ impl Filter {
 #[relm_derive::widget]
 impl relm::Widget for Filter {
     fn init_view(&mut self) {
-        self.filters.set_size_request(200, -1);
-        self.scroll
+        self.widgets.filters.set_size_request(200, -1);
+        self.widgets.scroll
             .set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
-        self.filters.set_model(Some(&self.model));
-        self.filters
+        self.widgets.filters.set_model(Some(&self.model));
+        self.widgets.filters
             .get_selection()
             .set_mode(gtk::SelectionMode::Multiple);
 
         let column = gtk::TreeViewColumn::new();
-        self.filters.append_column(&column);
+        self.widgets.filters.append_column(&column);
 
         let cell = gtk::CellRendererProgress::new();
         cell.set_property_text_xalign(0.);
@@ -129,7 +129,7 @@ impl relm::Widget for Filter {
         column.add_attribute(&cell, "text", Column::Title.into());
         column.add_attribute(&cell, "value", Column::Progress.into());
 
-        self.filters.set_tooltip_column(Column::Tooltip.into());
+        self.widgets.filters.set_tooltip_column(Column::Tooltip.into());
     }
 
     fn model(_: ()) -> gtk::TreeStore {

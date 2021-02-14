@@ -80,7 +80,7 @@ pub enum Msg {
 
 impl Widget {
     fn load_style(&self) {
-        let screen = self.window.get_screen().unwrap();
+        let screen = self.widgets.window.get_screen().unwrap();
         let css = gtk::CssProvider::new();
         if let Some(stylesheet) = self.get_stylesheet() {
             match css.load_from_path(stylesheet.to_str().unwrap()) {
@@ -101,7 +101,7 @@ impl Widget {
             if theme.ends_with(":dark") {
                 stylesheet = "style_dark.css";
             }
-        } else if let Some(setting) = self.window.get_settings() {
+        } else if let Some(setting) = self.widgets.window.get_settings() {
             if setting.get_property_gtk_application_prefer_dark_theme() {
                 stylesheet = "style_dark.css";
             }
@@ -133,7 +133,7 @@ impl Widget {
 
         self.model
             .add_popover
-            .set_relative_to(Some(&self.add_button));
+            .set_relative_to(Some(&self.widgets.add_button));
         self.model.add_popover.hide();
     }
 
@@ -161,19 +161,19 @@ impl Widget {
 
         self.model
             .pref_popover
-            .set_relative_to(Some(&self.pref_button));
+            .set_relative_to(Some(&self.widgets.pref_button));
         self.model.pref_popover.add(&vbox);
         self.model.pref_popover.hide();
     }
 
     fn replace_tab_widgets(&self) {
-        let n = self.notebook.get_n_pages();
+        let n = self.widgets.notebook.get_n_pages();
 
         for x in 0..n {
-            let page = self.notebook.get_nth_page(Some(x)).unwrap();
+            let page = self.widgets.notebook.get_nth_page(Some(x)).unwrap();
             let widget = self.get_tab_widget(x);
 
-            self.notebook.set_tab_label(&page, Some(&widget));
+            self.widgets.notebook.set_tab_label(&page, Some(&widget));
         }
     }
 
@@ -271,12 +271,12 @@ impl Widget {
     fn edit(&mut self, task: &crate::tasks::Task) {
         use relm::Widget;
 
-        self.edit
+        self.components.edit
             .emit(crate::edit::Msg::Set(Box::new(task.clone())));
-        self.edit.widget().show();
+        self.widgets.edit.show();
 
         let (width, _) = self.root().get_size();
-        self.paned.set_position(width - 436);
+        self.widgets.paned.set_position(width - 436);
     }
 
     fn save(&mut self, task: &crate::tasks::Task) {
@@ -295,19 +295,19 @@ impl Widget {
         log::info!("Task updated");
 
         self.update_tasks();
-        self.edit.widget().hide();
+        self.widgets.edit.hide();
     }
 
     fn search(&self, text: &str) {
         if text.is_empty() {
-            self.notebook.set_property_page(Page::Inbox.into());
-            self.search.widget().hide();
+            self.widgets.notebook.set_property_page(Page::Inbox.into());
+            self.widgets.search.hide();
         } else {
-            self.search.widget().show();
-            self.notebook.set_property_page(Page::Search.into());
+            self.widgets.search.show();
+            self.widgets.notebook.set_property_page(Page::Search.into());
         }
 
-        self.search
+        self.components.search
             .emit(crate::search::Msg::UpdateFilter(text.to_string()));
     }
 
@@ -336,13 +336,13 @@ impl Widget {
             done: self.model.done_button.get_active(),
         });
 
-        self.inbox.emit(crate::inbox::Msg::Update);
-        self.projects.emit(crate::widgets::tags::Msg::Update);
-        self.contexts.emit(crate::widgets::tags::Msg::Update);
-        self.agenda.emit(crate::agenda::Msg::Update);
-        self.done.emit(crate::done::Msg::Update);
-        self.flag.emit(crate::flag::Msg::Update);
-        self.search.emit(crate::search::Msg::Update);
+        self.components.inbox.emit(crate::inbox::Msg::Update);
+        self.components.projects.emit(crate::widgets::tags::Msg::Update);
+        self.components.contexts.emit(crate::widgets::tags::Msg::Update);
+        self.components.agenda.emit(crate::agenda::Msg::Update);
+        self.components.done.emit(crate::done::Msg::Update);
+        self.components.flag.emit(crate::flag::Msg::Update);
+        self.components.search.emit(crate::search::Msg::Update);
     }
 
     fn preferences(&self) {
@@ -399,8 +399,8 @@ impl Widget {
 #[relm_derive::widget]
 impl relm::Widget for Widget {
     fn init_view(&mut self) {
-        self.edit.widget().hide();
-        self.search.widget().hide();
+        self.widgets.edit.hide();
+        self.widgets.search.hide();
 
         self.load_style();
         self.init_add_popover();
@@ -431,11 +431,11 @@ impl relm::Widget for Widget {
             Complete(task) => self.complete(&task),
             Edit(task) => self.edit(&task),
             EditDone(task) => self.save(&task),
-            EditCancel => self.edit.widget().hide(),
+            EditCancel => self.widgets.edit.hide(),
             Preferences => self.preferences(),
             Refresh => self.update_tasks(),
             Search(text) => self.search(&text),
-            SwitchPage => self.edit.widget().hide(),
+            SwitchPage => self.widgets.edit.hide(),
         }
     }
 

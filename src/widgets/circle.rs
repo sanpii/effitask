@@ -34,8 +34,8 @@ impl Circle {
         context.close_path();
 
         if task.finished {
-            let width = self.drawing_area.get_property_width_request();
-            let height = self.drawing_area.get_property_height_request();
+            let width = self.widgets.drawing_area.get_property_width_request();
+            let height = self.widgets.drawing_area.get_property_height_request();
 
             context.save();
             context.fill();
@@ -81,8 +81,8 @@ impl Circle {
 
     fn center(&self) -> f64 {
         f64::min(
-            f64::from(self.drawing_area.get_property_width_request()) / 2.,
-            f64::from(self.drawing_area.get_property_height_request()) / 2.,
+            f64::from(self.widgets.drawing_area.get_property_width_request()) / 2.,
+            f64::from(self.widgets.drawing_area.get_property_height_request()) / 2.,
         )
     }
 }
@@ -90,7 +90,7 @@ impl Circle {
 #[relm_derive::widget]
 impl relm::Widget for Circle {
     fn init_view(&mut self) {
-        self.model.draw_handler.init(&self.drawing_area);
+        self.model.draw_handler.init(&self.widgets.drawing_area);
     }
 
     fn model(task: crate::tasks::Task) -> Model {

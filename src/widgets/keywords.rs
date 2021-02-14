@@ -37,13 +37,13 @@ impl Keywords {
     fn add(&mut self) {
         let iter = self.model.store.append();
         let path = self.model.store.get_path(&iter).unwrap();
-        let column = self.tree_view.get_column(Column::Name.into());
+        let column = self.widgets.tree_view.get_column(Column::Name.into());
 
-        self.tree_view.set_cursor(&path, column.as_ref(), true);
+        self.widgets.tree_view.set_cursor(&path, column.as_ref(), true);
     }
 
     fn delete(&mut self) {
-        let selection = self.tree_view.get_selection();
+        let selection = self.widgets.tree_view.get_selection();
         let (rows, _) = selection.get_selected_rows();
         let references: Vec<_> = rows
             .iter()
@@ -120,17 +120,17 @@ impl Keywords {
 #[relm_derive::widget]
 impl relm::Widget for Keywords {
     fn init_view(&mut self) {
-        self.scroll
+        self.widgets.scroll
             .set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
-        self.scroll.set_property_height_request(150);
-        self.tree_view.set_model(Some(&self.model.store));
-        self.tree_view
+        self.widgets.scroll.set_property_height_request(150);
+        self.widgets.tree_view.set_model(Some(&self.model.store));
+        self.widgets.tree_view
             .get_selection()
             .set_mode(gtk::SelectionMode::Multiple);
 
         let column = gtk::TreeViewColumn::new();
         column.set_title("name");
-        self.tree_view.append_column(&column);
+        self.widgets.tree_view.append_column(&column);
 
         let cell = gtk::CellRendererText::new();
         cell.set_property_editable(true);
@@ -145,7 +145,7 @@ impl relm::Widget for Keywords {
 
         let column = gtk::TreeViewColumn::new();
         column.set_title("value");
-        self.tree_view.append_column(&column);
+        self.widgets.tree_view.append_column(&column);
 
         let cell = gtk::CellRendererText::new();
         cell.set_property_editable(true);

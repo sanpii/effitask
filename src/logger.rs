@@ -60,7 +60,7 @@ impl Widget {
 
         let popover = &self.model.popover;
         popover.set_property_height_request(500);
-        popover.set_relative_to(Some(&self.toggle));
+        popover.set_relative_to(Some(&self.widgets.toggle));
         popover.set_border_width(5);
         relm::connect!(self.model.relm, popover, connect_hide(_), Msg::Hide);
 
@@ -70,10 +70,10 @@ impl Widget {
         let context = popover.get_style_context();
         context.add_class("log");
 
-        let context = self.toggle.get_style_context();
+        let context = self.widgets.toggle.get_style_context();
         context.add_class("log");
 
-        let context = self.count.get_style_context();
+        let context = self.widgets.count.get_style_context();
         context.add_class("count");
 
         let scrolled_window = gtk::ScrolledWindow::new::<gtk::Adjustment, gtk::Adjustment>(None, None);
@@ -155,7 +155,7 @@ impl Widget {
 
     fn hide(&self) {
         self.model.popover.hide();
-        self.toggle.set_active(false);
+        self.widgets.toggle.set_active(false);
     }
 
     fn read(&self, row: &gtk::ListBoxRow) {
@@ -176,11 +176,11 @@ impl Widget {
 
         let count = list_box.get_children().len();
         if count == 0 {
-            self.toggle.hide();
+            self.widgets.toggle.hide();
         } else {
-            self.toggle.show();
+            self.widgets.toggle.show();
         };
-        self.count.set_label(&format!("{}", count));
+        self.widgets.count.set_label(&format!("{}", count));
 
         let mut max_level = log::Level::Trace;
 
@@ -204,7 +204,7 @@ impl Widget {
             }
         }
 
-        let context = self.count.get_style_context();
+        let context = self.widgets.count.get_style_context();
         context.add_class(&format!("{}", max_level).to_lowercase());
     }
 }

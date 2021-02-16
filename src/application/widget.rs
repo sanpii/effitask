@@ -56,6 +56,7 @@ impl std::convert::Into<i32> for Page {
 
 pub struct Model {
     relm: relm::Relm<Widget>,
+    add: relm::Component<crate::add::Widget>,
     add_popover: gtk::Popover,
     pref_popover: gtk::Popover,
     defered_button: gtk::CheckButton,
@@ -125,10 +126,9 @@ impl Widget {
         Some(path)
     }
 
-    fn init_add_popover(&self) {
-        use relm::ContainerWidget;
+    fn init_add_popover(&mut self) {
+        let add = &self.model.add;
 
-        let add = self.model.add_popover.add_widget::<crate::add::Widget>(());
         relm::connect!(add@crate::add::Msg::Add(ref text), self.model.relm, Msg::Create(text.clone()));
 
         self.model
@@ -412,9 +412,14 @@ impl relm::Widget for Widget {
     }
 
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
+        use relm::ContainerWidget;
+
+        let add_popover = gtk::Popover::new(None::<&gtk::Button>);
+
         Model {
             relm: relm.clone(),
-            add_popover: gtk::Popover::new(None::<&gtk::Button>),
+            add: add_popover.add_widget::<crate::add::Widget>(()),
+            add_popover,
             pref_popover: gtk::Popover::new(None::<&gtk::Button>),
             defered_button: gtk::CheckButton::with_label("Display defered tasks"),
             done_button: gtk::CheckButton::with_label("Display done tasks"),

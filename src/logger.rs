@@ -114,11 +114,7 @@ impl Widget {
         vbox.show_all();
 
         GLOBAL.with(move |global| *global.borrow_mut() = Some((list_box, rx)));
-
-        std::thread::spawn(move || loop {
-            std::thread::sleep(std::time::Duration::from_millis(100));
-            glib::idle_add(Self::receive);
-        });
+        glib::idle_add(Self::receive);
     }
 
     fn receive() -> glib::Continue {
@@ -130,7 +126,7 @@ impl Widget {
             }
         });
 
-        glib::Continue(false)
+        glib::Continue(true)
     }
 
     fn add_message(list_box: &gtk::ListBox, level: log::Level, text: &str) {

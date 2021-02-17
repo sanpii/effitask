@@ -6,7 +6,9 @@ type Receiver = std::sync::mpsc::Receiver<ChannelData>;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
+    Add(ChannelData),
     Clear,
+    Destroy,
     Hide,
     Read(gtk::ListBoxRow),
     Show,
@@ -15,7 +17,6 @@ pub enum Msg {
 
 pub struct Model {
     relm: relm::Relm<Widget>,
-    popover: gtk::Popover,
 }
 
 pub struct Log {
@@ -46,82 +47,16 @@ impl log::Log for Log {
 }
 
 thread_local!(
-    static GLOBAL: std::cell::RefCell<Option<(gtk::ListBox, Receiver)>>
+    static GLOBAL: std::cell::RefCell<Option<(relm::StreamHandle<Msg>, Receiver)>>
         = std::cell::RefCell::new(None)
 );
 
 impl Widget {
-    fn init(&self) {
-        let (tx, rx) = std::sync::mpsc::channel();
-        let log = Log::new(tx);
-
-        log::set_max_level(log::LevelFilter::Info);
-        log::set_boxed_logger(Box::new(log)).unwrap_or_default();
-
-        let popover = &self.model.popover;
-        popover.set_property_height_request(500);
-        popover.set_relative_to(Some(&self.widgets.toggle));
-        popover.set_border_width(5);
-        relm::connect!(self.model.relm, popover, connect_hide(_), Msg::Hide);
-
-        let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
-        popover.add(&vbox);
-
-        let context = popover.get_style_context();
-        context.add_class("log");
-
-        let context = self.widgets.toggle.get_style_context();
-        context.add_class("log");
-
-        let context = self.widgets.count.get_style_context();
-        context.add_class("count");
-
-        let scrolled_window = gtk::ScrolledWindow::new::<gtk::Adjustment, gtk::Adjustment>(None, None);
-        scrolled_window.set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
-        vbox.pack_start(&scrolled_window, true, true, 0);
-
-        let list_box = gtk::ListBox::new();
-        relm::connect!(
-            self.model.relm,
-            list_box,
-            connect_row_activated(_, row),
-            Msg::Read(row.clone())
-        );
-        relm::connect!(
-            self.model.relm,
-            list_box,
-            connect_add(sender, _),
-            Msg::Update(sender.clone())
-        );
-        relm::connect!(
-            self.model.relm,
-            list_box,
-            connect_remove(sender, _),
-            Msg::Update(sender.clone())
-        );
-        scrolled_window.add(&list_box);
-
-        let clear = gtk::Button::with_label("Clear all");
-        clear.set_image(Some(&gtk::Image::from_icon_name(Some("list-remove-all"), gtk::IconSize::SmallToolbar)));
-        relm::connect!(
-            self.model.relm,
-            clear,
-            connect_clicked(_),
-            Msg::Clear
-        );
-        vbox.pack_start(&clear, false, false, 0);
-
-        vbox.show_all();
-
-        GLOBAL.with(move |global| *global.borrow_mut() = Some((list_box, rx)));
-        glib::idle_add(Self::receive);
-    }
-
     fn receive() -> glib::Continue {
         GLOBAL.with(|global| {
-            if let Some((ref list_box, ref rx)) = *global.borrow() {
-                if let Ok((level, text)) = rx.try_recv() {
-                    Self::add_message(list_box, level, &text);
+            if let Some((ref stream, ref rx)) = *global.borrow() {
+                if let Ok(data) = rx.try_recv() {
+                    stream.emit(Msg::Add(data));
                 }
             }
         });
@@ -129,7 +64,7 @@ impl Widget {
         glib::Continue(true)
     }
 
-    fn add_message(list_box: &gtk::ListBox, level: log::Level, text: &str) {
+    fn add_message(&self, level: log::Level, text: &str) {
         let class = format!("{}", level);
 
         let label = gtk::Label::new(Some(text));
@@ -138,32 +73,16 @@ impl Widget {
         let context = label.get_style_context();
         context.add_class(&class.to_lowercase());
 
-        list_box.add(&label);
-    }
-
-    fn clear(&self) {
-        GLOBAL.with(|global| {
-            if let Some((ref list_box, _)) = *global.borrow() {
-                list_box.foreach(|row| list_box.remove(row));
-            }
-        });
+        self.widgets.list_box.add(&label);
     }
 
     fn hide(&self) {
-        self.model.popover.hide();
+        self.widgets.popover.hide();
         self.widgets.toggle.set_active(false);
     }
 
-    fn read(&self, row: &gtk::ListBoxRow) {
-        GLOBAL.with(|global| {
-            if let Some((ref list_box, _)) = *global.borrow() {
-                list_box.remove(row);
-            }
-        });
-    }
-
     fn show(&self) {
-        self.model.popover.show();
+        self.widgets.popover.show();
     }
 
     fn update_count(&self, list_box: &gtk::ListBox)
@@ -208,13 +127,29 @@ impl Widget {
 #[relm_derive::widget]
 impl relm::Widget for Widget {
     fn init_view(&mut self) {
-        self.init();
+        let (tx, rx) = std::sync::mpsc::channel();
+        let log = Log::new(tx);
+
+        log::set_max_level(log::LevelFilter::Info);
+        log::set_boxed_logger(Box::new(log)).unwrap_or_default();
+
+        let context = self.widgets.popover.get_style_context();
+        context.add_class("log");
+
+        let context = self.widgets.toggle.get_style_context();
+        context.add_class("log");
+
+        let context = self.widgets.count.get_style_context();
+        context.add_class("count");
+
+        let stream = self.model.relm.stream().clone();
+        GLOBAL.with(move |global| *global.borrow_mut() = Some((stream, rx)));
+        glib::idle_add(Self::receive);
     }
 
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
         Model {
             relm: relm.clone(),
-            popover: gtk::Popover::new(None::<&gtk::Button>),
         }
     }
 
@@ -222,9 +157,11 @@ impl relm::Widget for Widget {
         use Msg::*;
 
         match event {
-            Clear => self.clear(),
+            Add((level, text)) => self.add_message(level, &text),
+            Clear => self.widgets.list_box.foreach(|row| self.widgets.list_box.remove(row)),
+            Destroy => GLOBAL.with(move |global| *global.borrow_mut() = None),
             Hide => self.hide(),
-            Read(row) => self.read(&row),
+            Read(row) => self.widgets.list_box.remove(&row),
             Show => self.show(),
             Update(sender) => self.update_count(&sender),
         }
@@ -251,6 +188,37 @@ impl relm::Widget for Widget {
             } else {
                 Msg::Hide
             },
+        }
+
+        #[name="popover"]
+        gtk::Popover {
+            property_height_request: 500,
+            border_width: 5,
+            relative_to: Some(&toggle),
+            gtk::Box {
+                orientation: gtk::Orientation::Vertical,
+                gtk::ScrolledWindow {
+                    property_hscrollbar_policy: gtk::PolicyType::Never,
+                    property_vscrollbar_policy: gtk::PolicyType::Automatic,
+                    child: {
+                        fill: true,
+                        expand: true,
+                    },
+                    #[name="list_box"]
+                    gtk::ListBox {
+                        row_activated(_, row) => Msg::Read(row.clone()),
+                        add(sender, _) => Msg::Update(sender.clone()),
+                        remove(sender, _) => Msg::Update(sender.clone()),
+                        destroy(_) => Msg::Destroy,
+                    },
+                },
+                gtk::Button {
+                    label: "Clear all",
+                    image: Some(&gtk::Image::from_icon_name(Some("list-remove-all"), gtk::IconSize::SmallToolbar)),
+                    clicked(_) => Msg::Clear,
+                },
+            },
+            hide(_) => Msg::Hide,
         }
     }
 }

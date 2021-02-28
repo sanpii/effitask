@@ -139,11 +139,17 @@ impl List {
         };
 
         for mut task in tasks {
-            task.note = task.note.write()?;
+            task.note = match task.note.write() {
+                Ok(note) => note,
+                Err(err) => {
+                    log::error!("Unable to save note: {}", err);
+                    todo_txt::task::Note::None
+                },
+            };
 
             match f.write(format!("{}\n", task).as_bytes()) {
                 Ok(_) => (),
-                Err(err) => return Err(format!("Unable to write tasks: {}", err)),
+                Err(err) => log::error!("Unable to write tasks: {}", err),
             };
         }
 

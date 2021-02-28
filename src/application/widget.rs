@@ -117,6 +117,7 @@ impl Widget {
     }
 
     #[cfg(debug_assertions)]
+    #[allow(clippy::unnecessary_wraps)]
     fn find_data_file(&self, stylesheet: &str) -> Option<std::path::PathBuf> {
         let mut path = std::path::PathBuf::new();
 

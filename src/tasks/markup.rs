@@ -41,7 +41,7 @@ impl Markup for todo_txt::task::Note {
                 Event::End(Tag::Strong) => markup.push_str("</b>"),
 
                 Event::Start(Tag::Item) => markup.push_str("· "),
-                Event::End(Tag::Item) | Event::SoftBreak => markup.push_str("\n"),
+                Event::End(Tag::Item) | Event::SoftBreak => markup.push('\n'),
 
                 Event::Start(Tag::Link(_, link, title)) => {
                     markup.push_str(&format!("<a href='{}' title='{}'>", link, title))

@@ -144,7 +144,7 @@ impl List {
                 Err(err) => {
                     log::error!("Unable to save note: {}", err);
                     todo_txt::task::Note::None
-                },
+                }
             };
 
             match f.write(format!("{}\n", task).as_bytes()) {

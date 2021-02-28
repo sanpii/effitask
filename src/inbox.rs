@@ -27,7 +27,9 @@ impl Widget {
             .cloned()
             .collect();
 
-        self.components.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
+        self.components
+            .tasks
+            .emit(crate::widgets::tasks::Msg::Update(tasks));
     }
 }
 

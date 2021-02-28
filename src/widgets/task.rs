@@ -40,7 +40,9 @@ impl relm::Widget for Task {
 
         let note = task.note.content();
         if note.is_some() {
-            self.model.note.set_relative_to(Some(&self.widgets.note_button));
+            self.model
+                .note
+                .set_relative_to(Some(&self.widgets.note_button));
             self.model.note.add(&self.model.note_label);
         } else {
             self.widgets.note_button.hide();
@@ -67,7 +69,8 @@ impl relm::Widget for Task {
             context.add_class("threshold");
 
             let date = self.date_alias(threshold);
-            self.widgets.threshold_label
+            self.widgets
+                .threshold_label
                 .set_text(format!("Deferred until {}", date).as_str());
         } else {
             self.widgets.threshold_label.hide();
@@ -91,7 +94,9 @@ impl relm::Widget for Task {
                 context.add_class("past");
             }
 
-            self.widgets.due_label.set_text(format!("due: {}", date).as_str());
+            self.widgets
+                .due_label
+                .set_text(format!("due: {}", date).as_str());
         } else {
             self.widgets.due_label.hide();
         }

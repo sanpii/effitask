@@ -39,7 +39,9 @@ impl Keywords {
         let path = self.model.store.get_path(&iter).unwrap();
         let column = self.widgets.tree_view.get_column(Column::Name.into());
 
-        self.widgets.tree_view.set_cursor(&path, column.as_ref(), true);
+        self.widgets
+            .tree_view
+            .set_cursor(&path, column.as_ref(), true);
     }
 
     fn delete(&mut self) {
@@ -120,11 +122,13 @@ impl Keywords {
 #[relm_derive::widget]
 impl relm::Widget for Keywords {
     fn init_view(&mut self) {
-        self.widgets.scroll
+        self.widgets
+            .scroll
             .set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
         self.widgets.scroll.set_property_height_request(150);
         self.widgets.tree_view.set_model(Some(&self.model.store));
-        self.widgets.tree_view
+        self.widgets
+            .tree_view
             .get_selection()
             .set_mode(gtk::SelectionMode::Multiple);
 

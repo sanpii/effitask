@@ -272,7 +272,8 @@ impl Widget {
     fn edit(&mut self, task: &crate::tasks::Task) {
         use relm::Widget;
 
-        self.components.edit
+        self.components
+            .edit
             .emit(crate::edit::Msg::Set(Box::new(task.clone())));
         self.widgets.edit.show();
 
@@ -308,7 +309,8 @@ impl Widget {
             self.widgets.notebook.set_property_page(Page::Search.into());
         }
 
-        self.components.search
+        self.components
+            .search
             .emit(crate::search::Msg::UpdateFilter(text.to_string()));
     }
 
@@ -338,8 +340,12 @@ impl Widget {
         });
 
         self.components.inbox.emit(crate::inbox::Msg::Update);
-        self.components.projects.emit(crate::widgets::tags::Msg::Update);
-        self.components.contexts.emit(crate::widgets::tags::Msg::Update);
+        self.components
+            .projects
+            .emit(crate::widgets::tags::Msg::Update);
+        self.components
+            .contexts
+            .emit(crate::widgets::tags::Msg::Update);
         self.components.agenda.emit(crate::agenda::Msg::Update);
         self.components.done.emit(crate::done::Msg::Update);
         self.components.flag.emit(crate::flag::Msg::Update);

@@ -35,25 +35,32 @@ impl Widget {
         self.model.task = task.clone();
 
         self.widgets.subject.set_text(task.subject.as_str());
-        self.components.priority
+        self.components
+            .priority
             .emit(crate::widgets::priority::Msg::Set(task.priority));
         self.widgets.flag.set_active(task.flagged);
-        self.components.due
+        self.components
+            .due
             .emit(crate::widgets::calendar::Msg::Set(task.due_date));
-        self.components.threshold
+        self.components
+            .threshold
             .emit(crate::widgets::calendar::Msg::Set(task.threshold_date));
         if task.create_date.is_some() {
-            self.components.created
+            self.components
+                .created
                 .emit(crate::widgets::calendar::Msg::Set(task.create_date));
             self.widgets.created.show();
         } else {
             self.widgets.created.hide();
         }
-        self.components.repeat
+        self.components
+            .repeat
             .emit(crate::widgets::repeat::Msg::Set(task.recurrence.clone()));
-        self.components.finish
+        self.components
+            .finish
             .emit(crate::widgets::calendar::Msg::Set(task.finish_date));
-        self.components.keywords
+        self.components
+            .keywords
             .emit(crate::widgets::keywords::Msg::Set(task.tags.clone()));
 
         let note = task.note.content().unwrap_or_default();

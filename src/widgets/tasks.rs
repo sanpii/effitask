@@ -29,7 +29,10 @@ impl Tasks {
             sorted_tasks.reverse();
 
             for task in &sorted_tasks {
-                let child = self.widgets.list_box.add_widget::<super::Task>(task.clone());
+                let child = self
+                    .widgets
+                    .list_box
+                    .add_widget::<super::Task>(task.clone());
 
                 relm::connect!(
                     child@crate::widgets::task::Msg::Complete(ref task),

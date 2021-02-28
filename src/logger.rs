@@ -76,7 +76,8 @@ impl Widget {
         let context = self.widgets.count.get_style_context();
         context.add_class("count");
 
-        let scrolled_window = gtk::ScrolledWindow::new::<gtk::Adjustment, gtk::Adjustment>(None, None);
+        let scrolled_window =
+            gtk::ScrolledWindow::new::<gtk::Adjustment, gtk::Adjustment>(None, None);
         scrolled_window.set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
         vbox.pack_start(&scrolled_window, true, true, 0);
 
@@ -102,13 +103,11 @@ impl Widget {
         scrolled_window.add(&list_box);
 
         let clear = gtk::Button::with_label("Clear all");
-        clear.set_image(Some(&gtk::Image::from_icon_name(Some("list-remove-all"), gtk::IconSize::SmallToolbar)));
-        relm::connect!(
-            self.model.relm,
-            clear,
-            connect_clicked(_),
-            Msg::Clear
-        );
+        clear.set_image(Some(&gtk::Image::from_icon_name(
+            Some("list-remove-all"),
+            gtk::IconSize::SmallToolbar,
+        )));
+        relm::connect!(self.model.relm, clear, connect_clicked(_), Msg::Clear);
         vbox.pack_start(&clear, false, false, 0);
 
         vbox.show_all();
@@ -166,8 +165,7 @@ impl Widget {
         self.model.popover.show();
     }
 
-    fn update_count(&self, list_box: &gtk::ListBox)
-    {
+    fn update_count(&self, list_box: &gtk::ListBox) {
         use std::str::FromStr;
 
         let count = list_box.get_children().len();
@@ -186,7 +184,8 @@ impl Widget {
                 None => continue,
             };
             let context = label.get_style_context();
-            let level = context.list_classes()
+            let level = context
+                .list_classes()
                 .iter()
                 .find_map(|class| log::Level::from_str(&class).ok())
                 .unwrap_or(log::Level::Info);

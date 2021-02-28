@@ -42,7 +42,8 @@ impl Calendar {
     fn date_selected(&self) {
         let (y, m, d) = self.model.calendar.get_date();
 
-        self.widgets.entry
+        self.widgets
+            .entry
             .set_text(format!("{}-{}-{}", y, m + 1, d).as_str());
         self.model.popover.popdown();
 
@@ -70,7 +71,8 @@ impl Calendar {
         if let Some(date) = date {
             use chrono::Datelike;
 
-            self.widgets.entry
+            self.widgets
+                .entry
                 .set_text(date.format("%Y-%m-%d").to_string().as_str());
             self.model
                 .calendar
@@ -95,7 +97,8 @@ impl Calendar {
 #[relm_derive::widget]
 impl relm::Widget for Calendar {
     fn init_view(&mut self) {
-        self.widgets.entry
+        self.widgets
+            .entry
             .set_icon_from_icon_name(gtk::EntryIconPosition::Primary, Some("x-office-calendar"));
 
         self.widgets.label.set_size_request(200, -1);
@@ -108,7 +111,9 @@ impl relm::Widget for Calendar {
             Msg::DateSelected
         );
         self.model.calendar.show();
-        self.model.popover.set_relative_to(Some(&self.widgets.entry));
+        self.model
+            .popover
+            .set_relative_to(Some(&self.widgets.entry));
         self.model.popover.set_pointing_to(&gdk::Rectangle {
             x: 15,
             y: 15,

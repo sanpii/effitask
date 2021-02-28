@@ -17,7 +17,10 @@ macro_rules! update {
 
         $self.widgets.$exp.set_expanded(!tasks.is_empty());
         $self.widgets.$exp.set_sensitive(!tasks.is_empty());
-        $self.components.$task.emit(crate::widgets::tasks::Msg::Update(tasks));
+        $self
+            .components
+            .$task
+            .emit(crate::widgets::tasks::Msg::Update(tasks));
     };
 }
 
@@ -144,7 +147,8 @@ impl relm::Widget for Widget {
             Select(date) => {
                 use chrono::Datelike;
 
-                self.widgets.calendar
+                self.widgets
+                    .calendar
                     .select_month(date.month0(), date.year() as u32);
                 self.widgets.calendar.select_day(date.day());
             }

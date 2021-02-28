@@ -13,7 +13,9 @@ impl Widget {
         let list = crate::application::tasks();
         let tasks = list.tasks.iter().filter(|x| x.finished).cloned().collect();
 
-        self.components.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
+        self.components
+            .tasks
+            .emit(crate::widgets::tasks::Msg::Update(tasks));
     }
 }
 

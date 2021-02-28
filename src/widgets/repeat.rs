@@ -19,7 +19,9 @@ impl Repeat {
         if let Some(recurrence) = recurrence {
             use todo_txt::task::Period::*;
 
-            self.widgets.num.set_text(format!("{}", recurrence.num).as_str());
+            self.widgets
+                .num
+                .set_text(format!("{}", recurrence.num).as_str());
             self.widgets.strict.set_active(recurrence.strict);
 
             match recurrence.period {

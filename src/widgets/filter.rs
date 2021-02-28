@@ -46,7 +46,8 @@ impl Filter {
         self.widgets.filters.expand_all();
 
         for path in paths {
-            self.widgets.filters
+            self.widgets
+                .filters
                 .set_cursor(&path, None as Option<&gtk::TreeViewColumn>, false);
         }
     }
@@ -87,7 +88,9 @@ impl Filter {
     }
 
     fn update_tasks(&self, tasks: Vec<crate::tasks::Task>) {
-        self.components.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
+        self.components
+            .tasks
+            .emit(crate::widgets::tasks::Msg::Update(tasks));
     }
 
     fn select_range(treeview: &gtk::TreeView, path: &gtk::TreePath) {
@@ -113,10 +116,12 @@ impl Filter {
 impl relm::Widget for Filter {
     fn init_view(&mut self) {
         self.widgets.filters.set_size_request(200, -1);
-        self.widgets.scroll
+        self.widgets
+            .scroll
             .set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
         self.widgets.filters.set_model(Some(&self.model));
-        self.widgets.filters
+        self.widgets
+            .filters
             .get_selection()
             .set_mode(gtk::SelectionMode::Multiple);
 
@@ -129,7 +134,9 @@ impl relm::Widget for Filter {
         column.add_attribute(&cell, "text", Column::Title.into());
         column.add_attribute(&cell, "value", Column::Progress.into());
 
-        self.widgets.filters.set_tooltip_column(Column::Tooltip.into());
+        self.widgets
+            .filters
+            .set_tooltip_column(Column::Tooltip.into());
     }
 
     fn model(_: ()) -> gtk::TreeStore {

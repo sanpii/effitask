@@ -46,7 +46,8 @@ impl Priority {
 #[relm_derive::widget]
 impl relm::Widget for Priority {
     fn init_view(&mut self) {
-        self.widgets.button
+        self.widgets
+            .button
             .set_adjustment(&gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
         self.widgets.button.hide();
 

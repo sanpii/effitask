@@ -48,9 +48,9 @@ impl std::convert::From<u32> for Page {
     }
 }
 
-impl std::convert::Into<i32> for Page {
-    fn into(self) -> i32 {
-        unsafe { std::mem::transmute(self) }
+impl From<Page> for i32 {
+    fn from(page: Page) -> i32 {
+        unsafe { std::mem::transmute(page) }
     }
 }
 

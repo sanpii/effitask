@@ -21,15 +21,15 @@ pub enum Column {
     Value = 1,
 }
 
-impl std::convert::Into<u32> for Column {
-    fn into(self) -> u32 {
-        unsafe { std::mem::transmute(self) }
+impl From<Column> for u32 {
+    fn from(column: Column) -> Self {
+        unsafe { std::mem::transmute(column) }
     }
 }
 
-impl std::convert::Into<i32> for Column {
-    fn into(self) -> i32 {
-        unsafe { std::mem::transmute(self) }
+impl From<Column> for i32 {
+    fn from(column: Column) -> Self {
+        unsafe { std::mem::transmute(column) }
     }
 }
 
@@ -52,12 +52,10 @@ impl Keywords {
             .map(|x| gtk::TreeRowReference::new(&self.model.store, x))
             .collect();
 
-        for reference in references {
-            if let Some(reference) = reference {
-                if let Some(path) = reference.path() {
-                    if let Some(iter) = self.model.store.iter(&path) {
-                        self.model.store.remove(&iter);
-                    }
+        for reference in references.into_iter().flatten() {
+            if let Some(path) = reference.path() {
+                if let Some(iter) = self.model.store.iter(&path) {
+                    self.model.store.remove(&iter);
                 }
             }
         }

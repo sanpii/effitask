@@ -19,15 +19,15 @@ enum Column {
     Tooltip = 3,
 }
 
-impl std::convert::Into<u32> for Column {
-    fn into(self) -> u32 {
-        unsafe { std::mem::transmute(self) }
+impl From<Column> for u32 {
+    fn from(column: Column) -> u32 {
+        unsafe { std::mem::transmute(column) }
     }
 }
 
-impl std::convert::Into<i32> for Column {
-    fn into(self) -> i32 {
-        unsafe { std::mem::transmute(self) }
+impl From<Column> for i32 {
+    fn from(column: Column) -> i32 {
+        unsafe { std::mem::transmute(column) }
     }
 }
 

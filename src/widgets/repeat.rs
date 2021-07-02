@@ -43,21 +43,21 @@ impl Repeat {
     }
 
     fn get_recurrence(&self) -> Option<todo_txt::task::Recurrence> {
-        let num = self.widgets.num.get_value() as i64;
+        let num = self.widgets.num.value() as i64;
 
         if num == 0 {
             return None;
         }
 
-        let strict = self.widgets.strict.get_active();
+        let strict = self.widgets.strict.is_active();
 
-        let period = if self.widgets.day.get_active() {
+        let period = if self.widgets.day.is_active() {
             todo_txt::task::Period::Day
-        } else if self.widgets.week.get_active() {
+        } else if self.widgets.week.is_active() {
             todo_txt::task::Period::Week
-        } else if self.widgets.month.get_active() {
+        } else if self.widgets.month.is_active() {
             todo_txt::task::Period::Month
-        } else if self.widgets.year.get_active() {
+        } else if self.widgets.year.is_active() {
             todo_txt::task::Period::Year
         } else {
             return None;

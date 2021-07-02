@@ -81,7 +81,7 @@ pub enum Msg {
 
 impl Widget {
     fn load_style(&self) {
-        let screen = self.widgets.window.get_screen().unwrap();
+        let screen = self.widgets.window.screen().unwrap();
         let css = gtk::CssProvider::new();
         if let Some(stylesheet) = self.get_stylesheet() {
             match css.load_from_path(stylesheet.to_str().unwrap()) {
@@ -102,8 +102,10 @@ impl Widget {
             if theme.ends_with(":dark") {
                 stylesheet = "style_dark.css";
             }
-        } else if let Some(setting) = self.widgets.window.get_settings() {
-            if setting.get_property_gtk_application_prefer_dark_theme() {
+        } else if let Some(setting) = self.widgets.window.settings() {
+            use gtk::traits::SettingsExt;
+
+            if setting.is_gtk_application_prefer_dark_theme() {
                 stylesheet = "style_dark.css";
             }
         }
@@ -168,10 +170,10 @@ impl Widget {
     }
 
     fn replace_tab_widgets(&self) {
-        let n = self.widgets.notebook.get_n_pages();
+        let n = self.widgets.notebook.n_pages();
 
         for x in 0..n {
-            let page = self.widgets.notebook.get_nth_page(Some(x)).unwrap();
+            let page = self.widgets.notebook.nth_page(Some(x)).unwrap();
             let widget = self.get_tab_widget(x);
 
             self.widgets.notebook.set_tab_label(&page, Some(&widget));
@@ -277,7 +279,7 @@ impl Widget {
             .emit(crate::edit::Msg::Set(Box::new(task.clone())));
         self.widgets.edit.show();
 
-        let (width, _) = self.root().get_size();
+        let (width, _) = self.root().size();
         self.widgets.paned.set_position(width - 436);
     }
 
@@ -302,11 +304,11 @@ impl Widget {
 
     fn search(&self, text: &str) {
         if text.is_empty() {
-            self.widgets.notebook.set_property_page(Page::Inbox.into());
+            self.widgets.notebook.set_page(Page::Inbox.into());
             self.widgets.search.hide();
         } else {
             self.widgets.search.show();
-            self.widgets.notebook.set_property_page(Page::Search.into());
+            self.widgets.notebook.set_page(Page::Search.into());
         }
 
         self.components
@@ -335,8 +337,8 @@ impl Widget {
         super::globals::tasks::replace(list);
 
         super::globals::preferences::replace(crate::application::Preferences {
-            defered: self.model.defered_button.get_active(),
-            done: self.model.done_button.get_active(),
+            defered: self.model.defered_button.is_active(),
+            done: self.model.done_button.is_active(),
         });
 
         self.components.inbox.emit(crate::inbox::Msg::Update);
@@ -481,7 +483,7 @@ impl relm::Widget for Widget {
                         child: {
                             pack_type: gtk::PackType::End,
                         },
-                        search_changed(entry) => Msg::Search(entry.get_text().to_string()),
+                        search_changed(entry) => Msg::Search(entry.text().to_string()),
                     },
                     LoggerWidget {
                         child: {

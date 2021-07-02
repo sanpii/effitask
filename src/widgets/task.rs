@@ -21,11 +21,9 @@ pub struct Model {
 #[relm_derive::widget]
 impl relm::Widget for Task {
     fn init_view(&mut self) {
-        use gtk::StyleContextExt;
-
         let task = &self.model.task;
 
-        let context = self.root().get_style_context();
+        let context = self.root().style_context();
 
         context.add_class("task");
 
@@ -61,11 +59,11 @@ impl relm::Widget for Task {
             self.widgets.keywords.hide();
         }
 
-        let context = self.widgets.date.get_style_context();
+        let context = self.widgets.date.style_context();
         context.add_class("date");
 
         if let Some(threshold) = task.threshold_date {
-            let context = self.widgets.threshold_label.get_style_context();
+            let context = self.widgets.threshold_label.style_context();
             context.add_class("threshold");
 
             let date = self.date_alias(threshold);
@@ -83,7 +81,7 @@ impl relm::Widget for Task {
         }
 
         if let Some(due) = task.due_date {
-            let context = self.widgets.due_label.get_style_context();
+            let context = self.widgets.due_label.style_context();
             context.add_class("due");
 
             let date = self.date_alias(due);
@@ -142,7 +140,7 @@ impl relm::Widget for Task {
 
         match event {
             Click(event) => {
-                if event.get_event_type() == gdk::EventType::DoubleButtonPress {
+                if event.event_type() == gdk::EventType::DoubleButtonPress {
                     self.model
                         .relm
                         .stream()
@@ -199,7 +197,7 @@ impl relm::Widget for Task {
                         #[name="keywords"]
                         gtk::Box {
                             gtk::Image {
-                                property_icon_name: Some("mail-attachment"),
+                                icon_name: Some("mail-attachment"),
                             },
                             #[name="keywords_label"]
                             gtk::Label {

@@ -121,7 +121,7 @@ impl relm::Widget for Priority {
             #[name="button"]
             gtk::SpinButton {
                 focus_out_event(button, _) => (
-                    Msg::Updated(button.get_value() as u8),
+                    Msg::Updated(button.value() as u8),
                     gtk::Inhibit(false)
                 ),
             },

@@ -11,8 +11,8 @@ pub struct Model {
 }
 
 impl Circle {
-    fn draw(&mut self) {
-        let context = self.model.draw_handler.get_context();
+    fn draw(&mut self) -> Result<(), cairo::Error> {
+        let context = self.model.draw_handler.get_context()?;
         let task = &self.model.task;
         let center = self.center();
 
@@ -34,21 +34,21 @@ impl Circle {
         context.close_path();
 
         if task.finished {
-            let width = self.widgets.drawing_area.get_property_width_request();
-            let height = self.widgets.drawing_area.get_property_height_request();
+            let width = self.widgets.drawing_area.width_request();
+            let height = self.widgets.drawing_area.height_request();
 
-            context.save();
-            context.fill();
+            context.save()?;
+            context.fill()?;
             context.translate(f64::from(width) as f64 / -4., f64::from(height) as f64 / 2.);
             context.rotate(std::f64::consts::PI / -4.);
             context.set_source_rgb(0., 0., 0.);
             context.rectangle(20., 30., 40., 10.);
             context.rectangle(20., 20., 10., 10.);
-            context.fill();
-            context.restore();
+            context.fill()?;
+            context.restore()?;
         }
 
-        context.stroke();
+        context.stroke()?;
 
         if !task.finished && task.flagged {
             let angle = if task.due_date.is_some() {
@@ -65,7 +65,7 @@ impl Circle {
                 angle,
                 2. * std::f64::consts::PI,
             );
-            context.stroke();
+            context.stroke()?;
         }
 
         if !task.finished && task.recurrence.is_some() {
@@ -74,15 +74,17 @@ impl Circle {
             for dx in &[-12., 0., 12.] {
                 context.arc(center + dx, center, 4., 0., 2. * std::f64::consts::PI);
                 context.close_path();
-                context.stroke();
+                context.stroke()?;
             }
         }
+
+        Ok(())
     }
 
     fn center(&self) -> f64 {
         f64::min(
-            f64::from(self.widgets.drawing_area.get_property_width_request()) / 2.,
-            f64::from(self.widgets.drawing_area.get_property_height_request()) / 2.,
+            f64::from(self.widgets.drawing_area.width_request()) / 2.,
+            f64::from(self.widgets.drawing_area.height_request()) / 2.,
         )
     }
 }
@@ -104,15 +106,15 @@ impl relm::Widget for Circle {
         use Msg::*;
 
         match event {
-            Draw => self.draw(),
+            Draw => self.draw().unwrap(),
         }
     }
 
     view! {
         #[name="drawing_area"]
         gtk::DrawingArea {
-            property_height_request: 60,
-            property_width_request: 60,
+            height_request: 60,
+            width_request: 60,
             draw(_, _) => (Msg::Draw, gtk::Inhibit(false)),
         }
     }

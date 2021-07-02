@@ -38,7 +38,7 @@ impl log::Log for Log {
     fn log(&self, record: &log::Record<'_>) {
         if let Ok(tx) = self.tx.lock() {
             tx.send((record.level(), format!("{}", record.args())))
-                .unwrap_or_default();
+                .ok();
         }
     }
 
@@ -59,7 +59,7 @@ impl Widget {
         log::set_boxed_logger(Box::new(log)).unwrap_or_default();
 
         let popover = &self.model.popover;
-        popover.set_property_height_request(500);
+        popover.set_height_request(500);
         popover.set_relative_to(Some(&self.widgets.toggle));
         popover.set_border_width(5);
         relm::connect!(self.model.relm, popover, connect_hide(_), Msg::Hide);
@@ -67,13 +67,13 @@ impl Widget {
         let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
         popover.add(&vbox);
 
-        let context = popover.get_style_context();
+        let context = popover.style_context();
         context.add_class("log");
 
-        let context = self.widgets.toggle.get_style_context();
+        let context = self.widgets.toggle.style_context();
         context.add_class("log");
 
-        let context = self.widgets.count.get_style_context();
+        let context = self.widgets.count.style_context();
         context.add_class("count");
 
         let scrolled_window =
@@ -134,7 +134,7 @@ impl Widget {
         let label = gtk::Label::new(Some(text));
         label.show();
 
-        let context = label.get_style_context();
+        let context = label.style_context();
         context.add_class(&class.to_lowercase());
 
         list_box.add(&label);
@@ -168,7 +168,7 @@ impl Widget {
     fn update_count(&self, list_box: &gtk::ListBox) {
         use std::str::FromStr;
 
-        let count = list_box.get_children().len();
+        let count = list_box.children().len();
         if count == 0 {
             self.widgets.toggle.hide();
         } else {
@@ -178,12 +178,12 @@ impl Widget {
 
         let mut max_level = log::Level::Trace;
 
-        for row in list_box.get_children() {
-            let label = match row.downcast::<gtk::Bin>().unwrap().get_child() {
+        for row in list_box.children() {
+            let label = match row.downcast::<gtk::Bin>().unwrap().child() {
                 Some(label) => label,
                 None => continue,
             };
-            let context = label.get_style_context();
+            let context = label.style_context();
             let level = context
                 .list_classes()
                 .iter()
@@ -199,7 +199,7 @@ impl Widget {
             }
         }
 
-        let context = self.widgets.count.get_style_context();
+        let context = self.widgets.count.style_context();
         context.add_class(&format!("{}", max_level).to_lowercase());
     }
 }
@@ -242,10 +242,10 @@ impl relm::Widget for Widget {
                     label: "0",
                 },
                 gtk::Image {
-                    property_icon_name: Some("go-down-symbolic"),
+                    icon_name: Some("go-down-symbolic"),
                 },
             },
-            toggled(e) => if e.get_active() {
+            toggled(e) => if e.is_active() {
                 Msg::Show
             } else {
                 Msg::Hide

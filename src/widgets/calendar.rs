@@ -22,7 +22,7 @@ impl Calendar {
     fn add(&self, period: todo_txt::task::Period) {
         let mut date = crate::date::today();
 
-        let text = self.widgets.entry.get_text();
+        let text = self.widgets.entry.text();
 
         if !text.is_empty() {
             date = match chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
@@ -40,7 +40,7 @@ impl Calendar {
     }
 
     fn date_selected(&self) {
-        let (y, m, d) = self.model.calendar.get_date();
+        let (y, m, d) = self.model.calendar.date();
 
         self.widgets
             .entry
@@ -52,7 +52,7 @@ impl Calendar {
 
     fn date_updated(&self) {
         let mut date = None;
-        let text = self.widgets.entry.get_text();
+        let text = self.widgets.entry.text();
 
         if !text.is_empty() {
             date = match chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
@@ -86,7 +86,7 @@ impl Calendar {
     fn sensitive(&self) {
         use relm::Widget;
 
-        if self.root().get_sensitive() {
+        if self.root().is_sensitive() {
             self.widgets.buttons.show();
         } else {
             self.widgets.buttons.hide();
@@ -151,7 +151,7 @@ impl relm::Widget for Calendar {
         gtk::Box {
             orientation: gtk::Orientation::Horizontal,
             spacing: 10,
-            property_sensitive_notify => Msg::Sensitive,
+            sensitive_notify => Msg::Sensitive,
 
             #[name="label"]
             gtk::Label {
@@ -171,7 +171,7 @@ impl relm::Widget for Calendar {
                         expand: true,
                         fill: true,
                     },
-                    property_width_request: 214,
+                    width_request: 214,
                     focus_out_event(_, _) => (Msg::DateUpdated, gtk::Inhibit(false)),
                     icon_press(_, _, _) => Msg::ShowCalendar,
                 },

@@ -64,14 +64,14 @@ impl Widget {
             .emit(crate::widgets::keywords::Msg::Set(task.tags.clone()));
 
         let note = task.note.content().unwrap_or_default();
-        let buffer = self.widgets.note.get_buffer().unwrap();
+        let buffer = self.widgets.note.buffer().unwrap();
         buffer.set_text(note.as_str());
     }
 
     fn get_task(&self) -> crate::tasks::Task {
         let mut task = self.model.task.clone();
 
-        task.subject = self.widgets.subject.get_text().to_string();
+        task.subject = self.widgets.subject.text().to_string();
 
         let new_note = self.get_note();
         task.note = match task.note {
@@ -92,14 +92,14 @@ impl Widget {
     }
 
     fn get_note(&self) -> String {
-        let buffer = match self.widgets.note.get_buffer() {
+        let buffer = match self.widgets.note.buffer() {
             Some(buffer) => buffer,
             None => return String::new(),
         };
-        let start = buffer.get_start_iter();
-        let end = buffer.get_end_iter();
+        let start = buffer.start_iter();
+        let end = buffer.end_iter();
 
-        buffer.get_text(&start, &end, false).expect("").to_string()
+        buffer.text(&start, &end, false).expect("").to_string()
     }
 
     fn edit_keywords(&mut self, keywords: &std::collections::BTreeMap<String, String>) {
@@ -107,7 +107,7 @@ impl Widget {
     }
 
     fn flag(&mut self) {
-        self.model.task.flagged = self.widgets.flag.get_active();
+        self.model.task.flagged = self.widgets.flag.is_active();
     }
 
     fn update_date(&mut self, date_type: DateType, date: Option<chrono::NaiveDate>) {
@@ -136,7 +136,7 @@ impl Widget {
 #[relm_derive::widget]
 impl relm::Widget for Widget {
     fn init_view(&mut self) {
-        self.widgets.note.set_property_height_request(150);
+        self.widgets.note.set_height_request(150);
         self.widgets.created.set_sensitive(false);
     }
 

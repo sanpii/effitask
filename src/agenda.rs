@@ -29,7 +29,7 @@ impl Widget {
         self.widgets.calendar.clear_marks();
 
         let list = crate::application::tasks();
-        let (y, m, d) = self.widgets.calendar.get_date();
+        let (y, m, d) = self.widgets.calendar.date();
         let date = chrono::naive::NaiveDate::from_ymd(y as i32, m + 1, d);
 
         update!(self, past_exp, past, get_past_tasks, list, date);
@@ -97,7 +97,7 @@ impl Widget {
         start: Option<chrono::naive::NaiveDate>,
         end: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
-        let (_, month, _) = self.widgets.calendar.get_date();
+        let (_, month, _) = self.widgets.calendar.date();
         let preferences = crate::application::preferences();
 
         let tasks: Vec<crate::tasks::Task> = list
@@ -185,7 +185,7 @@ impl relm::Widget for Widget {
                         label: Some("Past due"),
                         #[name="past"]
                         Tasks {
-                            property_vscrollbar_policy: gtk::PolicyType::Never,
+                            vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -195,7 +195,7 @@ impl relm::Widget for Widget {
                         label: Some("Today"),
                         #[name="today"]
                         Tasks {
-                            property_vscrollbar_policy: gtk::PolicyType::Never,
+                            vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -205,7 +205,7 @@ impl relm::Widget for Widget {
                         label: Some("Tomorrow"),
                         #[name="tomorrow"]
                         Tasks {
-                            property_vscrollbar_policy: gtk::PolicyType::Never,
+                            vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -215,7 +215,7 @@ impl relm::Widget for Widget {
                         label: Some("This week"),
                         #[name="week"]
                         Tasks {
-                            property_vscrollbar_policy: gtk::PolicyType::Never,
+                            vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         },
@@ -225,7 +225,7 @@ impl relm::Widget for Widget {
                         label: Some("This month"),
                         #[name="month"]
                         Tasks {
-                            property_vscrollbar_policy: gtk::PolicyType::Never,
+                            vscrollbar_policy: gtk::PolicyType::Never,
                             Complete(ref task) => Msg::Complete(task.clone()),
                             Edit(ref task) => Msg::Edit(task.clone()),
                         }

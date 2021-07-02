@@ -6,25 +6,25 @@ homepage = "https://github.com/sanpii/effitask"
 edition = "2018"
 
 [dependencies]
-cairo-rs = "^0.9"
+cairo-rs = "0.14"
 chrono = "^0.4"
 dotenv = "0.15"
 dirs-sys = "^0.3"
-gdk = "^0.13"
-gdk-sys = "^0.10"
-glib = "^0.10"
+gdk = "0.14"
+gdk-sys = "0.14"
+glib = "0.14"
 human-panic = "^1.0"
 lazy_static = "^1.4"
 notify = "^4.0"
 pulldown-cmark = "0.8"
 rand = "^0.8"
 regex = "^1.0"
-relm = "0.21"
-relm-derive = "0.21"
+relm = "0.22"
+relm-derive = "0.22"
 xdg = "2.1"
 
 [dependencies.gtk]
-version = "0.9"
+version = "0.14"
 features = ["v3_22"]
 
 [dependencies.log]

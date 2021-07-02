@@ -51,7 +51,7 @@ impl Tasks {
     }
 
     fn clear(&mut self) {
-        for child in self.widgets.list_box.get_children() {
+        for child in self.widgets.list_box.children() {
             self.widgets.list_box.remove(&child);
         }
         self.model.children = Vec::new();

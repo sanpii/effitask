@@ -33,8 +33,8 @@ impl std::convert::Into<i32> for Column {
 
 impl Filter {
     fn update_filters(&mut self, filters: Vec<(String, (u32, u32))>) {
-        let selection = self.widgets.filters.get_selection();
-        let (paths, _) = selection.get_selected_rows();
+        let selection = self.widgets.filters.selection();
+        let (paths, _) = selection.selected_rows();
 
         self.model.clear();
         let mut root = std::collections::HashMap::new();
@@ -94,10 +94,10 @@ impl Filter {
     }
 
     fn select_range(treeview: &gtk::TreeView, path: &gtk::TreePath) {
-        let model = treeview.get_model().unwrap();
+        let model = treeview.model().unwrap();
 
         let start = path;
-        let start_iter = model.get_iter(path).unwrap();
+        let start_iter = model.iter(path).unwrap();
 
         let n_child = model.iter_n_children(Some(&start_iter));
 
@@ -105,9 +105,9 @@ impl Filter {
             let end_iter = model
                 .iter_nth_child(Some(&start_iter), n_child - 1)
                 .unwrap();
-            let end = model.get_path(&end_iter).unwrap();
+            let end = model.path(&end_iter).unwrap();
 
-            treeview.get_selection().select_range(start, &end);
+            treeview.selection().select_range(start, &end);
         }
     }
 }
@@ -122,14 +122,14 @@ impl relm::Widget for Filter {
         self.widgets.filters.set_model(Some(&self.model));
         self.widgets
             .filters
-            .get_selection()
+            .selection()
             .set_mode(gtk::SelectionMode::Multiple);
 
         let column = gtk::TreeViewColumn::new();
         self.widgets.filters.append_column(&column);
 
         let cell = gtk::CellRendererProgress::new();
-        cell.set_property_text_xalign(0.);
+        cell.set_text_xalign(0.);
         column.pack_start(&cell, true);
         column.add_attribute(&cell, "text", Column::Title.into());
         column.add_attribute(&cell, "value", Column::Progress.into());
@@ -141,10 +141,10 @@ impl relm::Widget for Filter {
 
     fn model(_: ()) -> gtk::TreeStore {
         let columns = vec![
-            glib::types::Type::String,
-            glib::types::Type::String,
+            glib::types::Type::STRING,
+            glib::types::Type::STRING,
             glib::types::Type::U32,
-            glib::types::Type::String,
+            glib::types::Type::STRING,
         ];
 
         gtk::TreeStore::new(&columns)
@@ -175,15 +175,15 @@ impl relm::Widget for Filter {
                     row_activated(treeview, path, _) => Self::select_range(treeview, path),
                     selection.changed(ref mut selection) => {
                         let mut filters = Vec::new();
-                        let (paths, list_model) = selection.get_selected_rows();
+                        let (paths, list_model) = selection.selected_rows();
 
                         for path in paths {
-                            let iter = match list_model.get_iter(&path) {
+                            let iter = match list_model.iter(&path) {
                                 Some(iter) => iter,
                                 None => continue,
                             };
 
-                            match list_model.get_value(&iter, Column::Raw.into()).get() {
+                            match list_model.value(&iter, Column::Raw.into()).get() {
                                 Ok(Some(value)) => filters.push(value),
                                 Ok(None) | Err(_) => continue,
                             };

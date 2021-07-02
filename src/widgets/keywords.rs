@@ -36,8 +36,8 @@ impl std::convert::Into<i32> for Column {
 impl Keywords {
     fn add(&mut self) {
         let iter = self.model.store.append();
-        let path = self.model.store.get_path(&iter).unwrap();
-        let column = self.widgets.tree_view.get_column(Column::Name.into());
+        let path = self.model.store.path(&iter).unwrap();
+        let column = self.widgets.tree_view.column(Column::Name.into());
 
         self.widgets
             .tree_view
@@ -45,8 +45,8 @@ impl Keywords {
     }
 
     fn delete(&mut self) {
-        let selection = self.widgets.tree_view.get_selection();
-        let (rows, _) = selection.get_selected_rows();
+        let selection = self.widgets.tree_view.selection();
+        let (rows, _) = selection.selected_rows();
         let references: Vec<_> = rows
             .iter()
             .map(|x| gtk::TreeRowReference::new(&self.model.store, x))
@@ -54,8 +54,8 @@ impl Keywords {
 
         for reference in references {
             if let Some(reference) = reference {
-                if let Some(path) = reference.get_path() {
-                    if let Some(iter) = self.model.store.get_iter(&path) {
+                if let Some(path) = reference.path() {
+                    if let Some(iter) = self.model.store.iter(&path) {
                         self.model.store.remove(&iter);
                     }
                 }
@@ -66,7 +66,7 @@ impl Keywords {
     }
 
     fn edit(&mut self, column: Column, path: &gtk::TreePath, new_text: &str) {
-        let iter = self.model.store.get_iter(path).unwrap();
+        let iter = self.model.store.iter(path).unwrap();
 
         self.model
             .store
@@ -78,16 +78,16 @@ impl Keywords {
     fn keywords(&self) -> std::collections::BTreeMap<String, String> {
         let mut keywords = std::collections::BTreeMap::new();
 
-        let iter = match self.model.store.get_iter_first() {
+        let iter = match self.model.store.iter_first() {
             Some(iter) => iter,
             None => return keywords,
         };
 
-        while let Ok(Some(name)) = self.model.store.get_value(&iter, Column::Name.into()).get() {
+        while let Ok(Some(name)) = self.model.store.value(&iter, Column::Name.into()).get() {
             let value = match self
                 .model
                 .store
-                .get_value(&iter, Column::Value.into())
+                .value(&iter, Column::Value.into())
                 .get()
             {
                 Ok(Some(value)) => value,
@@ -125,11 +125,11 @@ impl relm::Widget for Keywords {
         self.widgets
             .scroll
             .set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
-        self.widgets.scroll.set_property_height_request(150);
+        self.widgets.scroll.set_height_request(150);
         self.widgets.tree_view.set_model(Some(&self.model.store));
         self.widgets
             .tree_view
-            .get_selection()
+            .selection()
             .set_mode(gtk::SelectionMode::Multiple);
 
         let column = gtk::TreeViewColumn::new();
@@ -137,7 +137,7 @@ impl relm::Widget for Keywords {
         self.widgets.tree_view.append_column(&column);
 
         let cell = gtk::CellRendererText::new();
-        cell.set_property_editable(true);
+        cell.set_editable(true);
         relm::connect!(
             self.model.relm,
             cell,
@@ -152,7 +152,7 @@ impl relm::Widget for Keywords {
         self.widgets.tree_view.append_column(&column);
 
         let cell = gtk::CellRendererText::new();
-        cell.set_property_editable(true);
+        cell.set_editable(true);
         relm::connect!(
             self.model.relm,
             cell,
@@ -164,7 +164,7 @@ impl relm::Widget for Keywords {
     }
 
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
-        let columns = vec![glib::types::Type::String, glib::types::Type::String];
+        let columns = vec![glib::types::Type::STRING, glib::types::Type::STRING];
 
         Model {
             store: gtk::ListStore::new(&columns),

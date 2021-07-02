@@ -37,8 +37,7 @@ impl log::Log for Log {
 
     fn log(&self, record: &log::Record<'_>) {
         if let Ok(tx) = self.tx.lock() {
-            tx.send((record.level(), format!("{}", record.args())))
-                .ok();
+            tx.send((record.level(), format!("{}", record.args()))).ok();
         }
     }
 

@@ -82,12 +82,7 @@ impl Keywords {
         };
 
         while let Ok(Some(name)) = self.model.store.value(&iter, Column::Name.into()).get() {
-            let value = match self
-                .model
-                .store
-                .value(&iter, Column::Value.into())
-                .get()
-            {
+            let value = match self.model.store.value(&iter, Column::Value.into()).get() {
                 Ok(Some(value)) => value,
                 Ok(None) | Err(_) => break,
             };

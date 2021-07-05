@@ -11,7 +11,7 @@ pub struct Model {
 }
 
 impl Circle {
-    fn draw(&mut self) -> Result<(), cairo::Error> {
+    fn draw(&mut self) -> Result<(), gtk::cairo::Error> {
         let context = self.model.draw_handler.get_context()?;
         let task = &self.model.task;
         let center = self.center();

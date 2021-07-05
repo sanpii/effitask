@@ -6,7 +6,6 @@ homepage = "https://github.com/sanpii/effitask"
 edition = "2018"
 
 [dependencies]
-cairo-rs = "0.14"
 chrono = "^0.4"
 dotenv = "0.15"
 dirs-sys = "^0.3"

@@ -1,0 +1,64 @@
+on: [pull_request, push]
+
+jobs:
+  lint_fmt:
+    name: cargo fmt
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt
+      - name: Check formating
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+
+  lint_clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy
+      - name: Install gtk
+        run: |
+          sudo apt update -yqq
+          sudo apt install -yqq --no-install-recommends libgtk-3-dev
+      - name: Run clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-features -- --deny warnings
+
+  tests:
+    name: Tests
+    strategy:
+      matrix:
+        mode: ["debug", "release"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install gtk
+        run: |
+          sudo apt update -yqq
+          sudo apt install -yqq --no-install-recommends libgtk-3-dev
+
+      - name: Run tests
+        if: matrix.mode == 'debug'
+        run: make MODE=debug test
+
+      - name: Run tests (release)
+        if: matrix.mode == 'release'
+        run: make MODE=release test

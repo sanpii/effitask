@@ -189,7 +189,6 @@ dependencies = [
  "chrono",
  "dirs-sys",
  "dotenv",
- "gdk-sys",
  "gtk",
  "human-panic",
  "lazy_static",

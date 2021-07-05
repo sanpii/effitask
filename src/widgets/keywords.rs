@@ -157,7 +157,10 @@ impl relm::Widget for Keywords {
     }
 
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
-        let columns = vec![glib::types::Type::STRING, glib::types::Type::STRING];
+        let columns = vec![
+            gtk::glib::types::Type::STRING,
+            gtk::glib::types::Type::STRING,
+        ];
 
         Model {
             store: gtk::ListStore::new(&columns),

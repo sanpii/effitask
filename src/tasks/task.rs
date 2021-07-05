@@ -34,7 +34,7 @@ impl Task {
     }
 
     fn markup_escape(text: &str) -> String {
-        glib::markup_escape_text(text).as_str().to_string()
+        gtk::glib::markup_escape_text(text).as_str().to_string()
     }
 }
 

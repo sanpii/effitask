@@ -141,10 +141,10 @@ impl relm::Widget for Filter {
 
     fn model(_: ()) -> gtk::TreeStore {
         let columns = vec![
-            glib::types::Type::STRING,
-            glib::types::Type::STRING,
-            glib::types::Type::U32,
-            glib::types::Type::STRING,
+            gtk::glib::types::Type::STRING,
+            gtk::glib::types::Type::STRING,
+            gtk::glib::types::Type::U32,
+            gtk::glib::types::Type::STRING,
         ];
 
         gtk::TreeStore::new(&columns)

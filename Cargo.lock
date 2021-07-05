@@ -190,7 +190,6 @@ dependencies = [
  "dirs-sys",
  "dotenv",
  "gdk-sys",
- "glib",
  "gtk",
  "human-panic",
  "lazy_static",

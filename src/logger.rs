@@ -112,10 +112,10 @@ impl Widget {
         vbox.show_all();
 
         GLOBAL.with(move |global| *global.borrow_mut() = Some((list_box, rx)));
-        glib::idle_add(Self::receive);
+        gtk::glib::idle_add(Self::receive);
     }
 
-    fn receive() -> glib::Continue {
+    fn receive() -> gtk::glib::Continue {
         GLOBAL.with(|global| {
             if let Some((ref list_box, ref rx)) = *global.borrow() {
                 if let Ok((level, text)) = rx.try_recv() {
@@ -124,7 +124,7 @@ impl Widget {
             }
         });
 
-        glib::Continue(true)
+        gtk::glib::Continue(true)
     }
 
     fn add_message(list_box: &gtk::ListBox, level: log::Level, text: &str) {

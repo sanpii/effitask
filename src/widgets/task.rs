@@ -25,8 +25,6 @@ impl relm::Widget for Task {
 
         let context = self.root().style_context();
 
-        context.add_class("task");
-
         if task.finished {
             context.add_class("finished");
         }
@@ -59,13 +57,7 @@ impl relm::Widget for Task {
             self.widgets.keywords.hide();
         }
 
-        let context = self.widgets.date.style_context();
-        context.add_class("date");
-
         if let Some(threshold) = task.threshold_date {
-            let context = self.widgets.threshold_label.style_context();
-            context.add_class("threshold");
-
             let date = self.date_alias(threshold);
             self.widgets
                 .threshold_label
@@ -81,9 +73,6 @@ impl relm::Widget for Task {
         }
 
         if let Some(due) = task.due_date {
-            let context = self.widgets.due_label.style_context();
-            context.add_class("due");
-
             let date = self.date_alias(due);
 
             let today = crate::date::today();
@@ -159,6 +148,7 @@ impl relm::Widget for Task {
     }
 
     view! {
+        #[style_class="task"]
         gtk::EventBox {
             button_press_event(_, event) => (Msg::Click(event.clone()), gtk::Inhibit(false)),
             gtk::Box {
@@ -204,12 +194,14 @@ impl relm::Widget for Task {
                             },
                         },
                         #[name="date"]
+                        #[style_class="date"]
                         gtk::Box {
                             spacing: 5,
                             child: {
                                 pack_type: gtk::PackType::End,
                             },
                             #[name="threshold_label"]
+                            #[style_class="threshold"]
                             gtk::Label {
                             },
                             #[name="arrow_label"]
@@ -217,6 +209,7 @@ impl relm::Widget for Task {
                                 text: " ➡ ",
                             },
                             #[name="due_label"]
+                            #[style_class="due"]
                             gtk::Label {
                             },
                         },

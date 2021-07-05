@@ -69,12 +69,6 @@ impl Widget {
         let context = popover.style_context();
         context.add_class("log");
 
-        let context = self.widgets.toggle.style_context();
-        context.add_class("log");
-
-        let context = self.widgets.count.style_context();
-        context.add_class("count");
-
         let scrolled_window =
             gtk::ScrolledWindow::new::<gtk::Adjustment, gtk::Adjustment>(None, None);
         scrolled_window.set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
@@ -230,6 +224,7 @@ impl relm::Widget for Widget {
 
     view! {
         #[name="toggle"]
+        #[style_name="log"]
         gtk::ToggleButton {
             gtk::Box {
                 spacing: 10,
@@ -237,6 +232,7 @@ impl relm::Widget for Widget {
                     label: "Notifications",
                 },
                 #[name="count"]
+                #[style_name="count"]
                 gtk::Label {
                     label: "0",
                 },

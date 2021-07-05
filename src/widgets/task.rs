@@ -3,7 +3,7 @@ use gtk::prelude::*;
 
 #[derive(relm_derive::Msg)]
 pub enum Msg {
-    Click(gdk::EventButton),
+    Click(gtk::gdk::EventButton),
     Complete(Box<crate::tasks::Task>),
     Edit(Box<crate::tasks::Task>),
     ShowNote,
@@ -140,7 +140,7 @@ impl relm::Widget for Task {
 
         match event {
             Click(event) => {
-                if event.event_type() == gdk::EventType::DoubleButtonPress {
+                if event.event_type() == gtk::gdk::EventType::DoubleButtonPress {
                     self.model
                         .relm
                         .stream()

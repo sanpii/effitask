@@ -189,7 +189,6 @@ dependencies = [
  "chrono",
  "dirs-sys",
  "dotenv",
- "gdk",
  "gdk-sys",
  "glib",
  "gtk",

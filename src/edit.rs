@@ -162,7 +162,7 @@ impl relm::Widget for Widget {
                 .emit(Msg::Done(Box::new(self.get_task()))),
             Set(task) => self.set_task(&task),
             UpdateDate(ref date_type, ref date) => self.update_date(*date_type, *date),
-            UpdateRepeat(ref recurrence) => self.update_repeat(&recurrence),
+            UpdateRepeat(ref recurrence) => self.update_repeat(recurrence),
             UpdatePriority(priority) => self.update_priority(priority),
         }
     }

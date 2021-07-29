@@ -180,7 +180,7 @@ impl Widget {
             let level = context
                 .list_classes()
                 .iter()
-                .find_map(|class| log::Level::from_str(&class).ok())
+                .find_map(|class| log::Level::from_str(class).ok())
                 .unwrap_or(log::Level::Info);
 
             if level < max_level {

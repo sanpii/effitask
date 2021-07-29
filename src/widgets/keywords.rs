@@ -47,12 +47,11 @@ impl Keywords {
     fn delete(&mut self) {
         let selection = self.widgets.tree_view.selection();
         let (rows, _) = selection.selected_rows();
-        let references: Vec<_> = rows
+        let references = rows
             .iter()
-            .map(|x| gtk::TreeRowReference::new(&self.model.store, x))
-            .collect();
+            .map(|x| gtk::TreeRowReference::new(&self.model.store, x));
 
-        for reference in references.into_iter().flatten() {
+        for reference in references.flatten() {
             if let Some(path) = reference.path() {
                 if let Some(iter) = self.model.store.iter(&path) {
                     self.model.store.remove(&iter);

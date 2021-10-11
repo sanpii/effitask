@@ -489,9 +489,9 @@ dependencies = [
 
 [[package]]
 name = "gtk"
-version = "0.14.0"
+version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10ae864e5eab8bc8b6b8544ed259eb02dd61b25323b20e777a77aa289c05fd0c"
+checksum = "2eb51122dd3317e9327ec1e4faa151d1fa0d95664cd8fb8dcfacf4d4d29ac70c"
 dependencies = [
  "atk",
  "bitflags",

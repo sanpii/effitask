@@ -193,7 +193,6 @@ impl relm::Widget for Task {
                             gtk::Label {
                             },
                         },
-                        #[name="date"]
                         #[style_class="date"]
                         gtk::Box {
                             spacing: 5,

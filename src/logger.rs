@@ -70,7 +70,7 @@ impl Widget {
         context.add_class("log");
 
         let scrolled_window =
-            gtk::ScrolledWindow::new::<gtk::Adjustment, gtk::Adjustment>(None, None);
+            gtk::ScrolledWindow::new(gtk::Adjustment::NONE, gtk::Adjustment::NONE);
         scrolled_window.set_policy(gtk::PolicyType::Never, gtk::PolicyType::Automatic);
         vbox.pack_start(&scrolled_window, true, true, 0);
 

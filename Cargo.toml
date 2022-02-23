@@ -16,7 +16,7 @@ rand = "^0.8"
 regex = "^1.0"
 relm = "0.23"
 relm-derive = "0.23"
-xdg = "2.1"
+xdg = "2.4"
 
 [dependencies.gtk]
 version = "0.15"

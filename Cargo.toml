@@ -27,5 +27,5 @@ version = "^0.4"
 features = ["std"]
 
 [dependencies.todo-txt]
-version = "2.1"
+version = "2.2"
 features = ["extended"]

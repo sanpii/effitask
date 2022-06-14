@@ -42,7 +42,8 @@ impl std::str::FromStr for Task {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, ()> {
-        let inner = todo_txt::task::Extended::from_str(s)?;
+        let inner = todo_txt::task::Extended::from_str(s)
+            .map_err(|_| ())?;
 
         Ok(Self { inner, id: 0 })
     }

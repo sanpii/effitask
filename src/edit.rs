@@ -37,7 +37,7 @@ impl Widget {
         self.widgets.subject.set_text(task.subject.as_str());
         self.components
             .priority
-            .emit(crate::widgets::priority::Msg::Set(task.priority));
+            .emit(crate::widgets::priority::Msg::Set(task.priority.clone().into()));
         self.widgets.flag.set_active(task.flagged);
         self.components
             .due
@@ -128,7 +128,7 @@ impl Widget {
     }
 
     fn update_priority(&mut self, priority: u8) {
-        self.model.task.priority = priority;
+        self.model.task.priority = priority.into();
     }
 }
 

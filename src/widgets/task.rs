@@ -29,8 +29,8 @@ impl relm::Widget for Task {
             context.add_class("finished");
         }
 
-        if task.priority < 26 {
-            let priority = (b'a' + task.priority) as char;
+        if task.priority < 26.into() {
+            let priority = (b'a' + u8::from(task.priority.clone())) as char;
             context.add_class(format!("pri_{}", priority).as_str());
         }
 

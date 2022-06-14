@@ -114,7 +114,9 @@ impl relm::Widget for Calendar {
         self.model
             .popover
             .set_relative_to(Some(&self.widgets.entry));
-        self.model.popover.set_pointing_to(&gtk::gdk::Rectangle::new(15, 15, 0, 0));
+        self.model
+            .popover
+            .set_pointing_to(&gtk::gdk::Rectangle::new(15, 15, 0, 0));
         self.model.popover.add(&self.model.calendar);
         self.model.popover.hide();
     }

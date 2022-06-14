@@ -37,7 +37,9 @@ impl Widget {
         self.widgets.subject.set_text(task.subject.as_str());
         self.components
             .priority
-            .emit(crate::widgets::priority::Msg::Set(task.priority.clone().into()));
+            .emit(crate::widgets::priority::Msg::Set(
+                task.priority.clone().into(),
+            ));
         self.widgets.flag.set_active(task.flagged);
         self.components
             .due

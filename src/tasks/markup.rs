@@ -48,7 +48,7 @@ impl Markup for todo_txt::task::Note {
                 }
                 Event::End(Tag::Link(_, _, _)) => markup.push_str("</a>"),
 
-                Event::Text(t) => markup.push_str(&t.replace("&", "&amp;")),
+                Event::Text(t) => markup.push_str(&t.replace('&', "&amp;")),
 
                 _ => (),
             }

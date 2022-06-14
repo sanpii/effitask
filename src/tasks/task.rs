@@ -20,7 +20,7 @@ impl Task {
             .replace_all(&subject, |caps: &regex::Captures<'_>| {
                 format!(
                     "<a href=\"{url}\">{url}</a>",
-                    url = caps[1].replace("&", "&amp;")
+                    url = caps[1].replace('&', "&amp;")
                 )
             })
             .into_owned();

@@ -18,14 +18,15 @@ impl Markup for todo_txt::task::Note {
         ];
 
         for event in parser {
+            use std::fmt::Write;
+
             use pulldown_cmark::Event;
             use pulldown_cmark::Tag;
 
             match event {
-                Event::Start(Tag::Heading(level, ..)) => markup.push_str(&format!(
-                    "<span font_size='{}'><u>",
-                    headers[level as usize]
-                )),
+                Event::Start(Tag::Heading(level, ..)) => {
+                    write!(markup, "<span font_size='{}'><u>", headers[level as usize]).ok();
+                }
                 Event::End(Tag::Heading(..)) => markup.push_str("</u></span>\n\n"),
 
                 Event::Start(Tag::Paragraph) => markup.push_str("<span>"),
@@ -44,7 +45,7 @@ impl Markup for todo_txt::task::Note {
                 Event::End(Tag::Item) | Event::SoftBreak => markup.push('\n'),
 
                 Event::Start(Tag::Link(_, link, title)) => {
-                    markup.push_str(&format!("<a href='{}' title='{}'>", link, title))
+                    write!(markup, "<a href='{link}' title='{title}'>").ok();
                 }
                 Event::End(Tag::Link(_, _, _)) => markup.push_str("</a>"),
 

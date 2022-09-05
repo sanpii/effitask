@@ -1129,9 +1129,9 @@ dependencies = [
 
 [[package]]
 name = "todo-txt"
-version = "2.2.0"
+version = "2.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "84f5bed18a80716e6cfb42af9010a43692aba4e38e8c299cade43da3d8ec8af6"
+checksum = "210aa8964468ce2961f5b1a647c20374bd9784c9ae668ebf33c269bb1d9d970e"
 dependencies = [
  "chrono",
  "lazy_static",

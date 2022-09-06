@@ -368,7 +368,6 @@ impl Widget {
             log::info!("Tasks reloaded");
         });
 
-
         let todo_dir = match std::env::var("TODO_DIR") {
             Ok(todo_dir) => todo_dir,
             Err(err) => {
@@ -377,19 +376,21 @@ impl Widget {
             }
         };
 
-        let mut watcher = notify::recommended_watcher(move |res| {
-            match res {
-                Ok(_) => {
-                    sender.send(()).expect("send message");
-                }
-                Err(e) => log::warn!("watch error: {:?}", e),
+        let mut watcher = notify::recommended_watcher(move |res| match res {
+            Ok(_) => {
+                sender.send(()).expect("send message");
             }
-        }).unwrap();
+            Err(e) => log::warn!("watch error: {:?}", e),
+        })
+        .unwrap();
 
         log::debug!("watching {} for changes", todo_dir);
 
         watcher
-            .watch(std::path::PathBuf::from(todo_dir).as_path(), notify::RecursiveMode::Recursive)
+            .watch(
+                std::path::PathBuf::from(todo_dir).as_path(),
+                notify::RecursiveMode::Recursive,
+            )
             .unwrap();
     }
 }

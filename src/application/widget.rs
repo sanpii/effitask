@@ -359,7 +359,8 @@ impl Widget {
     }
 
     fn watch(&self) {
-        let (tx, rx) = std::sync::mpsc::channel();
+        use notify::Watcher;
+
         let stream = self.model.relm.stream().clone();
 
         let (_, sender) = relm::Channel::new(move |_| {
@@ -367,41 +368,29 @@ impl Widget {
             log::info!("Tasks reloaded");
         });
 
-        std::thread::spawn(move || {
-            use notify::Watcher;
 
-            let todo_dir = match std::env::var("TODO_DIR") {
-                Ok(todo_dir) => todo_dir,
-                Err(err) => {
-                    eprintln!("Launch this program via todo.sh: {}", err);
-                    std::process::exit(1);
-                }
-            };
-
-            let timeout = std::time::Duration::from_secs(2);
-            let mut watcher = notify::watcher(tx, timeout).unwrap();
-
-            log::debug!("watching {} for changes", todo_dir);
-
-            watcher
-                .watch(todo_dir, notify::RecursiveMode::Recursive)
-                .unwrap();
-
-            loop {
-                if rx.try_recv().is_ok() {
-                    log::info!("shutting down todo_dir watcher");
-                    return;
-                }
-
-                match rx.recv_timeout(timeout) {
-                    Ok(_) => {
-                        sender.send(()).expect("send message");
-                    }
-                    Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {}
-                    Err(e) => log::warn!("watch error: {:?}", e),
-                }
+        let todo_dir = match std::env::var("TODO_DIR") {
+            Ok(todo_dir) => todo_dir,
+            Err(err) => {
+                eprintln!("Launch this program via todo.sh: {}", err);
+                std::process::exit(1);
             }
-        });
+        };
+
+        let mut watcher = notify::recommended_watcher(move |res| {
+            match res {
+                Ok(_) => {
+                    sender.send(()).expect("send message");
+                }
+                Err(e) => log::warn!("watch error: {:?}", e),
+            }
+        }).unwrap();
+
+        log::debug!("watching {} for changes", todo_dir);
+
+        watcher
+            .watch(std::path::PathBuf::from(todo_dir).as_path(), notify::RecursiveMode::Recursive)
+            .unwrap();
     }
 }
 

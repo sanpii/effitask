@@ -173,7 +173,7 @@ impl List {
             Err(_) => return Err(format!("Unable to convert task: '{}'", text)),
         };
 
-        (*task).create_date = Some(crate::date::today());
+        task.create_date = Some(crate::date::today());
 
         self.append(task);
         self.write()

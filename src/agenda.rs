@@ -30,7 +30,7 @@ impl Widget {
 
         let list = crate::application::tasks();
         let (y, m, d) = self.widgets.calendar.date();
-        let date = chrono::naive::NaiveDate::from_ymd(y as i32, m + 1, d);
+        let date = chrono::naive::NaiveDate::from_ymd_opt(y as i32, m + 1, d);
 
         update!(self, past_exp, past, get_past_tasks, list, date);
         update!(self, today_exp, today, get_today_tasks, list, date);
@@ -42,52 +42,52 @@ impl Widget {
     fn get_past_tasks(
         &self,
         list: &crate::tasks::List,
-        date: chrono::naive::NaiveDate,
+        date: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
-        self.get_tasks(list, None, Some(date))
+        self.get_tasks(list, None, date)
     }
 
     fn get_today_tasks(
         &self,
         list: &crate::tasks::List,
-        date: chrono::naive::NaiveDate,
+        date: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
-        self.get_tasks(list, Some(date), Some(date.succ()))
+        self.get_tasks(list, date, date.and_then(|x| x.succ_opt()))
     }
 
     fn get_tomorrow_tasks(
         &self,
         list: &crate::tasks::List,
-        date: chrono::naive::NaiveDate,
+        date: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
-            Some(date.succ()),
-            Some(date + chrono::Duration::days(2)),
+            date.and_then(|x| x.succ_opt()),
+            date.map(|x| x + chrono::Duration::days(2)),
         )
     }
 
     fn get_week_tasks(
         &self,
         list: &crate::tasks::List,
-        date: chrono::naive::NaiveDate,
+        date: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
-            Some(date + chrono::Duration::days(2)),
-            Some(date + chrono::Duration::weeks(1)),
+            date.map(|x| x + chrono::Duration::days(2)),
+            date.map(|x| x + chrono::Duration::weeks(1)),
         )
     }
 
     fn get_month_tasks(
         &self,
         list: &crate::tasks::List,
-        date: chrono::naive::NaiveDate,
+        date: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
         self.get_tasks(
             list,
-            Some(date + chrono::Duration::weeks(1)),
-            Some(date + chrono::Duration::weeks(4)),
+            date.map(|x| x + chrono::Duration::weeks(1)),
+            date.map(|x| x + chrono::Duration::weeks(4)),
         )
     }
 

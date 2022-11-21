@@ -94,9 +94,9 @@ impl relm::Widget for Task {
 
         if date == today {
             String::from("today")
-        } else if date == today.pred() {
+        } else if Some(date) == today.pred_opt() {
             String::from("yesterday")
-        } else if date == today.succ() {
+        } else if Some(date) == today.succ_opt() {
             String::from("tomorrow")
         } else {
             date.format("%Y-%m-%d").to_string()

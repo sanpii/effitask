@@ -386,12 +386,12 @@ impl Widget {
 
         log::debug!("watching {} for changes", todo_dir);
 
-        watcher
-            .watch(
-                std::path::PathBuf::from(todo_dir).as_path(),
-                notify::RecursiveMode::Recursive,
-            )
-            .unwrap();
+        if let Err(err) = watcher.watch(
+            std::path::PathBuf::from(todo_dir).as_path(),
+            notify::RecursiveMode::Recursive,
+        ) {
+            log::warn!("Unable to setup hot reload: {err}");
+        }
     }
 }
 

@@ -130,9 +130,19 @@ impl relm::Widget for Filter {
 
         let cell = gtk::CellRendererProgress::new();
         cell.set_text_xalign(0.);
-        column.pack_start(&cell, true);
-        column.add_attribute(&cell, "text", Column::Title.into());
-        column.add_attribute(&cell, "value", Column::Progress.into());
+        gtk::prelude::CellLayoutExt::pack_start(&column, &cell, true);
+        gtk::prelude::TreeViewColumnExt::add_attribute(
+            &column,
+            &cell,
+            "text",
+            Column::Title.into(),
+        );
+        gtk::prelude::TreeViewColumnExt::add_attribute(
+            &column,
+            &cell,
+            "value",
+            Column::Progress.into(),
+        );
 
         self.widgets
             .filters

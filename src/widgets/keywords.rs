@@ -136,8 +136,13 @@ impl relm::Widget for Keywords {
             connect_edited(_, path, new_text),
             Msg::Edit(Column::Name, path, new_text.to_string())
         );
-        column.pack_start(&cell, true);
-        column.add_attribute(&cell, "text", Column::Name.into());
+        gtk::prelude::CellLayoutExt::pack_start(&column, &cell, true);
+        gtk::prelude::TreeViewColumnExt::add_attribute(
+            &column,
+            &cell,
+            "text",
+            Column::Value.into(),
+        );
 
         let column = gtk::TreeViewColumn::new();
         column.set_title("value");
@@ -151,8 +156,13 @@ impl relm::Widget for Keywords {
             connect_edited(_, path, new_text),
             Msg::Edit(Column::Value, path, new_text.to_string())
         );
-        column.pack_start(&cell, true);
-        column.add_attribute(&cell, "text", Column::Value.into());
+        gtk::prelude::CellLayoutExt::pack_start(&column, &cell, true);
+        gtk::prelude::TreeViewColumnExt::add_attribute(
+            &column,
+            &cell,
+            "text",
+            Column::Value.into(),
+        );
     }
 
     fn model(relm: &relm::Relm<Self>, _: ()) -> Model {

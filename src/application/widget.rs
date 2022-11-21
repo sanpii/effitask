@@ -81,7 +81,7 @@ pub enum Msg {
 
 impl Widget {
     fn load_style(&self) {
-        let screen = self.widgets.window.screen().unwrap();
+        let screen = gtk::prelude::GtkWindowExt::screen(&self.widgets.window).unwrap();
         let css = gtk::CssProvider::new();
         if let Some(stylesheet) = self.get_stylesheet() {
             match css.load_from_path(stylesheet.to_str().unwrap()) {

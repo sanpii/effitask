@@ -1,0 +1,52 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'effitask'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=effitask",
+                    "--package=effitask"
+                ],
+                "filter": {
+                    "name": "effitask",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "TEST_VAR": "foo",
+                "TODO_DIR": "${userHome}/.local/opt/share/todo",
+                "TODO_FILE": "${userHome}/.local/opt/share/todo/todo.txt",
+                "DONE_FILE": "$${userHome}/.local/opt/share/todo/done.txt"
+
+            }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'effitask'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=effitask",
+                    "--package=effitask"
+                ],
+                "filter": {
+                    "name": "effitask",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

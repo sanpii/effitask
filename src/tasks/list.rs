@@ -40,6 +40,17 @@ impl List {
     fn load_file(&self, path: &str) -> Vec<crate::tasks::Task> {
         use std::io::BufRead;
         use std::str::FromStr;
+        
+        // If a todo.txt or done.txt file does not exist, create an empty one
+        if !std::fs::metadata(path).is_ok(){
+            log::info!("todo.txt or done.txt does not exist, creating an empty file at {}", path);
+            match std::fs::File::create(path){
+                Ok(_) => {},
+                Err(err) => {
+                    log::error!("Unable to create {} because {}", err, path);
+                },
+            }
+        }
 
         let mut tasks = Vec::new();
         let file = match std::fs::File::open(path) {

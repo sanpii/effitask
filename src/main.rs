@@ -16,6 +16,7 @@ mod tasks;
 mod widgets;
 
 fn main() {
+    let environment = application::environment::EffiEnvironment::new();
     human_panic::setup_panic!();
 
     #[cfg(debug_assertions)]

@@ -269,6 +269,7 @@ name = "effitask"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "dirs",
  "dotenv",
  "gtk",
  "human-panic",

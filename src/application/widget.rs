@@ -21,6 +21,7 @@ use crate::search::Widget as SearchWidget;
 use crate::widgets::tags::Msg::Complete as TagsComplete;
 use crate::widgets::tags::Msg::Edit as TagsEdit;
 use crate::widgets::Tags as TagsWidget;
+use crate::application::environment::EffiEnvironment;
 
 #[repr(u32)]
 enum Page {
@@ -317,23 +318,9 @@ impl Widget {
     }
 
     fn update_tasks(&mut self) {
-        let todo_file = match std::env::var("TODO_FILE") {
-            Ok(todo_file) => todo_file,
-            Err(err) => {
-                eprintln!("Launch this program via todo.sh: {}", err);
-                std::process::exit(1);
-            }
-        };
+        let env = EffiEnvironment::new();
 
-        let done_file = match std::env::var("DONE_FILE") {
-            Ok(done_file) => done_file,
-            Err(err) => {
-                eprintln!("Launch this program via todo.sh: {}", err);
-                std::process::exit(1);
-            }
-        };
-
-        let list = crate::tasks::List::from_files(&todo_file, &done_file);
+        let list = crate::tasks::List::from_files(&env.todo_file_path, &env.done_file_path);
         super::globals::tasks::replace(list);
 
         super::globals::preferences::replace(crate::application::Preferences {

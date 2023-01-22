@@ -17,7 +17,26 @@ fn initialize_effi_file(file_path: &str){
             },
         }
     }
+}
 
+fn initialize_effi_directory(directory_path: &str){
+    let dir_exists = match std::fs::metadata(directory_path){
+        Ok(val) => {
+            val.is_dir()
+        },
+        Err(_) => {
+            false
+        },
+    };
+
+    if !dir_exists {
+        match std::fs::create_dir_all(directory_path){
+            Ok(_) => {},
+            Err(err) =>  {
+                log::error!("Unable to create {} because {}", directory_path, err)
+            }
+        }
+    }
 }
 
 impl EffiEnvironment {
@@ -37,7 +56,8 @@ impl EffiEnvironment {
         let todo_dir = format!("{}{}", home_dir_str, "/.local/opt/share/todo");
         let todo_file = format!("{}/{}", todo_dir, "todo.txt");
         let done_file = format!("{}/{}", todo_dir, "done.txt");
-
+        
+        initialize_effi_directory(&todo_dir);
         initialize_effi_file(&todo_file);
         initialize_effi_file(&done_file);
 

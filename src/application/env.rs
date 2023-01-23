@@ -1,9 +1,9 @@
 
 #[derive(Debug, Clone)]
-pub struct EffiEnvironment {
-    pub todo_directory_path: String,
-    pub todo_file_path: String,
-    pub done_file_path: String
+pub struct Environment {
+    pub todo_dir: String,
+    pub todo_file: String,
+    pub done_file: String
 }
 
 fn initialize_effi_file(file_path: &str) -> Result<(), std::io::Error>{
@@ -43,7 +43,7 @@ fn initialize_effi_directory(directory_path: &str) -> Result<(), std::io::Error>
     return Ok(());
 }
 
-impl EffiEnvironment {
+impl Environment {
     pub fn new() -> Self {
         let home_dir = dirs::home_dir();
         let home_dir_path = match home_dir{
@@ -69,7 +69,7 @@ impl EffiEnvironment {
         }
         match initialize_effi_file(&todo_file){
             Ok(_) => {},
-            Err(err) => {
+            Err(_) => {
                 panic!("Unable to initialize {}", todo_file)
             },
         }
@@ -81,9 +81,9 @@ impl EffiEnvironment {
         }
 
         Self{
-            todo_directory_path: todo_dir,
-            todo_file_path: todo_file,
-            done_file_path: done_file
+            todo_dir,
+            todo_file,
+            done_file
         }
     }
 

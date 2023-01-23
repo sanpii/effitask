@@ -39,7 +39,7 @@ impl Circle {
 
             context.save()?;
             context.fill()?;
-            context.translate(f64::from(width) as f64 / -4., f64::from(height) as f64 / 2.);
+            context.translate(f64::from(width) / -4., f64::from(height) / 2.);
             context.rotate(std::f64::consts::PI / -4.);
             context.set_source_rgb(0., 0., 0.);
             context.rectangle(20., 30., 40., 10.);

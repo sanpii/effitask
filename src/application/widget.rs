@@ -21,7 +21,7 @@ use crate::search::Widget as SearchWidget;
 use crate::widgets::tags::Msg::Complete as TagsComplete;
 use crate::widgets::tags::Msg::Edit as TagsEdit;
 use crate::widgets::Tags as TagsWidget;
-use crate::application::environment::EffiEnvironment;
+use crate::application::env::EffiEnvironment;
 
 #[repr(u32)]
 enum Page {

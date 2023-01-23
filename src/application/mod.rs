@@ -1,7 +1,7 @@
 mod globals;
 mod preferences;
 mod widget;
-pub mod environment;
+pub mod env;
 
 pub use globals::preferences::get as preferences;
 pub use globals::tasks::add as add_task;

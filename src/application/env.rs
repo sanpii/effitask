@@ -6,37 +6,41 @@ pub struct EffiEnvironment {
     pub done_file_path: String
 }
 
-fn initialize_effi_file(file_path: &str){
+fn initialize_effi_file(file_path: &str) -> Result<(), std::io::Error>{
     // If a todo.txt or done.txt file does not exist, create an empty one
-    if !std::fs::metadata(file_path).is_ok(){
-        log::info!("todo.txt or done.txt does not exist, creating an empty file at {}", file_path);
+
+    let file_path = std::path::Path::new(file_path);
+    if !file_path.exists(){
+        log::debug!("todo.txt or done.txt does not exist, creating an empty file at {}", file_path.display());
         match std::fs::File::create(file_path){
-            Ok(_) => {},
+            Ok(_) => {
+                return Ok(());
+            },
             Err(err) => {
-                log::error!("Unable to create {} because {}",file_path, err);
+                log::debug!("Unable to create {} because {}",file_path.display(), err);
+                return Err(err);
             },
         }
     }
+    return Ok(());
 }
 
-fn initialize_effi_directory(directory_path: &str){
-    let dir_exists = match std::fs::metadata(directory_path){
-        Ok(val) => {
-            val.is_dir()
-        },
-        Err(_) => {
-            false
-        },
-    };
+fn initialize_effi_directory(directory_path: &str) -> Result<(), std::io::Error>{
+    let directory_path = std::path::Path::new(directory_path);
 
-    if !dir_exists {
+
+    if !directory_path.exists(){
         match std::fs::create_dir_all(directory_path){
-            Ok(_) => {},
+            Ok(_) => {
+                return Ok(());
+            },
             Err(err) =>  {
-                log::error!("Unable to create {} because {}", directory_path, err)
+                log::debug!("Unable to create {:?} because {}", directory_path.display(), err);
+                return Err(err);
             }
         }
     }
+    return Ok(());
 }
 
 impl EffiEnvironment {
@@ -57,9 +61,24 @@ impl EffiEnvironment {
         let todo_file = format!("{}/{}", todo_dir, "todo.txt");
         let done_file = format!("{}/{}", todo_dir, "done.txt");
         
-        initialize_effi_directory(&todo_dir);
-        initialize_effi_file(&todo_file);
-        initialize_effi_file(&done_file);
+        match initialize_effi_directory(&todo_dir){
+            Ok(_) => {},
+            Err(_) => {
+                panic!("Unable to initialize todo directory {}", todo_dir);
+            },
+        }
+        match initialize_effi_file(&todo_file){
+            Ok(_) => {},
+            Err(err) => {
+                panic!("Unable to initialize {}", todo_file)
+            },
+        }
+        match initialize_effi_file(&done_file){
+            Ok(_) => {},
+            Err(_) => {
+                panic!("Unable to initialize {}", done_file)
+            },
+        }
 
         Self{
             todo_directory_path: todo_dir,

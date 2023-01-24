@@ -21,7 +21,7 @@ fn main() {
     #[cfg(debug_assertions)]
     dotenv::dotenv().ok();
 
-    if std::env::args().nth(1) == Some("usage".to_string()) {
+    if std::env::args().nth(1).as_deref() == Some("usage") {
         usage(&std::env::args().next().unwrap());
 
         std::process::exit(0);

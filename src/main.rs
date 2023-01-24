@@ -1,6 +1,7 @@
 #![warn(rust_2018_idioms)]
 
 use relm::Widget;
+use crate::application::Environment;
 
 mod add;
 mod agenda;
@@ -16,7 +17,6 @@ mod tasks;
 mod widgets;
 
 fn main() {
-    let environment = application::env::Environment::new();
     human_panic::setup_panic!();
 
     #[cfg(debug_assertions)]
@@ -28,7 +28,8 @@ fn main() {
         std::process::exit(0);
     }
 
-    crate::application::Widget::run(()).unwrap();
+    let env = Environment::new();
+    crate::application::Widget::run(env).unwrap();
 }
 
 fn usage(program: &str) {

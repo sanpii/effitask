@@ -64,19 +64,20 @@ impl Environment {
         match initialize_effi_directory(&todo_dir){
             Ok(_) => {},
             Err(_) => {
-                panic!("Unable to initialize todo directory {}", todo_dir);
+                log::error!("Unable to initialize todo directory {}", todo_dir);
             },
         }
         match initialize_effi_file(&todo_file){
             Ok(_) => {},
             Err(_) => {
-                panic!("Unable to initialize {}", todo_file)
+                // Should we panic here or just log something?
+                log::error!("Unable to initialize {}", todo_file)
             },
         }
         match initialize_effi_file(&done_file){
             Ok(_) => {},
             Err(_) => {
-                panic!("Unable to initialize {}", done_file)
+                log::error!("Unable to initialize {}", done_file)
             },
         }
 

@@ -1,6 +1,7 @@
 #![warn(rust_2018_idioms)]
 
 use relm::Widget;
+use crate::application::Environment;
 
 mod add;
 mod agenda;
@@ -27,7 +28,8 @@ fn main() {
         std::process::exit(0);
     }
 
-    crate::application::Widget::run(()).unwrap();
+    let env = Environment::new().unwrap();
+    crate::application::Widget::run(env).unwrap();
 }
 
 fn usage(program: &str) {

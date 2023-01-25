@@ -40,7 +40,7 @@ impl List {
     fn load_file(&self, path: &str) -> Vec<crate::tasks::Task> {
         use std::io::BufRead;
         use std::str::FromStr;
-
+        
         let mut tasks = Vec::new();
         let file = match std::fs::File::open(path) {
             Ok(file) => file,

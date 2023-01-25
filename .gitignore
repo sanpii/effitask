@@ -2,3 +2,4 @@
 /example/*.bak
 /target/
 **/*.rs.bk
+.vscode/*

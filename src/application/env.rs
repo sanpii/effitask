@@ -57,9 +57,9 @@ impl Environment {
             } 
         };
 
-        let todo_dir = format!("{}{}", home_dir_str, "/.local/opt/share/todo");
-        let todo_file = format!("{}/{}", todo_dir, "todo.txt");
-        let done_file = format!("{}/{}", todo_dir, "done.txt");
+        let todo_dir = format!("{home_dir_str}/.local/opt/share/todo");
+        let todo_file = format!("{todo_dir}/todo.txt");
+        let done_file = format!("{todo_dir}/done.txt");
         
         match initialize_effi_directory(&todo_dir){
             Ok(_) => {},

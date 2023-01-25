@@ -28,7 +28,7 @@ fn main() {
         std::process::exit(0);
     }
 
-    let env = Environment::new();
+    let env = Environment::new().unwrap();
     crate::application::Widget::run(env).unwrap();
 }
 

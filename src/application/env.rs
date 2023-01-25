@@ -44,7 +44,7 @@ fn initialize_effi_directory(directory_path: &str) -> Result<(), std::io::Error>
 }
 
 impl Environment {
-    pub fn new() -> Self {
+    pub fn new() -> Result<Self, std::io::Error> {
         let home_dir = dirs::home_dir();
         let home_dir_path = match home_dir{
             Some(home_dir) => home_dir,
@@ -63,28 +63,28 @@ impl Environment {
         
         match initialize_effi_directory(&todo_dir){
             Ok(_) => {},
-            Err(_) => {
-                log::error!("Unable to initialize todo directory {}", todo_dir);
+            Err(err) => {
+                return Err(err);
             },
         }
         match initialize_effi_file(&todo_file){
             Ok(_) => {},
-            Err(_) => {
-                log::error!("Unable to initialize {}", todo_file)
+            Err(err) => {
+                return Err(err);
             },
         }
         match initialize_effi_file(&done_file){
             Ok(_) => {},
-            Err(_) => {
-                log::error!("Unable to initialize {}", done_file)
+            Err(err) => {
+                return Err(err);
             },
         }
 
-        Self{
+        Ok(Self{
             todo_dir,
             todo_file,
             done_file
-        }
+        })
     }
 
 }

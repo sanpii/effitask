@@ -39,7 +39,7 @@ impl Tags {
             .iter()
             .filter(|x| {
                 for tag in self.get_tags(tag, x) {
-                    if tag == current || tag.starts_with(format!("{}-", current).as_str()) {
+                    if tag == current || tag.starts_with(format!("{current}-").as_str()) {
                         return true;
                     }
                 }

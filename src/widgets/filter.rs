@@ -80,7 +80,7 @@ impl Filter {
         self.model
             .set_value(&row, Column::Progress.into(), &progress.to_value());
 
-        let tooltip = format!("{}/{}", done, total);
+        let tooltip = format!("{done}/{total}");
         self.model
             .set_value(&row, Column::Tooltip.into(), &tooltip.to_value());
 

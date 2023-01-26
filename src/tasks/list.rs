@@ -135,21 +135,21 @@ impl List {
 
         let mut f = match std::fs::File::create(file) {
             Ok(f) => f,
-            Err(err) => return Err(format!("Unable to write tasks: {}", err)),
+            Err(err) => return Err(format!("Unable to write tasks: {err}")),
         };
 
         for mut task in tasks {
             task.note = match task.note.write() {
                 Ok(note) => note,
                 Err(err) => {
-                    log::error!("Unable to save note: {}", err);
+                    log::error!("Unable to save note: {err}");
                     todo_txt::task::Note::None
                 }
             };
 
-            match f.write(format!("{}\n", task).as_bytes()) {
+            match f.write(format!("{task}\n").as_bytes()) {
                 Ok(_) => (),
-                Err(err) => log::error!("Unable to write tasks: {}", err),
+                Err(err) => log::error!("Unable to write tasks: {err}"),
             };
         }
 
@@ -157,11 +157,11 @@ impl List {
     }
 
     fn backup(&self, file: &str) -> Result<(), String> {
-        let bak = format!("{}.bak", file);
+        let bak = format!("{file}.bak");
 
         match std::fs::copy(file, bak) {
             Ok(_) => Ok(()),
-            Err(_) => Err(format!("Unable to backup {}", file)),
+            Err(_) => Err(format!("Unable to backup {file}")),
         }
     }
 
@@ -170,7 +170,7 @@ impl List {
 
         let mut task = match crate::tasks::Task::from_str(text) {
             Ok(task) => task,
-            Err(_) => return Err(format!("Unable to convert task: '{}'", text)),
+            Err(_) => return Err(format!("Unable to convert task: '{text}'")),
         };
 
         task.create_date = Some(crate::date::today());

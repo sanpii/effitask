@@ -43,7 +43,7 @@ impl std::convert::From<u32> for Page {
             4 => Page::Flag,
             5 => Page::Done,
             6 => Page::Search,
-            _ => panic!("Invalid page {}", n),
+            _ => panic!("Invalid page {n}"),
         }
     }
 }
@@ -192,7 +192,7 @@ impl Widget {
             Page::Search => "search",
         };
 
-        if let Some(filename) = self.find_data_file(format!("{}.png", title).as_str()) {
+        if let Some(filename) = self.find_data_file(format!("{title}.png").as_str()) {
             let image = gtk::Image::from_file(filename);
             vbox.pack_start(&image, false, false, 0);
         } else {
@@ -320,7 +320,7 @@ impl Widget {
         let todo_file = match std::env::var("TODO_FILE") {
             Ok(todo_file) => todo_file,
             Err(err) => {
-                eprintln!("Launch this program via todo.sh: {}", err);
+                eprintln!("Launch this program via todo.sh: {err}");
                 std::process::exit(1);
             }
         };
@@ -328,7 +328,7 @@ impl Widget {
         let done_file = match std::env::var("DONE_FILE") {
             Ok(done_file) => done_file,
             Err(err) => {
-                eprintln!("Launch this program via todo.sh: {}", err);
+                eprintln!("Launch this program via todo.sh: {err}");
                 std::process::exit(1);
             }
         };
@@ -371,7 +371,7 @@ impl Widget {
         let todo_dir = match std::env::var("TODO_DIR") {
             Ok(todo_dir) => todo_dir,
             Err(err) => {
-                eprintln!("Launch this program via todo.sh: {}", err);
+                eprintln!("Launch this program via todo.sh: {err}");
                 std::process::exit(1);
             }
         };

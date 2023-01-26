@@ -122,7 +122,7 @@ impl Widget {
     }
 
     fn add_message(list_box: &gtk::ListBox, level: log::Level, text: &str) {
-        let class = format!("{}", level);
+        let class = level.to_string();
 
         let label = gtk::Label::new(Some(text));
         label.show();
@@ -167,7 +167,7 @@ impl Widget {
         } else {
             self.widgets.toggle.show();
         };
-        self.widgets.count.set_label(&format!("{}", count));
+        self.widgets.count.set_label(&count.to_string());
 
         let mut max_level = log::Level::Trace;
 
@@ -193,7 +193,7 @@ impl Widget {
         }
 
         let context = self.widgets.count.style_context();
-        context.add_class(&format!("{}", max_level).to_lowercase());
+        context.add_class(&max_level.to_string().to_lowercase());
     }
 }
 

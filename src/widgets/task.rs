@@ -31,7 +31,7 @@ impl relm::Widget for Task {
 
         if task.priority < 26.into() {
             let priority = (b'a' + u8::from(task.priority.clone())) as char;
-            context.add_class(format!("pri_{}", priority).as_str());
+            context.add_class(format!("pri_{priority}").as_str());
         }
 
         let note = task.note.content();
@@ -48,7 +48,7 @@ impl relm::Widget for Task {
             let text = task
                 .tags
                 .iter()
-                .map(|(k, v)| format!("{}: {}", k, v))
+                .map(|(k, v)| format!("{k}: {v}"))
                 .collect::<Vec<String>>()
                 .join(" · ");
 
@@ -61,7 +61,7 @@ impl relm::Widget for Task {
             let date = self.date_alias(threshold);
             self.widgets
                 .threshold_label
-                .set_text(format!("Deferred until {}", date).as_str());
+                .set_text(format!("Deferred until {date}").as_str());
         } else {
             self.widgets.threshold_label.hide();
         }
@@ -83,7 +83,7 @@ impl relm::Widget for Task {
 
             self.widgets
                 .due_label
-                .set_text(format!("due: {}", date).as_str());
+                .set_text(format!("due: {date}").as_str());
         } else {
             self.widgets.due_label.hide();
         }

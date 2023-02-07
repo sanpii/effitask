@@ -6,7 +6,6 @@ homepage = "https://github.com/sanpii/effitask"
 edition = "2021"
 
 [dependencies]
-chrono = "^0.4"
 dotenv = "0.15"
 gtk = "0.16"
 human-panic = "^1.0"
@@ -19,10 +18,14 @@ relm = "0.24"
 relm-derive = "0.24"
 xdg = "2.1"
 
+[dependencies.chrono]
+version = "0.4"
+default-features = false
+
 [dependencies.log]
 version = "^0.4"
 features = ["std"]
 
 [dependencies.todo-txt]
-version = "2.1"
+version = "3.0"
 features = ["extended"]

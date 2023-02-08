@@ -1,4 +1,4 @@
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Task {
     inner: todo_txt::task::Extended,
     pub id: usize,
@@ -69,30 +69,6 @@ impl std::fmt::Display for Task {
         f.write_str(format!("{}", self.deref()).as_str())?;
 
         Ok(())
-    }
-}
-
-impl std::cmp::PartialOrd for Task {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl std::cmp::Ord for Task {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        if self.inner.due_date != other.inner.due_date {
-            return self.inner.due_date.cmp(&other.inner.due_date);
-        }
-
-        if self.inner.priority != other.inner.priority {
-            return self.inner.priority.cmp(&other.inner.priority).reverse();
-        }
-
-        if self.inner.subject != other.inner.subject {
-            return self.inner.subject.cmp(&other.inner.subject);
-        }
-
-        std::cmp::Ordering::Equal
     }
 }
 

@@ -977,9 +977,9 @@ dependencies = [
 
 [[package]]
 name = "pest"
-version = "2.5.4"
+version = "2.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ab62d2fa33726dbe6321cc97ef96d8cde531e3eeaf858a058de53a8a6d40d8f"
+checksum = "028accff104c4e513bad663bbcd2ad7cfd5304144404c31ed0a77ac103d00660"
 dependencies = [
  "thiserror",
  "ucd-trie",
@@ -1320,9 +1320,9 @@ dependencies = [
 
 [[package]]
 name = "todo-txt"
-version = "3.0.0"
+version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8835320992319ef69258b974b989be950412440e471254c27a93905920daed16"
+checksum = "3c80478362ac7b75a2133363eb2a31365d607d09c7606335091f434edc01555d"
 dependencies = [
  "chrono",
  "lazy_static",

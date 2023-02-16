@@ -141,9 +141,8 @@ impl relm::Widget for Widget {
         use Msg::*;
 
         match event {
-            Complete(_) => (),
-            Edit(_) => (),
-            Selected => self.update_tasks(),
+            Complete(_) | Edit(_) => (),
+            Selected | Update => self.update_tasks(),
             Select(date) => {
                 use chrono::Datelike;
 
@@ -151,8 +150,7 @@ impl relm::Widget for Widget {
                     .calendar
                     .select_month(date.month0(), date.year() as u32);
                 self.widgets.calendar.select_day(date.day());
-            }
-            Update => self.update_tasks(),
+            },
         }
     }
 

@@ -42,13 +42,10 @@ impl List {
         use std::str::FromStr;
 
         let mut tasks = Vec::new();
-        let file = match std::fs::File::open(path) {
-            Ok(file) => file,
-            Err(_) => {
-                log::error!("Unable to open {:?}", path);
+        let Ok(file) = std::fs::File::open(path) else {
+            log::error!("Unable to open {path:?}");
 
-                return tasks;
-            }
+            return tasks;
         };
 
         let last_id = self.tasks.len();
@@ -65,7 +62,7 @@ impl List {
                     task.id = last_id + id;
                     tasks.push(task);
                 }
-                Err(_) => log::error!("Invalid tasks: '{}'", line),
+                Err(_) => log::error!("Invalid tasks: '{line}'"),
             };
         }
 
@@ -165,10 +162,8 @@ impl List {
     pub fn add(&mut self, text: &str) -> Result<(), String> {
         use std::str::FromStr;
 
-        let mut task = match crate::tasks::Task::from_str(text) {
-            Ok(task) => task,
-            Err(_) => return Err(format!("Unable to convert task: '{text}'")),
-        };
+        let mut task = crate::tasks::Task::from_str(text)
+            .map_err(|_| format!("Unable to convert task: '{text}'"))?;
 
         task.create_date = Some(crate::date::today());
 

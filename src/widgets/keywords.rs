@@ -75,15 +75,13 @@ impl Keywords {
     fn keywords(&self) -> std::collections::BTreeMap<String, String> {
         let mut keywords = std::collections::BTreeMap::new();
 
-        let iter = match self.model.store.iter_first() {
-            Some(iter) => iter,
-            None => return keywords,
+        let Some(iter) = self.model.store.iter_first() else {
+            return keywords;
         };
 
         while let Ok(Some(name)) = self.model.store.value(&iter, Column::Name.into()).get() {
-            let value = match self.model.store.value(&iter, Column::Value.into()).get() {
-                Ok(Some(value)) => value,
-                Ok(None) | Err(_) => break,
+            let Ok(Some(value)) = self.model.store.value(&iter, Column::Value.into()).get() else {
+                break;
             };
 
             keywords.insert(name, value);

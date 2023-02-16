@@ -164,9 +164,7 @@ impl relm::Widget for Filter {
         use Msg::*;
 
         match event {
-            Complete(_) => (),
-            Edit(_) => (),
-            Filters(_) => (),
+            Complete(_) | Edit(_) | Filters(_) => (),
             UpdateFilters(filters) => self.update_filters(filters),
             UpdateTasks(tasks) => self.update_tasks(tasks),
         }
@@ -188,9 +186,8 @@ impl relm::Widget for Filter {
                         let (paths, list_model) = selection.selected_rows();
 
                         for path in paths {
-                            let iter = match list_model.iter(&path) {
-                                Some(iter) => iter,
-                                None => continue,
+                            let Some(iter) = list_model.iter(&path) else {
+                                continue;
                             };
 
                             match list_model.value(&iter, Column::Raw.into()).get() {

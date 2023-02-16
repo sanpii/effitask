@@ -99,9 +99,7 @@ impl relm::Widget for Repeat {
         match event {
             Set(recurrence) => self.set_recurrence(recurrence),
             Updated(_) => (),
-            UpdateNum => self.update_recurrence(),
-            UpdatePeriod => self.update_recurrence(),
-            UpdateStrict => self.update_recurrence(),
+            UpdateNum | UpdatePeriod | UpdateStrict => self.update_recurrence(),
         }
     }
 

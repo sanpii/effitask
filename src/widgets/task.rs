@@ -44,7 +44,9 @@ impl relm::Widget for Task {
             self.widgets.note_button.hide();
         }
 
-        if !task.tags.is_empty() {
+        if task.tags.is_empty() {
+            self.widgets.keywords.hide();
+        } else {
             let text = task
                 .tags
                 .iter()
@@ -53,8 +55,6 @@ impl relm::Widget for Task {
                 .join(" · ");
 
             self.widgets.keywords_label.set_text(&text);
-        } else {
-            self.widgets.keywords.hide();
         }
 
         if let Some(threshold) = task.threshold_date {
@@ -133,11 +133,10 @@ impl relm::Widget for Task {
                     self.model
                         .relm
                         .stream()
-                        .emit(Edit(Box::new(self.model.task.clone())))
+                        .emit(Edit(Box::new(self.model.task.clone())));
                 }
             }
-            Complete(_) => (),
-            Edit(_) => (),
+            Complete(_) | Edit(_) => (),
             ShowNote => self.model.note.popup(),
             Toggle => self
                 .model

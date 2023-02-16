@@ -172,9 +172,8 @@ impl Widget {
         let mut max_level = log::Level::Trace;
 
         for row in list_box.children() {
-            let label = match row.downcast::<gtk::Bin>().unwrap().child() {
-                Some(label) => label,
-                None => continue,
+            let Some(label) = row.downcast::<gtk::Bin>().unwrap().child() else {
+                continue;
             };
             let context = label.style_context();
             let level = context

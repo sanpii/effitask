@@ -44,7 +44,7 @@ impl Calendar {
 
         self.widgets
             .entry
-            .set_text(format!("{}-{}-{}", y, m + 1, d).as_str());
+            .set_text(format!("{y}-{}-{d}", m + 1).as_str());
         self.model.popover.popdown();
 
         self.date_updated();

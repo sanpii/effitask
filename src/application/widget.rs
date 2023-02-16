@@ -86,7 +86,7 @@ impl Widget {
         if let Some(stylesheet) = self.get_stylesheet() {
             match css.load_from_path(stylesheet.to_str().unwrap()) {
                 Ok(_) => (),
-                Err(err) => log::error!("Invalid CSS: {}", err),
+                Err(err) => log::error!("Invalid CSS: {err}"),
             }
 
             gtk::StyleContext::add_provider_for_screen(&screen, &css, 0);
@@ -196,7 +196,7 @@ impl Widget {
             let image = gtk::Image::from_file(filename);
             vbox.pack_start(&image, false, false, 0);
         } else {
-            log::error!("Unable to find resource '{}.png'", title);
+            log::error!("Unable to find resource '{title}.png'");
         }
 
         let label = gtk::Label::new(Some(title));
@@ -211,10 +211,10 @@ impl Widget {
         self.model.add_popover.popup();
     }
 
-    fn create(&mut self, text: String) {
-        match super::add_task(&text) {
+    fn create(&mut self, text: &str) {
+        match super::add_task(text) {
             Ok(_) => self.update_tasks(),
-            Err(err) => log::error!("Unable to create task: '{}'", err),
+            Err(err) => log::error!("Unable to create task: '{err}'"),
         }
 
         self.model.add_popover.popdown();
@@ -225,10 +225,10 @@ impl Widget {
         let mut list = super::tasks();
 
         if let Some(ref mut t) = list.tasks.get_mut(id) {
-            if !t.finished {
-                t.complete();
-            } else {
+            if t.finished {
                 t.uncomplete();
+            } else {
+                t.complete();
             }
         } else {
             return;
@@ -265,7 +265,7 @@ impl Widget {
                     log::info!("Task undone");
                 }
             }
-            Err(err) => log::error!("Unable to save tasks: {}", err),
+            Err(err) => log::error!("Unable to save tasks: {err}"),
         };
 
         self.update_tasks();
@@ -293,7 +293,7 @@ impl Widget {
 
         match list.write() {
             Ok(_) => (),
-            Err(err) => log::error!("Unable to save tasks: {}", err),
+            Err(err) => log::error!("Unable to save tasks: {err}"),
         };
 
         log::info!("Task updated");
@@ -380,11 +380,11 @@ impl Widget {
             Ok(_) => {
                 sender.send(()).expect("send message");
             }
-            Err(e) => log::warn!("watch error: {:?}", e),
+            Err(e) => log::warn!("watch error: {e:?}"),
         })
         .unwrap();
 
-        log::debug!("watching {} for changes", todo_dir);
+        log::debug!("watching {todo_dir} for changes");
 
         if let Err(err) = watcher.watch(
             std::path::PathBuf::from(todo_dir).as_path(),
@@ -431,15 +431,14 @@ impl relm::Widget for Widget {
 
         match event {
             Add => self.add(),
-            Create(text) => self.create(text),
+            Create(text) => self.create(&text),
             Complete(task) => self.complete(&task),
             Edit(task) => self.edit(&task),
             EditDone(task) => self.save(&task),
-            EditCancel => self.widgets.edit.hide(),
+            EditCancel | SwitchPage => self.widgets.edit.hide(),
             Preferences => self.preferences(),
             Refresh => self.update_tasks(),
             Search(text) => self.search(&text),
-            SwitchPage => self.widgets.edit.hide(),
         }
     }
 

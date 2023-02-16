@@ -94,9 +94,8 @@ impl Widget {
     }
 
     fn get_note(&self) -> String {
-        let buffer = match self.widgets.note.buffer() {
-            Some(buffer) => buffer,
-            None => return String::new(),
+        let Some(buffer) = self.widgets.note.buffer() else {
+            return String::new();
         };
         let start = buffer.start_iter();
         let end = buffer.end_iter();
@@ -153,8 +152,7 @@ impl relm::Widget for Widget {
         use Msg::*;
 
         match event {
-            Cancel => (),
-            Done(_) => (),
+            Cancel | Done(_) => (),
             EditKeyword(ref keywords) => self.edit_keywords(keywords),
             Flag => self.flag(),
             Ok => self

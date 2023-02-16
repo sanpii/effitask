@@ -41,8 +41,7 @@ impl relm::Widget for Widget {
         use Msg::*;
 
         match event {
-            Complete(_) => (),
-            Edit(_) => (),
+            Complete(_) | Edit(_) => (),
             Update => self.update_tasks(),
         }
     }

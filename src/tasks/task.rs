@@ -7,7 +7,7 @@ pub struct Task {
 impl Task {
     pub fn new() -> Self {
         Self {
-            inner: Default::default(),
+            inner: todo_txt::task::Extended::default(),
             id: 0,
         }
     }

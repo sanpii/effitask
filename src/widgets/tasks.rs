@@ -28,8 +28,7 @@ impl Tasks {
             sorted_tasks.sort();
             sorted_tasks.reverse();
 
-            for task in &mut sorted_tasks {
-                task.subject = format!("{} - Test", task.subject);
+            for task in &sorted_tasks {
                 let child = self
                     .widgets
                     .list_box

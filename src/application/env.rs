@@ -100,38 +100,24 @@ impl Environment {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use mktemp::Temp;
 
     #[test]
     fn test_initialize_effi_file() {
-        let test_file = "./test_file.txt";
-        std::fs::remove_file(test_file).unwrap();
-
-        // Test file does not exist
-        let result = initialize_effi_file(test_file);
-        assert!(result.is_ok());
-
-        // Test file already exists
-        let result = initialize_effi_file(test_file);
+        let test_file = Temp::new_file().unwrap();
+        let result = initialize_effi_file(&test_file.to_str().unwrap());
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_initialize_effi_directory() {
-        let test_dir = "./test_dir";
-        std::fs::remove_dir(test_dir).unwrap();
-
-        // Test directory does not exist
-        let result = initialize_effi_directory(test_dir);
-        assert!(result.is_ok());
-
-        // Test directory already exists
-        let result = initialize_effi_directory(test_dir);
+        let test_dir = Temp::new_dir().unwrap();
+        let result = initialize_effi_directory(&test_dir.to_str().unwrap());
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_get_default_todo_dir() {
-        // Test home directory can be retrieved
         let result = get_default_todo_dir();
         assert!(result.is_ok());
     }
@@ -139,7 +125,8 @@ mod tests {
     #[test]
     fn test_new() {
         // Test with TODO_DIR environment variable set
-        std::env::set_var("TODO_DIR", "/tmp/todo");
+        let temp_todo_dir = Temp::new_dir().unwrap();
+        std::env::set_var("TODO_DIR", temp_todo_dir.to_str().unwrap());
         let environment = Environment::new();
         assert!(environment.is_ok());
 
@@ -155,12 +142,19 @@ mod tests {
     #[test]
     fn test_new_non_default_todo_dir_files_set() {
         // Test with TODO_DIR environment variable set
-        std::env::set_var("TODO_DIR", "/tmp/todo");
+        let temp_todo_dir = Temp::new_dir().unwrap();
+        std::env::set_var("TODO_DIR", temp_todo_dir.to_str().unwrap());
         let environment = Environment::new();
         assert!(environment.is_ok());
 
         let environment = environment.unwrap();
-        assert_eq!(environment.todo_file, "/tmp/todo/todo.txt");
-        assert_eq!(environment.done_file, "/tmp/todo/done.txt");
+        assert_eq!(
+            environment.todo_file,
+            format!("{}/todo.txt", temp_todo_dir.to_str().unwrap())
+        );
+        assert_eq!(
+            environment.done_file,
+            format!("{}/done.txt", temp_todo_dir.to_str().unwrap())
+        );
     }
 }

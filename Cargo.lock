@@ -275,6 +275,7 @@ dependencies = [
  "human-panic",
  "lazy_static",
  "log",
+ "mktemp",
  "notify",
  "pulldown-cmark",
  "rand",
@@ -634,7 +635,7 @@ dependencies = [
  "serde_derive",
  "termcolor",
  "toml",
- "uuid",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -780,6 +781,15 @@ dependencies = [
  "log",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys",
+]
+
+[[package]]
+name = "mktemp"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4bdc1f74dd7bb717d39f784f844e490d935b3aa7e383008006dbbf29c1f7820a"
+dependencies = [
+ "uuid 1.2.2",
 ]
 
 [[package]]
@@ -1273,6 +1283,15 @@ name = "uuid"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
+dependencies = [
+ "getrandom",
+]
+
+[[package]]
+name = "uuid"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "422ee0de9031b5b948b97a8fc04e3aa35230001a722ddd27943e0be31564ce4c"
 dependencies = [
  "getrandom",
 ]

@@ -19,6 +19,7 @@ relm = "0.24"
 relm-derive = "0.24"
 xdg = "2.1"
 dirs = "4.0.0"
+mktemp = "0.5.0"
 
 [dependencies.log]
 version = "^0.4"

@@ -85,24 +85,9 @@ impl Environment {
         let todo_file = format!("{todo_dir}/todo.txt");
         let done_file = format!("{todo_dir}/done.txt");
 
-        match initialize_effi_directory(&todo_dir) {
-            Ok(_) => {}
-            Err(err) => {
-                return Err(err);
-            }
-        }
-        match initialize_effi_file(&todo_file) {
-            Ok(_) => {}
-            Err(err) => {
-                return Err(err);
-            }
-        }
-        match initialize_effi_file(&done_file) {
-            Ok(_) => {}
-            Err(err) => {
-                return Err(err);
-            }
-        }
+        initialize_effi_directory(&todo_dir)?;
+        initialize_effi_file(&todo_file)?;
+        initialize_effi_file(&done_file)?;
 
         Ok(Self {
             todo_dir,

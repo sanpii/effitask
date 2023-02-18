@@ -62,7 +62,7 @@ pub struct Model {
     pref_popover: gtk::Popover,
     defered_button: gtk::CheckButton,
     done_button: gtk::CheckButton,
-    environment: Environment,
+    env: Environment,
     #[allow(dead_code)]
     xdg: xdg::BaseDirectories,
 }
@@ -319,7 +319,7 @@ impl Widget {
     }
 
     fn update_tasks(&mut self) {
-        let list = crate::tasks::List::from_files(&self.model.environment.todo_file, &self.model.environment.done_file);
+        let list = crate::tasks::List::from_files(&self.model.env.todo_file, &self.model.env.done_file);
         super::globals::tasks::replace(list);
 
         super::globals::preferences::replace(crate::application::Preferences {
@@ -408,7 +408,7 @@ impl relm::Widget for Widget {
             pref_popover: gtk::Popover::new(None::<&gtk::Button>),
             defered_button: gtk::CheckButton::with_label("Display defered tasks"),
             done_button: gtk::CheckButton::with_label("Display done tasks"),
-            environment: env,
+            env: env,
             xdg: xdg::BaseDirectories::with_prefix(super::NAME.to_lowercase()).unwrap(),
         }
     }

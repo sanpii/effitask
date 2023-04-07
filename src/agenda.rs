@@ -150,7 +150,7 @@ impl relm::Widget for Widget {
                     .calendar
                     .select_month(date.month0(), date.year() as u32);
                 self.widgets.calendar.select_day(date.day());
-            },
+            }
         }
     }
 

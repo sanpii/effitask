@@ -19,7 +19,7 @@ fn main() {
     human_panic::setup_panic!();
 
     #[cfg(debug_assertions)]
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
 
     if std::env::args().nth(1).as_deref() == Some("usage") {
         usage(&std::env::args().next().unwrap());

@@ -65,6 +65,7 @@ You also need `gtk+ 3.0` on your system. Depending of your distribution, run:
 ```bash
 apt install libgtk-3-dev # debian
 pacman -S gtk3 # archlinux
+dnf install gtk3 gtk3-devel #fedora
 ```
 
 ```bash

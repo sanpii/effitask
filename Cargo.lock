@@ -1077,9 +1077,9 @@ checksum = "a5996294f19bd3aae0453a862ad728f60e6600695733dd5df01da90c54363a3c"
 
 [[package]]
 name = "relm"
-version = "0.24.0"
+version = "0.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ef327e1bc9eaab40a13b0500b2e190d918c00d4c7f57b7ff3ad7822d9cea106"
+checksum = "031126cd60d39b0b42d02b9c9ee7870372ea926c9278131484b86f8798b1bb59"
 dependencies = [
  "cairo-rs",
  "fragile",

@@ -1,7 +1,7 @@
 # Effitask
 
 [![.github/workflows/ci.yml](https://github.com/sanpii/effitask/actions/workflows/ci.yml/badge.svg)](https://github.com/sanpii/effitask/actions/workflows/ci.yml)
-[![Build Status](https://gitlab.com/sanpi/effitask/badges/master/pipeline.svg)](https://gitlab.com/sanpi/effitask/commits/master)
+[![Build Status](https://gitlab.com/sanpi/effitask/badges/main/pipeline.svg)](https://gitlab.com/sanpi/effitask/-/commits/main)
 
 Effitask is a graphical task manager, based on the [todo.txt
 format](https://github.com/todotxt/todo.txt).

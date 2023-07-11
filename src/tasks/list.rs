@@ -79,9 +79,7 @@ impl List {
                 !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
             .fold(Vec::new(), |mut acc, item| {
-                let mut projects = item.projects.clone();
-
-                acc.append(&mut projects);
+                acc.extend_from_slice(item.projects());
 
                 acc
             });
@@ -102,9 +100,7 @@ impl List {
                 !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
             .fold(Vec::new(), |mut acc, item| {
-                let mut contexts = item.contexts.clone();
-
-                acc.append(&mut contexts);
+                acc.extend_from_slice(item.contexts());
 
                 acc
             });

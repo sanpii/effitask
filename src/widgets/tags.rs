@@ -81,10 +81,10 @@ impl Tags {
             .emit(crate::widgets::filter::Msg::UpdateTasks(tasks));
     }
 
-    fn get_tags<'a>(&self, tag: Type, task: &'a crate::tasks::Task) -> &'a Vec<String> {
+    fn get_tags<'a>(&self, tag: Type, task: &'a crate::tasks::Task) -> &'a [String] {
         match tag {
-            Type::Projects => &task.projects,
-            Type::Contexts => &task.contexts,
+            Type::Projects => task.projects(),
+            Type::Contexts => task.contexts(),
         }
     }
 

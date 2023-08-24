@@ -12,7 +12,7 @@ impl Markup for todo_txt::task::Note {
 
         let mut markup = String::from("<markup>");
 
-        let headers = vec![
+        let headers = [
             "xx-large", "x-large", "large", "medium", "small", "x-small", "xx-small",
         ];
 

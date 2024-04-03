@@ -4,9 +4,7 @@ pub trait Markup {
 
 impl Markup for todo_txt::task::Note {
     fn markup(&self) -> Option<String> {
-        let Some(content) = self.content() else {
-            return None;
-        };
+        let content = self.content()?;
 
         let parser = pulldown_cmark::Parser::new(&content);
 

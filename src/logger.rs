@@ -46,7 +46,7 @@ impl log::Log for Log {
 
 thread_local!(
     static GLOBAL: std::cell::RefCell<Option<(gtk::ListBox, Receiver)>>
-        = std::cell::RefCell::new(None)
+        = const { std::cell::RefCell::new(None) }
 );
 
 impl Widget {

@@ -137,7 +137,7 @@ impl List {
                 task.note = todo_txt::task::Note::None;
             }
 
-            match f.write(format!("{task}\n").as_bytes()) {
+            match f.write_all(format!("{task}\n").as_bytes()) {
                 Ok(_) => (),
                 Err(err) => log::error!("Unable to write tasks: {err}"),
             };

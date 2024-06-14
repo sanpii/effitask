@@ -77,7 +77,7 @@ impl relm::Widget for Repeat {
         self.widgets.num.set_adjustment(&gtk::Adjustment::new(
             0.,
             0.,
-            std::usize::MAX as f64,
+            usize::MAX as f64,
             1.,
             5.,
             1.,

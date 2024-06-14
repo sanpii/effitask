@@ -125,7 +125,7 @@ impl Widget {
     }
 
     fn update_repeat(&mut self, recurrence: &Option<todo_txt::task::Recurrence>) {
-        self.model.task.recurrence = recurrence.clone();
+        self.model.task.recurrence.clone_from(recurrence);
     }
 
     fn update_priority(&mut self, priority: u8) {

@@ -4,12 +4,12 @@ version = "0.1.0"
 authors = ["Sanpi <sanpi@homecomputing.fr>"]
 homepage = "https://github.com/sanpii/effitask"
 edition = "2021"
+rust-version = "1.80"
 
 [dependencies]
 dotenvy = "0.15"
 gtk = "0.16"
 human-panic = "2.0"
-lazy_static = "^1.4"
 notify = "6.0"
 pulldown-cmark = "0.11"
 rand = "^0.8"

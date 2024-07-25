@@ -1,10 +1,8 @@
 pub mod preferences {
     use crate::application::Preferences;
 
-    lazy_static::lazy_static! {
-        static ref PREFERENCES: std::sync::RwLock<Preferences> =
-            std::sync::RwLock::new(Preferences::new());
-    }
+    static PREFERENCES: std::sync::LazyLock<std::sync::RwLock<Preferences>> =
+        std::sync::LazyLock::new(|| std::sync::RwLock::new(Preferences::new()));
 
     pub fn get() -> Preferences {
         PREFERENCES
@@ -23,10 +21,8 @@ pub mod preferences {
 pub mod tasks {
     use crate::tasks::List;
 
-    lazy_static::lazy_static! {
-        static ref TASKS: std::sync::RwLock<List> =
-            std::sync::RwLock::new(List::new());
-    }
+    static TASKS: std::sync::LazyLock<std::sync::RwLock<List>> =
+        std::sync::LazyLock::new(|| std::sync::RwLock::new(List::new()));
 
     pub fn get() -> List {
         TASKS.read().expect("Unable to rlock tasks").clone()

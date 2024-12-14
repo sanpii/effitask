@@ -1,130 +1,133 @@
 use gtk::prelude::*;
 
-#[derive(relm_derive::Msg)]
-pub enum Msg {
+#[derive(Debug)]
+pub enum MsgInput {
     More,
-    Set(u8),
-    Updated(u8),
 }
 
-impl Priority {
-    fn more(&self) {
-        self.widgets.hbox.hide();
-        self.widgets.button.show();
-    }
-
-    fn less(&self) {
-        self.widgets.hbox.show();
-        self.widgets.button.hide();
-    }
-
-    fn set(&self, priority: u8) {
-        self.widgets.button.set_value(f64::from(priority));
-
-        match priority {
-            0 => self.widgets.a.set_active(true),
-            1 => self.widgets.b.set_active(true),
-            2 => self.widgets.c.set_active(true),
-            3 => self.widgets.d.set_active(true),
-            4 => self.widgets.e.set_active(true),
-            26 => self.widgets.z.set_active(true),
-            _ => (),
-        }
-
-        if priority < 5 || priority == 26 {
-            self.less();
-        } else {
-            self.more();
-        }
-    }
-
-    fn updated(&self, priority: u8) {
-        self.widgets.button.set_value(f64::from(priority));
-    }
+#[derive(Debug)]
+pub enum MsgOutput {
+    Updated(todo_txt::Priority),
 }
 
-#[relm_derive::widget]
-impl relm::Widget for Priority {
-    fn init_view(&mut self) {
-        self.widgets
-            .button
-            .set_adjustment(&gtk::Adjustment::new(0., 0., 27., 1., 5., 1.));
-        self.widgets.button.hide();
+pub struct Model {
+    priority: todo_txt::Priority,
+    show_more: bool,
+}
 
-        self.widgets.b.join_group(Some(&self.widgets.a));
-        self.widgets.c.join_group(Some(&self.widgets.a));
-        self.widgets.d.join_group(Some(&self.widgets.a));
-        self.widgets.e.join_group(Some(&self.widgets.a));
-        self.widgets.z.join_group(Some(&self.widgets.a));
+#[relm4::component(pub)]
+impl relm4::SimpleComponent for Model {
+    type Init = todo_txt::Priority;
+    type Input = MsgInput;
+    type Output = MsgOutput;
+
+    fn init(
+        init: Self::Init,
+        root: Self::Root,
+        sender: relm4::ComponentSender<Self>,
+    ) -> relm4::ComponentParts<Self> {
+        let model = Self {
+            priority: init,
+            show_more: false,
+        };
+
+        let widgets = view_output!();
+
+        relm4::ComponentParts { model, widgets }
     }
 
-    fn model(_: ()) {}
-
-    fn update(&mut self, event: Msg) {
-        use Msg::*;
-
-        match event {
-            More => self.more(),
-            Set(priority) => self.set(priority),
-            Updated(priority) => self.updated(priority),
+    fn update(&mut self, msg: Self::Input, _sender: relm4::ComponentSender<Self>) {
+        match msg {
+            MsgInput::More => self.show_more = true,
         }
     }
 
     view! {
         gtk::Box {
-            orientation: gtk::Orientation::Vertical,
-            #[name="hbox"]
+            set_orientation: gtk::Orientation::Vertical,
+
             gtk::Box {
-                orientation: gtk::Orientation::Horizontal,
-                #[name="a"]
-                gtk::RadioButton {
-                    label: "A",
-                    mode: false,
-                    toggled => Msg::Updated(0),
+                set_orientation: gtk::Orientation::Horizontal,
+                #[watch]
+                set_visible: !model.show_more,
+
+                append: group = &gtk::ToggleButton {
+                    set_active: model.priority == 0,
+                    set_label: "A",
+
+                    connect_toggled[sender] => move |_| {
+                        sender.output(MsgOutput::Updated(0.into())).ok();
+                    },
                 },
                 #[name="b"]
-                gtk::RadioButton {
-                    label: "B",
-                    mode: false,
-                    toggled => Msg::Updated(1),
+                gtk::ToggleButton {
+                    set_active: model.priority == 1,
+                    set_group: Some(&group),
+                    set_label: "B",
+
+                    connect_toggled[sender] => move |_| {
+                        sender.output(MsgOutput::Updated(1.into())).ok();
+                    },
                 },
                 #[name="c"]
-                gtk::RadioButton {
-                    label: "C",
-                    mode: false,
-                    toggled => Msg::Updated(2),
+                gtk::ToggleButton {
+                    set_active: model.priority == 2,
+                    set_group: Some(&group),
+                    set_label: "C",
+
+                    connect_toggled[sender] => move |_| {
+                        sender.output(MsgOutput::Updated(2.into())).ok();
+                    },
                 },
                 #[name="d"]
-                gtk::RadioButton {
-                    label: "D",
-                    mode: false,
-                    toggled => Msg::Updated(3),
+                gtk::ToggleButton {
+                    set_active: model.priority == 3,
+                    set_group: Some(&group),
+                    set_label: "D",
+
+                    connect_toggled[sender] => move |_| {
+                        sender.output(MsgOutput::Updated(3.into())).ok();
+                    },
                 },
                 #[name="e"]
-                gtk::RadioButton {
-                    label: "E",
-                    mode: false,
-                    toggled => Msg::Updated(4),
+                gtk::ToggleButton {
+                    set_active: model.priority == 4,
+                    set_group: Some(&group),
+                    set_label: "E",
+
+                    connect_toggled[sender] => move |_| {
+                        sender.output(MsgOutput::Updated(4.into())).ok();
+                    },
                 },
                 gtk::Button {
-                    label: "…",
-                    tooltip_text: Some("More"),
-                    clicked => Msg::More,
+                    set_label: "…",
+                    set_tooltip_text: Some("More"),
+
+                    connect_clicked => MsgInput::More,
                 },
                 #[name="z"]
-                gtk::RadioButton {
-                    label: "Z",
-                    mode: false,
-                    clicked => Msg::Updated(26),
+                gtk::ToggleButton {
+                    set_active: model.priority == 26,
+                    set_group: Some(&group),
+                    set_label: "Z",
+
+                    connect_clicked[sender] => move |_| {
+                        sender.output(MsgOutput::Updated(26.into())).ok();
+                    },
                 },
             },
-            #[name="button"]
             gtk::SpinButton {
-                focus_out_event(button, _) => (
-                    Msg::Updated(button.value() as u8),
-                    gtk::Inhibit(false)
-                ),
+                set_adjustment: &gtk::Adjustment::new(0., 0., 27., 1., 5., 1.),
+                set_climb_rate: 1.,
+                set_digits: 0,
+                #[watch]
+                set_visible: model.show_more,
+
+                connect_value_changed[sender] => move |button| {
+                    let priority = (button.value() as u8).into();
+                    sender.output(MsgOutput::Updated(priority)).ok();
+                },
             },
-        }
+        },
     }
 }

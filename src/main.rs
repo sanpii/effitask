@@ -1,8 +1,5 @@
 #![warn(warnings)]
 
-use relm::Widget;
-
-mod add;
 mod agenda;
 mod application;
 mod date;
@@ -27,7 +24,9 @@ fn main() {
         std::process::exit(0);
     }
 
-    crate::application::Widget::run(()).unwrap();
+    let app = relm4::RelmApp::new("txt.todo.effitask")
+        .with_args(Vec::new());
+    app.run::<application::Model>(());
 }
 
 fn usage(program: &str) {

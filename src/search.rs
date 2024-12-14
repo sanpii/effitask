@@ -1,26 +1,29 @@
-use crate::widgets::tasks::Msg::{Complete, Edit};
-use crate::widgets::Tasks;
+use gtk::prelude::*;
+use relm4::ComponentController as _;
 
-#[derive(relm_derive::Msg)]
-pub enum Msg {
-    Complete(Box<crate::tasks::Task>),
-    Edit(Box<crate::tasks::Task>),
+#[derive(Debug)]
+pub enum MsgInput {
     Update,
     UpdateFilter(String),
 }
 
-impl Widget {
+pub struct Model {
+    query: String,
+    tasks: relm4::Controller<crate::widgets::tasks::Model>,
+}
+
+impl Model {
     fn update_tasks(&mut self) {
         self.update();
     }
 
     fn update_filter(&mut self, filter: &str) {
-        self.model = filter.to_string();
+        self.query = filter.to_string();
         self.update();
     }
 
     fn update(&self) {
-        let filter = self.model.to_lowercase();
+        let filter = self.query.to_lowercase();
         let list = crate::application::tasks();
 
         let tasks = list
@@ -30,33 +33,46 @@ impl Widget {
             .cloned()
             .collect();
 
-        self.components
-            .tasks
-            .emit(crate::widgets::tasks::Msg::Update(tasks));
+        self.tasks.emit(crate::widgets::tasks::Msg::Update(tasks));
     }
 }
 
-#[relm_derive::widget]
-impl relm::Widget for Widget {
-    fn model(_: ()) -> String {
-        String::new()
+#[relm4::component(pub)]
+impl relm4::SimpleComponent for Model {
+    type Init = String;
+    type Input = MsgInput;
+    type Output = crate::widgets::task::MsgOutput;
+
+    fn init(
+        init: Self::Init,
+        root: Self::Root,
+        sender: relm4::ComponentSender<Self>,
+    ) -> relm4::ComponentParts<Self> {
+        use relm4::Component as _;
+
+        let tasks = crate::widgets::tasks::Model::builder()
+            .launch(())
+            .forward(sender.output_sender(), std::convert::identity);
+
+        let model = Self { query: init, tasks };
+
+        let widgets = view_output!();
+
+        relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, event: Msg) {
-        use Msg::*;
+    fn update(&mut self, msg: Self::Input, _: relm4::ComponentSender<Self>) {
+        use MsgInput::*;
 
-        match event {
-            Complete(_) | Edit(_) => (),
+        match msg {
             Update => self.update_tasks(),
             UpdateFilter(filter) => self.update_filter(&filter),
         }
     }
 
     view! {
-        #[name="tasks"]
-        Tasks {
-            Complete(ref task) => Msg::Complete(task.clone()),
-            Edit(ref task) => Msg::Edit(task.clone()),
+        gtk::Box {
+            append: model.tasks.widget(),
         }
     }
 }

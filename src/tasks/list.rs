@@ -156,7 +156,7 @@ impl List {
     }
 
     pub fn add(&mut self, text: &str) -> Result<(), String> {
-        use std::str::FromStr;
+        use std::str::FromStr as _;
 
         let mut task = crate::tasks::Task::from_str(text)
             .map_err(|_| format!("Unable to convert task: '{text}'"))?;

@@ -1,211 +1,155 @@
+use chrono::Datelike as _;
 use gtk::prelude::*;
 
 pub struct Model {
-    label: String,
+    date: Option<chrono::NaiveDate>,
+    entry: gtk::Entry,
+    label: &'static str,
     popover: gtk::Popover,
-    calendar: gtk::Calendar,
-    relm: relm::Relm<Calendar>,
 }
 
-#[derive(relm_derive::Msg)]
-pub enum Msg {
+#[derive(Debug)]
+pub enum MsgInput {
     Add(todo_txt::task::Period),
-    DateSelected,
+    DateSelected(gtk::glib::DateTime),
     DateUpdated,
-    Sensitive,
     Set(Option<chrono::NaiveDate>),
-    ShowCalendar,
+}
+
+#[derive(Debug)]
+pub enum MsgOutput {
     Updated(Option<chrono::NaiveDate>),
 }
 
-impl Calendar {
-    fn add(&self, period: todo_txt::task::Period) {
-        let mut date = crate::date::today();
-
-        let text = self.widgets.entry.text();
-
-        if !text.is_empty() {
-            date = match chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
-                Ok(date) => date,
-                Err(_) => {
-                    log::error!("Invalid date format, use YYYY-MM-DD");
-                    return;
-                }
-            };
-        }
-
-        date = period + date;
-        self.set_date(Some(date));
-        self.date_updated();
+impl Model {
+    fn add(&mut self, sender: relm4::ComponentSender<Self>, period: todo_txt::task::Period) {
+        self.date = Some(period + self.date.unwrap_or_else(crate::date::today));
+        sender.output(MsgOutput::Updated(self.date)).ok();
     }
 
-    fn date_selected(&self) {
-        let (y, m, d) = self.model.calendar.date();
+    fn date_selected(&mut self, sender: relm4::ComponentSender<Self>, date: gtk::glib::DateTime) {
+        self.date = Some(crate::date::from_glib(date));
 
-        self.widgets
-            .entry
-            .set_text(format!("{y}-{}-{d}", m + 1).as_str());
-        self.model.popover.popdown();
-
-        self.date_updated();
-    }
-
-    fn date_updated(&self) {
-        let mut date = None;
-        let text = self.widgets.entry.text();
-
-        if !text.is_empty() {
-            date = match chrono::NaiveDate::parse_from_str(text.as_str(), "%Y-%m-%d") {
-                Ok(date) => Some(date),
-                Err(_) => {
-                    log::error!("Invalid date format, use YYYY-MM-DD");
-                    return;
-                }
-            };
-        }
-
-        self.model.relm.stream().emit(Msg::Updated(date));
-    }
-
-    fn set_date(&self, date: Option<chrono::NaiveDate>) {
-        if let Some(date) = date {
-            use chrono::Datelike;
-
-            self.widgets
-                .entry
-                .set_text(date.format("%Y-%m-%d").to_string().as_str());
-            self.model
-                .calendar
-                .select_month(date.month() - 1, date.year() as u32);
-            self.model.calendar.select_day(date.day());
-        } else {
-            self.widgets.entry.set_text("");
-        }
-    }
-
-    fn sensitive(&self) {
-        use relm::Widget;
-
-        if self.root().is_sensitive() {
-            self.widgets.buttons.show();
-        } else {
-            self.widgets.buttons.hide();
-        }
+        sender.output(MsgOutput::Updated(self.date)).ok();
+        self.popover.popdown();
     }
 }
 
-#[relm_derive::widget]
-impl relm::Widget for Calendar {
-    fn init_view(&mut self) {
-        self.widgets
-            .entry
-            .set_icon_from_icon_name(gtk::EntryIconPosition::Primary, Some("x-office-calendar"));
+#[relm4::component(pub)]
+impl relm4::SimpleComponent for Model {
+    type Init = &'static str;
+    type Input = MsgInput;
+    type Output = MsgOutput;
 
-        self.widgets.label.set_size_request(200, -1);
-        self.widgets.label.set_text(self.model.label.as_str());
+    fn init(
+        init: Self::Init,
+        root: Self::Root,
+        sender: relm4::ComponentSender<Self>,
+    ) -> relm4::ComponentParts<Self> {
+        let model = Self {
+            entry: gtk::Entry::new(),
+            date: None,
+            label: init,
+            popover: gtk::Popover::new(),
+        };
 
-        relm::connect!(
-            self.model.relm,
-            self.model.calendar,
-            connect_day_selected(_),
-            Msg::DateSelected
-        );
-        self.model.calendar.show();
-        self.model
-            .popover
-            .set_relative_to(Some(&self.widgets.entry));
-        self.model
-            .popover
-            .set_pointing_to(&gtk::gdk::Rectangle::new(15, 15, 0, 0));
-        self.model.popover.add(&self.model.calendar);
-        self.model.popover.hide();
+        let entry = &model.entry;
+        let popover = &model.popover;
+        let widgets = view_output!();
+
+        relm4::ComponentParts { model, widgets }
     }
 
-    fn model(relm: &relm::Relm<Self>, label: String) -> Model {
-        Model {
-            label,
-            popover: gtk::Popover::new(None::<&gtk::Calendar>),
-            calendar: gtk::Calendar::new(),
-            relm: relm.clone(),
-        }
-    }
+    fn update(&mut self, msg: Self::Input, sender: relm4::ComponentSender<Self>) {
+        use MsgInput::*;
 
-    fn update(&mut self, event: Msg) {
-        use Msg::*;
-
-        match event {
-            Add(period) => self.add(period),
-            DateSelected => self.date_selected(),
-            DateUpdated => self.date_updated(),
-            Sensitive => self.sensitive(),
-            Set(date) => self.set_date(date),
-            ShowCalendar => self.model.popover.popup(),
-            Updated(_) => (),
+        match msg {
+            Add(period) => self.add(sender, period),
+            DateSelected(date) => self.date_selected(sender, date),
+            Set(date) => self.date = date,
+            DateUpdated => {
+                sender.output(MsgOutput::Updated(self.date)).ok();
+            }
         }
     }
 
     view! {
+        #[name = "r#box"]
         gtk::Box {
-            orientation: gtk::Orientation::Horizontal,
-            spacing: 10,
-            sensitive_notify => Msg::Sensitive,
+            set_orientation: gtk::Orientation::Horizontal,
+            set_spacing: 10,
 
-            #[name="label"]
             gtk::Label {
-                child: {
-                    expand: true,
-                    fill: true,
-                },
-                xalign: 1.,
-                yalign: 0.,
+                set_hexpand: true,
+                set_text: &model.label,
+                set_width_request: 200,
+                set_xalign: 1.,
+                set_yalign: 0.,
             },
 
             gtk::Box {
-                orientation: gtk::Orientation::Vertical,
-                #[name="entry"]
-                gtk::Entry {
-                    child: {
-                        expand: true,
-                        fill: true,
-                    },
-                    width_request: 214,
-                    focus_out_event(_, _) => (Msg::DateUpdated, gtk::Inhibit(false)),
-                    icon_press(_, _, _) => Msg::ShowCalendar,
-                },
-                #[name="buttons"]
+                set_orientation: gtk::Orientation::Vertical,
                 gtk::Box {
-                    orientation: gtk::Orientation::Horizontal,
-                    gtk::Button {
-                        child: {
-                            pack_type: gtk::PackType::End,
+                    gtk::MenuButton {
+                        set_icon_name: "x-office-calendar",
+                        #[wrap(Some)]
+                        #[local_ref]
+                        set_popover = popover -> gtk::Popover {
+                            gtk::Calendar {
+                                #[watch]
+                                set_day?: model.date.map(|x| x.day() as i32),
+                                #[watch]
+                                set_month?: model.date.map(|x| x.month() as i32 - 1),
+                                #[watch]
+                                set_year?: model.date.map(|x| x.year()),
+
+                                connect_day_selected[sender] => move |this| {
+                                    sender.input(MsgInput::DateSelected(this.date()));
+                                },
+                            },
                         },
-                        label: "+1y",
-                        tooltip_text: Some("Add one year"),
-                        clicked => Msg::Add(todo_txt::task::Period::Year),
+                    },
+                    #[local_ref]
+                    entry -> gtk::Entry {
+                        set_hexpand: true,
+                        #[watch]
+                        set_text?: &model.date.map(|x| x.format("%Y-%m-%d").to_string()),
+                        set_width_request: 214,
+
+                        connect_move_focus[sender] => move |_, _| {
+                            sender.input(MsgInput::DateUpdated);
+                        },
+                    },
+                },
+                gtk::Box {
+                    set_halign: gtk::Align::End,
+                    set_orientation: gtk::Orientation::Horizontal,
+                    #[watch]
+                    set_visible: r#box.is_sensitive(),
+
+                    gtk::Button {
+                        set_label: "+1y",
+                        set_tooltip_text: Some("Add one year"),
+
+                        connect_clicked => MsgInput::Add(todo_txt::task::Period::Year),
                     },
                     gtk::Button {
-                        child: {
-                            pack_type: gtk::PackType::End,
-                        },
-                        label: "+1m",
-                        tooltip_text: Some("Add one month"),
-                        clicked => Msg::Add(todo_txt::task::Period::Month),
+                        set_label: "+1m",
+                        set_tooltip_text: Some("Add one month"),
+
+                        connect_clicked => MsgInput::Add(todo_txt::task::Period::Month),
                     },
                     gtk::Button {
-                        child: {
-                            pack_type: gtk::PackType::End,
-                        },
-                        label: "+1w",
-                        tooltip_text: Some("Add one month"),
-                        clicked => Msg::Add(todo_txt::task::Period::Week),
+                        set_label: "+1w",
+                        set_tooltip_text: Some("Add one month"),
+
+                        connect_clicked => MsgInput::Add(todo_txt::task::Period::Week),
                     },
                     gtk::Button {
-                        child: {
-                            pack_type: gtk::PackType::End,
-                        },
-                        label: "+1d",
-                        tooltip_text: Some("Add one month"),
-                        clicked => Msg::Add(todo_txt::task::Period::Day),
+                        set_label: "+1d",
+                        set_tooltip_text: Some("Add one month"),
+
+                        connect_clicked => MsgInput::Add(todo_txt::task::Period::Day),
                     },
                 },
             },

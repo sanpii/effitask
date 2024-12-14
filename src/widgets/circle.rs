@@ -1,20 +1,17 @@
 use gtk::prelude::*;
 
-#[derive(relm_derive::Msg)]
-pub enum Msg {
-    Draw,
-}
+pub struct Model {}
 
-pub struct Model {
-    draw_handler: relm::DrawHandler<gtk::DrawingArea>,
-    task: crate::tasks::Task,
-}
-
-impl Circle {
-    fn draw(&mut self) -> Result<(), gtk::cairo::Error> {
-        let context = self.model.draw_handler.get_context()?;
-        let task = &self.model.task;
-        let center = self.center();
+impl Model {
+    fn draw(
+        task: &crate::tasks::Task,
+        drawing_area: &gtk::DrawingArea,
+        context: &gtk::cairo::Context,
+    ) -> Result<(), gtk::cairo::Error> {
+        let center = f64::min(
+            f64::from(drawing_area.width_request()) / 2.,
+            f64::from(drawing_area.height_request()) / 2.,
+        );
 
         if task.finished || task.due_date.is_none() {
             context.set_source_rgb(0.8, 0.8, 0.8);
@@ -34,8 +31,8 @@ impl Circle {
         context.close_path();
 
         if task.finished {
-            let width = self.widgets.drawing_area.width_request();
-            let height = self.widgets.drawing_area.height_request();
+            let width = drawing_area.width_request();
+            let height = drawing_area.height_request();
 
             context.save()?;
             context.fill()?;
@@ -80,42 +77,33 @@ impl Circle {
 
         Ok(())
     }
-
-    fn center(&self) -> f64 {
-        f64::min(
-            f64::from(self.widgets.drawing_area.width_request()) / 2.,
-            f64::from(self.widgets.drawing_area.height_request()) / 2.,
-        )
-    }
 }
 
-#[relm_derive::widget]
-impl relm::Widget for Circle {
-    fn init_view(&mut self) {
-        self.model.draw_handler.init(&self.widgets.drawing_area);
+impl relm4::SimpleComponent for Model {
+    type Init = crate::tasks::Task;
+    type Input = ();
+    type Output = ();
+    type Root = gtk::DrawingArea;
+    type Widgets = ();
+
+    fn init_root() -> Self::Root {
+        gtk::DrawingArea::new()
     }
 
-    fn model(task: crate::tasks::Task) -> Model {
-        Model {
-            draw_handler: relm::DrawHandler::new().expect("draw handler"),
-            task,
-        }
-    }
+    fn init(
+        init: Self::Init,
+        root: Self::Root,
+        _sender: relm4::ComponentSender<Self>,
+    ) -> relm4::ComponentParts<Self> {
+        root.set_height_request(60);
+        root.set_width_request(60);
 
-    fn update(&mut self, event: Msg) {
-        use Msg::*;
+        let model = Self {};
 
-        match event {
-            Draw => self.draw().unwrap(),
-        }
-    }
+        root.set_draw_func(move |drawing_area, context, _w, _h| {
+            Self::draw(&init, drawing_area, context).ok();
+        });
 
-    view! {
-        #[name="drawing_area"]
-        gtk::DrawingArea {
-            height_request: 60,
-            width_request: 60,
-            draw(_, _) => (Msg::Draw, gtk::Inhibit(false)),
-        }
+        relm4::ComponentParts { model, widgets: () }
     }
 }

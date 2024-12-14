@@ -1,258 +1,261 @@
-use crate::widgets::calendar::Msg::Updated as CalendarUpdated;
-use crate::widgets::keywords::Msg::Updated as KeywordsUpdated;
-use crate::widgets::priority::Msg::Updated as PriorityUpdated;
-use crate::widgets::repeat::Msg::Updated as RepeatUpdated;
-use crate::widgets::{Calendar, Keywords, Priority, Repeat};
 use gtk::prelude::*;
+use relm4::ComponentController as _;
 
-#[derive(relm_derive::Msg)]
-pub enum Msg {
-    Cancel,
-    EditKeyword(std::collections::BTreeMap<String, String>),
-    Flag,
-    Done(Box<crate::tasks::Task>),
+#[derive(Debug)]
+pub enum MsgInput {
     Ok,
+    Flag(bool),
     Set(Box<crate::tasks::Task>),
     UpdateDate(DateType, Option<chrono::NaiveDate>),
-    UpdateRepeat(Option<todo_txt::task::Recurrence>),
-    UpdatePriority(u8),
+    UpdateKeywords(std::collections::BTreeMap<String, String>),
+    UpdatePriority(todo_txt::Priority),
+    UpdateRecurrence(Option<todo_txt::task::Recurrence>),
+}
+
+#[derive(Debug)]
+pub enum MsgOutput {
+    Cancel,
+    Done(Box<crate::tasks::Task>),
 }
 
 pub struct Model {
+    buffer: gtk::TextBuffer,
+    created: relm4::Controller<crate::widgets::calendar::Model>,
+    due: relm4::Controller<crate::widgets::calendar::Model>,
+    finish: relm4::Controller<crate::widgets::calendar::Model>,
+    keywords: relm4::Controller<crate::widgets::keywords::Model>,
+    priority: relm4::Controller<crate::widgets::priority::Model>,
+    recurrence: relm4::Controller<crate::widgets::recurrence::Model>,
+    threshold: relm4::Controller<crate::widgets::calendar::Model>,
     task: crate::tasks::Task,
-    relm: relm::Relm<Widget>,
 }
 
-#[derive(Clone, Copy)]
+impl Model {
+    fn update_date(&mut self, date_type: DateType, date: Option<chrono::NaiveDate>) {
+        use DateType::*;
+
+        match date_type {
+            Due => self.task.due_date = date,
+            Threshold => self.task.threshold_date = date,
+            Finish => {
+                self.task.finish_date = date;
+                self.task.finished = date.is_some();
+            }
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
 pub enum DateType {
     Due,
     Threshold,
     Finish,
 }
 
-impl Widget {
-    fn set_task(&mut self, task: &crate::tasks::Task) {
-        self.model.task = task.clone();
+#[relm4::component(pub)]
+impl relm4::SimpleComponent for Model {
+    type Init = crate::tasks::Task;
+    type Input = MsgInput;
+    type Output = MsgOutput;
 
-        self.widgets.subject.set_text(task.subject.as_str());
-        self.components
-            .priority
-            .emit(crate::widgets::priority::Msg::Set(
-                task.priority.clone().into(),
-            ));
-        self.widgets.flag.set_active(task.flagged);
-        self.components
-            .due
-            .emit(crate::widgets::calendar::Msg::Set(task.due_date));
-        self.components
-            .threshold
-            .emit(crate::widgets::calendar::Msg::Set(task.threshold_date));
-        if task.create_date.is_some() {
-            self.components
-                .created
-                .emit(crate::widgets::calendar::Msg::Set(task.create_date));
-            self.widgets.created.show();
-        } else {
-            self.widgets.created.hide();
-        }
-        self.components
-            .repeat
-            .emit(crate::widgets::repeat::Msg::Set(task.recurrence.clone()));
-        self.components
-            .finish
-            .emit(crate::widgets::calendar::Msg::Set(task.finish_date));
-        self.components
-            .keywords
-            .emit(crate::widgets::keywords::Msg::Set(task.tags.clone()));
+    fn init(
+        init: Self::Init,
+        root: Self::Root,
+        sender: relm4::ComponentSender<Self>,
+    ) -> relm4::ComponentParts<Self> {
+        use relm4::Component as _;
 
-        let note = task.note.content().unwrap_or_default();
-        let buffer = self.widgets.note.buffer().unwrap();
-        buffer.set_text(note.as_str());
-    }
+        let created = crate::widgets::calendar::Model::builder()
+            .launch("Created")
+            .detach();
+        created.widget().set_sensitive(false);
 
-    fn get_task(&self) -> crate::tasks::Task {
-        let mut task = self.model.task.clone();
-
-        task.subject = self.widgets.subject.text().to_string();
-
-        let new_note = self.get_note();
-        task.note = match task.note {
-            todo_txt::task::Note::Long { ref filename, .. } => todo_txt::task::Note::Long {
-                filename: filename.to_string(),
-                content: new_note,
-            },
-            _ => {
-                if new_note.is_empty() {
-                    todo_txt::task::Note::None
-                } else {
-                    todo_txt::task::Note::Short(new_note)
+        let due = crate::widgets::calendar::Model::builder()
+            .launch("Due")
+            .forward(sender.input_sender(), |output| match output {
+                crate::widgets::calendar::MsgOutput::Updated(date) => {
+                    MsgInput::UpdateDate(DateType::Due, date)
                 }
-            }
+            });
+
+        let keywords = crate::widgets::keywords::Model::builder()
+            .launch(init.tags.clone())
+            .forward(sender.input_sender(), |output| match output {
+                crate::widgets::keywords::MsgOutput::Updated(keywords) => {
+                    MsgInput::UpdateKeywords(keywords)
+                }
+            });
+
+        let finish = crate::widgets::calendar::Model::builder()
+            .launch("Completed")
+            .forward(sender.input_sender(), |output| match output {
+                crate::widgets::calendar::MsgOutput::Updated(date) => {
+                    MsgInput::UpdateDate(DateType::Finish, date)
+                }
+            });
+
+        let priority = crate::widgets::priority::Model::builder()
+            .launch(init.priority.clone())
+            .forward(sender.input_sender(), |output| match output {
+                crate::widgets::priority::MsgOutput::Updated(priority) => {
+                    MsgInput::UpdatePriority(priority)
+                }
+            });
+
+        let recurrence = crate::widgets::recurrence::Model::builder()
+            .launch(init.recurrence.clone())
+            .forward(sender.input_sender(), |output| match output {
+                crate::widgets::recurrence::MsgOutput::Updated(recurrence) => {
+                    MsgInput::UpdateRecurrence(recurrence)
+                }
+            });
+
+        let threshold = crate::widgets::calendar::Model::builder()
+            .launch("Defer until")
+            .forward(sender.input_sender(), |output| match output {
+                crate::widgets::calendar::MsgOutput::Updated(date) => {
+                    MsgInput::UpdateDate(DateType::Threshold, date)
+                }
+            });
+
+        let model = Self {
+            buffer: gtk::TextBuffer::new(None),
+            created,
+            due,
+            finish,
+            threshold,
+            keywords,
+            priority,
+            task: init,
+            recurrence,
         };
 
-        task
+        let widgets = view_output!();
+
+        let note = model.task.note.content().unwrap_or_default();
+        widgets.note.set_buffer(Some(&model.buffer));
+        model.buffer.set_text(&note);
+
+        relm4::ComponentParts { model, widgets }
     }
 
-    fn get_note(&self) -> String {
-        let Some(buffer) = self.widgets.note.buffer() else {
-            return String::new();
-        };
-        let start = buffer.start_iter();
-        let end = buffer.end_iter();
+    fn update(&mut self, msg: Self::Input, sender: relm4::ComponentSender<Self>) {
+        use MsgInput::*;
 
-        buffer.text(&start, &end, false).expect("").to_string()
-    }
+        match msg {
+            Flag(flagged) => self.task.flagged = flagged,
+            Ok => {
+                let start = self.buffer.start_iter();
+                let end = self.buffer.start_iter();
+                self.task.note = self.buffer.text(&start, &end, true).to_string().into();
 
-    fn edit_keywords(&mut self, keywords: &std::collections::BTreeMap<String, String>) {
-        self.model.task.tags = keywords.clone();
-    }
-
-    fn flag(&mut self) {
-        self.model.task.flagged = self.widgets.flag.is_active();
-    }
-
-    fn update_date(&mut self, date_type: DateType, date: Option<chrono::NaiveDate>) {
-        use DateType::*;
-
-        match date_type {
-            Due => self.model.task.due_date = date,
-            Threshold => self.model.task.threshold_date = date,
-            Finish => {
-                self.model.task.finish_date = date;
-                self.model.task.finished = date.is_some();
+                sender
+                    .output(MsgOutput::Done(Box::new(self.task.clone())))
+                    .ok();
             }
-        }
-    }
-
-    fn update_repeat(&mut self, recurrence: &Option<todo_txt::task::Recurrence>) {
-        self.model.task.recurrence.clone_from(recurrence);
-    }
-
-    fn update_priority(&mut self, priority: u8) {
-        self.model.task.priority = priority.into();
-    }
-}
-
-#[allow(clippy::cognitive_complexity)]
-#[relm_derive::widget]
-impl relm::Widget for Widget {
-    fn init_view(&mut self) {
-        self.widgets.note.set_height_request(150);
-        self.widgets.created.set_sensitive(false);
-    }
-
-    fn model(relm: &relm::Relm<Self>, _: ()) -> Model {
-        Model {
-            task: crate::tasks::Task::new(),
-            relm: relm.clone(),
-        }
-    }
-
-    fn update(&mut self, event: Msg) {
-        use Msg::*;
-
-        match event {
-            Cancel | Done(_) => (),
-            EditKeyword(ref keywords) => self.edit_keywords(keywords),
-            Flag => self.flag(),
-            Ok => self
-                .model
-                .relm
-                .stream()
-                .emit(Msg::Done(Box::new(self.get_task()))),
-            Set(task) => self.set_task(&task),
-            UpdateDate(ref date_type, ref date) => self.update_date(*date_type, *date),
-            UpdateRepeat(ref recurrence) => self.update_repeat(recurrence),
-            UpdatePriority(priority) => self.update_priority(priority),
+            Set(task) => {
+                self.task = *task;
+                self.created.emit(crate::widgets::calendar::MsgInput::Set(
+                    self.task.create_date,
+                ));
+                self.due
+                    .emit(crate::widgets::calendar::MsgInput::Set(self.task.due_date));
+                self.finish.emit(crate::widgets::calendar::MsgInput::Set(
+                    self.task.finish_date,
+                ));
+                self.keywords.emit(crate::widgets::keywords::MsgInput::Set(
+                    self.task.tags.clone(),
+                ));
+                self.threshold.emit(crate::widgets::calendar::MsgInput::Set(
+                    self.task.threshold_date,
+                ));
+            }
+            UpdateDate(date_type, date) => self.update_date(date_type, date),
+            UpdateKeywords(keywords) => self.task.tags = keywords,
+            UpdatePriority(priority) => self.task.priority = priority,
+            UpdateRecurrence(recurrence) => self.task.recurrence = recurrence,
         }
     }
 
     view! {
         gtk::ScrolledWindow {
+            set_visible: false,
+            set_width_request: 172,
+
             gtk::Box {
-                orientation: gtk::Orientation::Vertical,
-                spacing: 10,
+                set_orientation: gtk::Orientation::Vertical,
+                set_spacing: 10,
+
                 gtk::Frame {
-                    label: Some("Subject"),
-                    #[name="subject"]
+                    set_label: Some("Subject"),
                     gtk::Entry {
-                        activate => Msg::Ok,
+                        #[watch]
+                        set_text: &model.task.subject,
+                        connect_activate => MsgInput::Ok,
                     },
                 },
                 gtk::Frame {
-                    label: Some("Priority"),
+                    set_label: Some("Priority"),
                     gtk::Box {
-                        orientation: gtk::Orientation::Horizontal,
-                        #[name="priority"]
-                        Priority {
-                            PriorityUpdated(priority) => Msg::UpdatePriority(priority),
-                        },
-                        #[name="flag"]
+                        set_orientation: gtk::Orientation::Horizontal,
+
+                        append: model.priority.widget(),
+
                         gtk::ToggleButton {
-                            child: {
-                                expand: true,
+                            set_hexpand: true,
+                            set_halign: gtk::Align::Center,
+                            set_icon_name: "emblem-favorite",
+                            set_tooltip_text: Some("Flag"),
+                            #[watch]
+                            set_active: model.task.flagged,
+
+                            connect_toggled[sender] => move |button| {
+                                sender.input(MsgInput::Flag(button.is_active()));
                             },
-                            halign: gtk::Align::Center,
-                            image: Some(&gtk::Image::from_icon_name(Some("emblem-favorite"), gtk::IconSize::SmallToolbar)),
-                            tooltip_text: Some("Flag"),
-                            toggled => Msg::Flag,
                         },
                     },
                 },
                 gtk::Frame {
-                    label: Some("Date"),
+                    set_label: Some("Repeat"),
+                    set_child: Some(model.recurrence.widget()),
+                },
+                gtk::Frame {
+                    set_label: Some("Date"),
                     gtk::Box {
-                        spacing: 10,
-                        orientation: gtk::Orientation::Vertical,
-                        #[name="threshold"]
-                        Calendar("Defer until".to_string()) {
-                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Threshold, date),
-                        },
-                        #[name="due"]
-                        Calendar("Due".to_string()) {
-                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Due, date),
-                        },
-                        #[name="finish"]
-                        Calendar("Completed".to_string()) {
-                            CalendarUpdated(date) => Msg::UpdateDate(DateType::Finish, date),
-                        },
-                        #[name="created"]
-                        Calendar("Created".to_string()),
+                        set_spacing: 10,
+                        set_orientation: gtk::Orientation::Vertical,
+
+                        append: model.threshold.widget(),
+                        append: model.due.widget(),
+                        append: model.finish.widget(),
+                        append: model.created.widget(),
                     },
                 },
                 gtk::Frame {
-                    label: Some("Repeat"),
-                    #[name="repeat"]
-                    Repeat {
-                        RepeatUpdated(ref recurrence) => Msg::UpdateRepeat(recurrence.clone()),
-                    },
+                    set_label: Some("Keywords"),
+
+                    set_child: Some(model.keywords.widget()),
                 },
                 gtk::Frame {
-                    label: Some("Keywords"),
-                    #[name="keywords"]
-                    Keywords {
-                        KeywordsUpdated(ref keywords) => Msg::EditKeyword(keywords.clone()),
-                    },
-                },
-                gtk::Frame {
-                    label: Some("Note"),
-                    #[name="note"]
+                    set_label: Some("Note"),
+
+                    #[name = "note"]
                     gtk::TextView {
+                        set_hexpand: true,
+                        set_vexpand: true,
                     },
                 },
                 gtk::ActionBar {
-                    child: {
-                        pack_type: gtk::PackType::End,
+                    pack_start = &gtk::Button {
+                        set_label: "Ok",
+
+                        connect_clicked => MsgInput::Ok,
                     },
-                    gtk::ButtonBox {
-                        orientation: gtk::Orientation::Horizontal,
-                        gtk::Button {
-                            label: "Ok",
-                            clicked => Msg::Ok,
-                        },
-                        gtk::Button {
-                            label: "Cancel",
-                            clicked => Msg::Cancel,
+                    pack_start = &gtk::Button {
+                        set_label: "Cancel",
+
+                        connect_clicked[sender] => move |_| {
+                            sender.output(MsgOutput::Cancel).ok();
                         },
                     },
                 },

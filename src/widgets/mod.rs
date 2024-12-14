@@ -3,17 +3,7 @@ pub mod circle;
 pub mod filter;
 pub mod keywords;
 pub mod priority;
-pub mod repeat;
+pub mod recurrence;
 pub mod tags;
 pub mod task;
 pub mod tasks;
-
-pub use calendar::Calendar;
-pub use circle::Circle;
-pub use filter::Filter;
-pub use keywords::Keywords;
-pub use priority::Priority;
-pub use repeat::Repeat;
-pub use tags::Tags;
-pub use task::Task;
-pub use tasks::Tasks;

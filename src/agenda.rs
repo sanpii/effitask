@@ -1,106 +1,144 @@
-use crate::widgets::tasks::Msg::{Complete, Edit};
-use crate::widgets::Tasks;
+use chrono::Datelike as _;
 use gtk::prelude::*;
 
-#[derive(relm_derive::Msg)]
-pub enum Msg {
-    Complete(Box<crate::tasks::Task>),
-    Edit(Box<crate::tasks::Task>),
-    Selected,
-    Select(chrono::DateTime<chrono::Local>),
+#[derive(Debug)]
+pub enum MsgInput {
+    CalendarChange(Change),
+    DateSelect(chrono::NaiveDate),
     Update,
 }
 
-macro_rules! update {
-    ($self:ident, $exp:ident, $task:ident, $get:ident, $list:ident, $date:ident) => {
-        let tasks = $self.$get(&$list, $date);
-
-        $self.widgets.$exp.set_expanded(!tasks.is_empty());
-        $self.widgets.$exp.set_sensitive(!tasks.is_empty());
-        $self
-            .components
-            .$task
-            .emit(crate::widgets::tasks::Msg::Update(tasks));
-    };
+#[derive(Debug)]
+pub enum Change {
+    PrevMonth,
+    PrevYear,
+    NextMonth,
+    NextYear,
 }
 
-impl Widget {
+#[derive(Debug)]
+pub enum MsgOutput {
+    Complete(Box<crate::tasks::Task>),
+    Edit(Box<crate::tasks::Task>),
+}
+
+macro_rules! create {
+    ($sender:ident) => {{
+        let component = crate::widgets::tasks::Model::builder().launch(()).forward(
+            $sender.output_sender(),
+            |output| match output {
+                crate::widgets::task::MsgOutput::Complete(task) => MsgOutput::Complete(task),
+                crate::widgets::task::MsgOutput::Edit(task) => MsgOutput::Edit(task),
+            },
+        );
+        component
+            .widget()
+            .set_vscrollbar_policy(gtk::PolicyType::Never);
+
+        component
+    }};
+}
+
+macro_rules! update {
+    ($self:ident, $exp:ident, $task:ident, $get:ident, $list:ident, $date:ident) => {{
+        use relm4::ComponentController as _;
+
+        let tasks = $self.$get(&$list, $date);
+
+        $self.$exp.set_expanded(!tasks.is_empty());
+        $self.$exp.set_sensitive(!tasks.is_empty());
+        $self.$task.emit(crate::widgets::tasks::Msg::Update(tasks));
+    }};
+}
+
+pub struct Model {
+    calendar: gtk::Calendar,
+    date: chrono::NaiveDate,
+    month_exp: gtk::Expander,
+    month: relm4::Controller<crate::widgets::tasks::Model>,
+    past_exp: gtk::Expander,
+    past: relm4::Controller<crate::widgets::tasks::Model>,
+    today_exp: gtk::Expander,
+    today: relm4::Controller<crate::widgets::tasks::Model>,
+    tomorrow_exp: gtk::Expander,
+    tomorrow: relm4::Controller<crate::widgets::tasks::Model>,
+    week_exp: gtk::Expander,
+    week: relm4::Controller<crate::widgets::tasks::Model>,
+}
+
+impl Model {
     fn update_tasks(&self) {
-        self.widgets.calendar.clear_marks();
-
         let list = crate::application::tasks();
-        let (y, m, d) = self.widgets.calendar.date();
-        let date = chrono::naive::NaiveDate::from_ymd_opt(y as i32, m + 1, d);
+        let date = crate::date::from_glib(self.calendar.date());
 
-        update!(self, past_exp, past, get_past_tasks, list, date);
-        update!(self, today_exp, today, get_today_tasks, list, date);
-        update!(self, tomorrow_exp, tomorrow, get_tomorrow_tasks, list, date);
-        update!(self, week_exp, week, get_week_tasks, list, date);
-        update!(self, month_exp, month, get_month_tasks, list, date);
+        update!(self, past_exp, past, past_tasks, list, date);
+        update!(self, today_exp, today, today_tasks, list, date);
+        update!(self, tomorrow_exp, tomorrow, tomorrow_tasks, list, date);
+        update!(self, week_exp, week, week_tasks, list, date);
+        update!(self, month_exp, month, month_tasks, list, date);
     }
 
-    fn get_past_tasks(
+    fn past_tasks(
         &self,
         list: &crate::tasks::List,
-        date: Option<chrono::naive::NaiveDate>,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
-        self.get_tasks(list, None, date)
+        self.tasks(list, None, Some(date))
     }
 
-    fn get_today_tasks(
+    fn today_tasks(
         &self,
         list: &crate::tasks::List,
-        date: Option<chrono::naive::NaiveDate>,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
-        self.get_tasks(list, date, date.and_then(|x| x.succ_opt()))
+        self.tasks(list, Some(date), Some(date + chrono::Duration::days(1)))
     }
 
-    fn get_tomorrow_tasks(
+    fn tomorrow_tasks(
         &self,
         list: &crate::tasks::List,
-        date: Option<chrono::naive::NaiveDate>,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
-        self.get_tasks(
+        self.tasks(
             list,
-            date.and_then(|x| x.succ_opt()),
-            date.map(|x| x + chrono::Duration::days(2)),
+            Some(date + chrono::Duration::days(1)),
+            Some(date + chrono::Duration::days(2)),
         )
     }
 
-    fn get_week_tasks(
+    fn week_tasks(
         &self,
         list: &crate::tasks::List,
-        date: Option<chrono::naive::NaiveDate>,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
-        self.get_tasks(
+        self.tasks(
             list,
-            date.map(|x| x + chrono::Duration::days(2)),
-            date.map(|x| x + chrono::Duration::weeks(1)),
+            Some(date + chrono::Duration::days(2)),
+            Some(date + chrono::Duration::weeks(1)),
         )
     }
 
-    fn get_month_tasks(
+    fn month_tasks(
         &self,
         list: &crate::tasks::List,
-        date: Option<chrono::naive::NaiveDate>,
+        date: chrono::naive::NaiveDate,
     ) -> Vec<crate::tasks::Task> {
-        self.get_tasks(
+        self.tasks(
             list,
-            date.map(|x| x + chrono::Duration::weeks(1)),
-            date.map(|x| x + chrono::Duration::weeks(4)),
+            Some(date + chrono::Duration::weeks(1)),
+            Some(date + chrono::Duration::weeks(4)),
         )
     }
 
-    fn get_tasks(
+    fn tasks(
         &self,
         list: &crate::tasks::List,
         start: Option<chrono::naive::NaiveDate>,
         end: Option<chrono::naive::NaiveDate>,
     ) -> Vec<crate::tasks::Task> {
-        let (_, month, _) = self.widgets.calendar.date();
         let preferences = crate::application::preferences();
 
-        let tasks: Vec<crate::tasks::Task> = list
+        let tasks = list
             .tasks
             .iter()
             .filter(|x| {
@@ -116,117 +154,157 @@ impl Widget {
                     false
                 }
             })
-            .map(|x| {
-                use chrono::Datelike;
-
-                let due_date = x.due_date.unwrap();
-
-                if due_date.month0() == month {
-                    self.widgets.calendar.mark_day(due_date.day());
-                }
-
-                x.clone()
-            })
+            .cloned()
             .collect();
 
         tasks
     }
-}
 
-#[relm_derive::widget]
-impl relm::Widget for Widget {
-    fn model(_: ()) {}
+    fn update_marks(&self) {
+        use chrono::Datelike as _;
 
-    fn update(&mut self, event: Msg) {
-        use Msg::*;
+        self.calendar.clear_marks();
 
-        match event {
-            Complete(_) | Edit(_) => (),
-            Selected | Update => self.update_tasks(),
-            Select(date) => {
-                use chrono::Datelike;
+        let list = crate::application::tasks();
+        let date = self.calendar.date();
+        let month = date.month() as u32;
+        let year = date.year();
 
-                self.widgets
-                    .calendar
-                    .select_month(date.month0(), date.year() as u32);
-                self.widgets.calendar.select_day(date.day());
+        for task in list.tasks {
+            let Some(due_date) = task.due_date else {
+                continue;
+            };
+
+            if due_date.year() == year && due_date.month() == month {
+                self.calendar.mark_day(due_date.day());
             }
         }
+    }
+}
+
+#[relm4::component(pub)]
+impl relm4::SimpleComponent for Model {
+    type Init = chrono::NaiveDate;
+    type Input = MsgInput;
+    type Output = MsgOutput;
+
+    fn init(
+        init: Self::Init,
+        root: Self::Root,
+        sender: relm4::ComponentSender<Self>,
+    ) -> relm4::ComponentParts<Self> {
+        use relm4::Component as _;
+        use relm4::ComponentController as _;
+
+        let model = Self {
+            calendar: gtk::Calendar::new(),
+            date: init,
+            month: create!(sender),
+            month_exp: gtk::Expander::new(None),
+            past: create!(sender),
+            past_exp: gtk::Expander::new(None),
+            today: create!(sender),
+            today_exp: gtk::Expander::new(None),
+            tomorrow: create!(sender),
+            tomorrow_exp: gtk::Expander::new(None),
+            week: create!(sender),
+            week_exp: gtk::Expander::new(None),
+        };
+
+        let calendar = &model.calendar;
+        let month_exp = &model.month_exp;
+        let past_exp = &model.past_exp;
+        let today_exp = &model.today_exp;
+        let tomorrow_exp = &model.tomorrow_exp;
+        let week_exp = &model.week_exp;
+        let widgets = view_output!();
+
+        relm4::ComponentParts { model, widgets }
+    }
+
+    fn update(&mut self, msg: Self::Input, _: relm4::ComponentSender<Self>) {
+        use MsgInput::*;
+
+        match msg {
+            CalendarChange(change) => {
+                self.date = match change {
+                    Change::NextMonth => self.date.checked_add_months(chrono::Months::new(1)),
+                    Change::NextYear => self.date.checked_add_months(chrono::Months::new(12)),
+                    Change::PrevMonth => self.date.checked_sub_months(chrono::Months::new(1)),
+                    Change::PrevYear => self.date.checked_sub_months(chrono::Months::new(12)),
+                }
+                .unwrap();
+
+                self.update_marks();
+            }
+            DateSelect(date) => self.date = date,
+            Update => (),
+        }
+
+        self.update_tasks();
     }
 
     view! {
         gtk::Box {
-            orientation: gtk::Orientation::Horizontal,
-            spacing: 10,
+            set_orientation: gtk::Orientation::Horizontal,
+            set_spacing: 10,
+
             gtk::Box {
-                orientation: gtk::Orientation::Vertical,
-                #[name="calendar"]
-                gtk::Calendar {
-                    day_selected => Msg::Selected,
+                set_orientation: gtk::Orientation::Vertical,
+                set_spacing: 5,
+
+                #[local_ref]
+                calendar -> gtk::Calendar {
+                    #[watch]
+                    set_day: model.date.day() as i32,
+                    #[watch]
+                    set_month: model.date.month() as i32 - 1,
+                    #[watch]
+                    set_year: model.date.year(),
+
+                    connect_day_selected[sender] => move |this| {
+                        sender.input(MsgInput::DateSelect(crate::date::from_glib(this.date())));
+                    },
+                    connect_next_month => MsgInput::CalendarChange(Change::NextMonth),
+                    connect_next_year => MsgInput::CalendarChange(Change::NextYear),
+                    connect_prev_month => MsgInput::CalendarChange(Change::PrevMonth),
+                    connect_prev_year => MsgInput::CalendarChange(Change::PrevYear),
                 },
                 gtk::Button {
-                    child: {
-                        padding: 5,
-                    },
-                    label: "Today",
-                    clicked => Msg::Select(chrono::Local::now()),
+                    set_label: "Today",
+                    connect_clicked => MsgInput::DateSelect(crate::date::today()),
                 },
             },
             gtk::ScrolledWindow {
-                child: {
-                    expand: true,
-                },
                 gtk::Box {
-                    orientation: gtk::Orientation::Vertical,
-                    #[name="past_exp"]
-                    gtk::Expander {
-                        label: Some("Past due"),
-                        #[name="past"]
-                        Tasks {
-                            vscrollbar_policy: gtk::PolicyType::Never,
-                            Complete(ref task) => Msg::Complete(task.clone()),
-                            Edit(ref task) => Msg::Edit(task.clone()),
-                        },
+                    set_hexpand: true,
+                    set_orientation: gtk::Orientation::Vertical,
+                    set_vexpand: true,
+
+                    #[local_ref]
+                    past_exp -> gtk::Expander {
+                        set_child: Some(model.past.widget()),
+                        set_label: Some("Past due"),
                     },
-                    #[name="today_exp"]
-                    gtk::Expander {
-                        label: Some("Today"),
-                        #[name="today"]
-                        Tasks {
-                            vscrollbar_policy: gtk::PolicyType::Never,
-                            Complete(ref task) => Msg::Complete(task.clone()),
-                            Edit(ref task) => Msg::Edit(task.clone()),
-                        },
+                    #[local_ref]
+                    today_exp -> gtk::Expander {
+                        set_child: Some(model.today.widget()),
+                        set_label: Some("Today"),
                     },
-                    #[name="tomorrow_exp"]
-                    gtk::Expander {
-                        label: Some("Tomorrow"),
-                        #[name="tomorrow"]
-                        Tasks {
-                            vscrollbar_policy: gtk::PolicyType::Never,
-                            Complete(ref task) => Msg::Complete(task.clone()),
-                            Edit(ref task) => Msg::Edit(task.clone()),
-                        },
+                    #[local_ref]
+                    tomorrow_exp -> gtk::Expander {
+                        set_child: Some(model.tomorrow.widget()),
+                        set_label: Some("Tomorrow"),
                     },
-                    #[name="week_exp"]
-                    gtk::Expander {
-                        label: Some("This week"),
-                        #[name="week"]
-                        Tasks {
-                            vscrollbar_policy: gtk::PolicyType::Never,
-                            Complete(ref task) => Msg::Complete(task.clone()),
-                            Edit(ref task) => Msg::Edit(task.clone()),
-                        },
+                    #[local_ref]
+                    week_exp -> gtk::Expander {
+                        set_child: Some(model.week.widget()),
+                        set_label: Some("This week"),
                     },
-                    #[name="month_exp"]
-                    gtk::Expander {
-                        label: Some("This month"),
-                        #[name="month"]
-                        Tasks {
-                            vscrollbar_policy: gtk::PolicyType::Never,
-                            Complete(ref task) => Msg::Complete(task.clone()),
-                            Edit(ref task) => Msg::Edit(task.clone()),
-                        }
+                    #[local_ref]
+                    month_exp -> gtk::Expander {
+                        set_child: Some(model.month.widget()),
+                        set_label: Some("This month"),
                     },
                 },
             },

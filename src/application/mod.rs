@@ -204,7 +204,7 @@ impl Model {
                     new.threshold_date = Some(recurrence.clone() + threshold_date);
                 }
 
-                list.append(new);
+                list.push(new);
             }
         }
 
@@ -485,6 +485,7 @@ impl relm4::SimpleComponent for Model {
                                 gtk::Entry {
                                     connect_activate[sender] => move |this| {
                                         sender.input(Msg::Add(this.text().to_string()));
+                                        this.set_text("");
                                     }
                                 },
                                 gtk::Label {

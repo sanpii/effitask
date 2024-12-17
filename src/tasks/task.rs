@@ -1,4 +1,4 @@
-#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Default, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Task {
     inner: todo_txt::task::Extended,
     pub id: usize,
@@ -38,13 +38,29 @@ impl Task {
     }
 }
 
-impl std::str::FromStr for Task {
-    type Err = ();
+impl todo_txt::Task for Task {}
 
-    fn from_str(s: &str) -> Result<Self, ()> {
-        let inner = todo_txt::task::Extended::from_str(s).map_err(|_| ())?;
+impl AsRef<todo_txt::task::Simple> for Task {
+    fn as_ref(&self) -> &todo_txt::task::Simple {
+        &self.inner
+    }
+}
+
+impl std::str::FromStr for Task {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let inner = todo_txt::task::Extended::from_str(s)?;
 
         Ok(Self { inner, id: 0 })
+    }
+}
+
+impl From<String> for Task {
+    fn from(value: String) -> Self {
+        let inner = todo_txt::task::Extended::from(value);
+
+        Self { inner, id: 0 }
     }
 }
 

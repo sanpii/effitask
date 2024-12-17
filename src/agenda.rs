@@ -170,7 +170,7 @@ impl Model {
         let month = date.month() as u32;
         let year = date.year();
 
-        for task in list.tasks {
+        for task in &list.tasks {
             let Some(due_date) = task.due_date else {
                 continue;
             };

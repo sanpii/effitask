@@ -1,17 +1,13 @@
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct List {
-    pub tasks: Vec<crate::tasks::Task>,
+    pub inner: todo_txt::task::List<super::Task>,
     todo: String,
     done: String,
 }
 
 impl List {
     pub fn new() -> Self {
-        Self {
-            tasks: Vec::new(),
-            todo: String::new(),
-            done: String::new(),
-        }
+        Self::default()
     }
 
     pub fn from_files(todo: &str, done: &str) -> Self {
@@ -27,19 +23,18 @@ impl List {
         let tasks = self.load_file(todo);
 
         self.todo = todo.to_string();
-        self.tasks.extend(tasks);
+        self.inner.extend(tasks);
     }
 
     fn load_done(&mut self, done: &str) {
         let tasks = self.load_file(done);
 
         self.done = done.to_string();
-        self.tasks.extend(tasks);
+        self.inner.extend(tasks);
     }
 
     fn load_file(&self, path: &str) -> Vec<crate::tasks::Task> {
         use std::io::BufRead;
-        use std::str::FromStr;
 
         let mut tasks = Vec::new();
         let Ok(file) = std::fs::File::open(path) else {
@@ -48,7 +43,7 @@ impl List {
             return tasks;
         };
 
-        let last_id = self.tasks.len();
+        let last_id = self.inner.len();
 
         for (id, line) in std::io::BufReader::new(file).lines().enumerate() {
             let line = line.unwrap();
@@ -57,13 +52,9 @@ impl List {
                 continue;
             }
 
-            match crate::tasks::Task::from_str(line.as_str()) {
-                Ok(mut task) => {
-                    task.id = last_id + id;
-                    tasks.push(task);
-                }
-                Err(_) => log::error!("Invalid tasks: '{line}'"),
-            };
+            let mut task = crate::tasks::Task::from(line);
+            task.id = last_id + id;
+            tasks.push(task);
         }
 
         tasks
@@ -72,50 +63,32 @@ impl List {
     pub fn projects(&self) -> Vec<String> {
         let today = crate::date::today();
 
-        let mut projects = self
-            .tasks
+        self.inner
             .iter()
             .filter(|x| {
                 !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
-            .fold(Vec::new(), |mut acc, item| {
-                acc.extend_from_slice(item.projects());
-
-                acc
-            });
-
-        projects.sort();
-        projects.dedup();
-
-        projects
+            .collect::<todo_txt::task::List<_>>()
+            .projects()
     }
 
     pub fn contexts(&self) -> Vec<String> {
         let today = crate::date::today();
 
-        let mut contexts = self
-            .tasks
+        self.inner
             .iter()
             .filter(|x| {
                 !x.finished && (x.threshold_date.is_none() || x.threshold_date.unwrap() <= today)
             })
-            .fold(Vec::new(), |mut acc, item| {
-                acc.extend_from_slice(item.contexts());
-
-                acc
-            });
-
-        contexts.sort();
-        contexts.dedup();
-
-        contexts
+            .collect::<todo_txt::task::List<_>>()
+            .contexts()
     }
 
     pub fn write(&self) -> Result<(), String> {
-        let todo = self.tasks.iter().filter(|x| !x.finished).cloned().collect();
+        let todo = self.inner.iter().filter(|x| !x.finished).cloned().collect();
         self.write_tasks(&self.todo, todo)?;
 
-        let done = self.tasks.iter().filter(|x| x.finished).cloned().collect();
+        let done = self.inner.iter().filter(|x| x.finished).cloned().collect();
         self.write_tasks(&self.done, done)?;
 
         Ok(())
@@ -168,6 +141,20 @@ impl List {
     }
 
     pub fn append(&mut self, task: crate::tasks::Task) {
-        self.tasks.push(task);
+        self.inner.push(task);
+    }
+}
+
+impl std::ops::Deref for List {
+    type Target = todo_txt::task::List<super::Task>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl std::ops::DerefMut for List {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
     }
 }

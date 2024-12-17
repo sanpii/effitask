@@ -15,8 +15,7 @@ mod widgets;
 fn main() {
     human_panic::setup_panic!();
 
-    #[cfg(debug_assertions)]
-    dotenvy::dotenv().ok();
+    envir::init();
 
     if std::env::args().nth(1).as_deref() == Some("usage") {
         usage(&std::env::args().next().unwrap());

@@ -7,7 +7,7 @@ edition = "2021"
 rust-version = "1.80"
 
 [dependencies]
-dotenvy = "0.15"
+envir = "1.0"
 human-panic = "2.0"
 notify = "7.0"
 pulldown-cmark = "0.12"

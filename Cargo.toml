@@ -32,4 +32,4 @@ features = ["std"]
 
 [dependencies.todo-txt]
 version = "4.0"
-features = ["extended"]
+features = ["config", "extended"]

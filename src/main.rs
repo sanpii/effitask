@@ -23,9 +23,11 @@ fn main() {
         std::process::exit(0);
     }
 
+    let config = todo_txt::Config::from_env();
+
     let app = relm4::RelmApp::new("txt.todo.effitask")
         .with_args(Vec::new());
-    app.run::<application::Model>(());
+    app.run::<application::Model>(config);
 }
 
 fn usage(program: &str) {

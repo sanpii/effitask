@@ -60,6 +60,7 @@ pub enum Msg {
 pub struct Model {
     add_popover: gtk::Popover,
     agenda: relm4::Controller<crate::agenda::Model>,
+    config: todo_txt::Config,
     contexts: relm4::Controller<crate::widgets::tags::Model>,
     defered_button: gtk::CheckButton,
     done_button: gtk::CheckButton,
@@ -261,23 +262,7 @@ impl Model {
     }
 
     fn update_tasks(&self) {
-        let todo_file = match std::env::var("TODO_FILE") {
-            Ok(todo_file) => todo_file,
-            Err(err) => {
-                eprintln!("Launch this program via todo.sh: {err}");
-                std::process::exit(1);
-            }
-        };
-
-        let done_file = match std::env::var("DONE_FILE") {
-            Ok(done_file) => done_file,
-            Err(err) => {
-                eprintln!("Launch this program via todo.sh: {err}");
-                std::process::exit(1);
-            }
-        };
-
-        let list = crate::tasks::List::from_files(&todo_file, &done_file);
+        let list = crate::tasks::List::from_files(&self.config.todo_file, &self.config.done_file);
         globals::tasks::replace(list);
 
         globals::preferences::replace(crate::application::Preferences {
@@ -301,14 +286,6 @@ impl Model {
     fn watch(&self, sender: relm4::ComponentSender<Self>) {
         use notify::Watcher as _;
 
-        let todo_dir = match std::env::var("TODO_DIR") {
-            Ok(todo_dir) => todo_dir,
-            Err(err) => {
-                eprintln!("Launch this program via todo.sh: {err}");
-                std::process::exit(1);
-            }
-        };
-
         let mut watcher = notify::recommended_watcher(move |res| match res {
             Ok(_) => {
                 sender.input(Msg::Refresh);
@@ -318,10 +295,10 @@ impl Model {
         })
         .unwrap();
 
-        log::debug!("watching {todo_dir} for changes");
+        log::debug!("watching {} for changes", self.config.todo_file);
 
         if let Err(err) = watcher.watch(
-            std::path::PathBuf::from(todo_dir).as_path(),
+            std::path::PathBuf::from(self.config.todo_file.clone()).as_path(),
             notify::RecursiveMode::Recursive,
         ) {
             log::warn!("Unable to setup hot reload: {err}");
@@ -331,12 +308,12 @@ impl Model {
 
 #[relm4::component(pub)]
 impl relm4::SimpleComponent for Model {
-    type Init = ();
+    type Init = todo_txt::Config;
     type Input = Msg;
     type Output = ();
 
     fn init(
-        _init: Self::Init,
+        init: Self::Init,
         root: Self::Root,
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
@@ -420,6 +397,7 @@ impl relm4::SimpleComponent for Model {
         let model = Self {
             add_popover: gtk::Popover::new(),
             agenda,
+            config: init,
             contexts,
             defered_button,
             done_button,

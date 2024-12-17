@@ -67,27 +67,21 @@ pub struct Model {
     logger: relm4::Controller<crate::logger::Model>,
     projects: relm4::Controller<crate::widgets::tags::Model>,
     search: relm4::Controller<crate::search::Model>,
-    #[allow(dead_code)]
-    xdg: xdg::BaseDirectories,
 }
 
 impl Model {
     fn load_style(&self) {
         let css = gtk::CssProvider::new();
-        if let Some(stylesheet) = self.stylesheet() {
-            css.load_from_path(stylesheet);
+        css.load_from_resource(&self.stylesheet());
 
-            gtk::style_context_add_provider_for_display(
-                &gtk::gdk::Display::default().unwrap(),
-                &css,
-                0,
-            );
-        } else {
-            log::error!("Unable to find stylesheet");
-        }
+        gtk::style_context_add_provider_for_display(
+            &gtk::gdk::Display::default().unwrap(),
+            &css,
+            0,
+        );
     }
 
-    fn stylesheet(&self) -> Option<std::path::PathBuf> {
+    fn stylesheet(&self) -> String {
         let mut stylesheet = "style_light.css";
 
         if let Ok(theme) = std::env::var("GTK_THEME") {
@@ -100,7 +94,7 @@ impl Model {
             }
         }
 
-        self.find_data_file(stylesheet)
+        format!("/txt/todo/effitask/{stylesheet}")
     }
 
     fn add_tab_widgets(&self, notebook: &gtk::Notebook) {
@@ -128,34 +122,14 @@ impl Model {
             Page::Search => "search",
         };
 
-        if let Some(filename) = self.find_data_file(&format!("{title}.png")) {
-            let image = gtk::Image::from_file(filename);
-            image.set_icon_size(gtk::IconSize::Large);
-            vbox.append(&image);
-        } else {
-            log::error!("Unable to find resource '{title}.png'");
-        }
+        let image = gtk::Image::from_icon_name(title);
+        image.set_icon_size(gtk::IconSize::Large);
+        vbox.append(&image);
 
         let label = gtk::Label::new(Some(title));
         vbox.append(&label);
 
         vbox
-    }
-
-    #[cfg(not(debug_assertions))]
-    fn find_data_file(&self, stylesheet: &str) -> Option<std::path::PathBuf> {
-        self.xdg.find_data_file(stylesheet)
-    }
-
-    #[cfg(debug_assertions)]
-    #[allow(clippy::unnecessary_wraps)]
-    fn find_data_file(&self, stylesheet: &str) -> Option<std::path::PathBuf> {
-        let mut path = std::path::PathBuf::new();
-
-        path.push("resources");
-        path.push(stylesheet);
-
-        Some(path)
     }
 
     fn add(&mut self, widgets: &ModelWidgets, text: &str) {
@@ -385,7 +359,6 @@ impl relm4::Component for Model {
             logger,
             projects,
             search,
-            xdg: xdg::BaseDirectories::with_prefix(NAME.to_lowercase()).unwrap(),
         };
 
         let widgets = view_output!();

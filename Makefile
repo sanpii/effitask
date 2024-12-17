@@ -23,9 +23,6 @@ gtk+-4.0:
 install:
 	install --directory $(PREFIX)/bin
 	install $(TARGET) $(PREFIX)/bin/
-	install --directory $(PREFIX)/share/effitask
-	install --mode 644 resources/*.png $(PREFIX)/share/effitask/
-	install --mode 644 resources/*.css $(PREFIX)/share/effitask/
 
 test:
 	$(CARGO) test $(CARGO_FLAGS)

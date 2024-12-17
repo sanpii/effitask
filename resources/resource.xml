@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="/txt/todo/effitask">
+        <file>agenda.png</file>
+        <file>contexts.png</file>
+        <file>done.png</file>
+        <file>flag.png</file>
+        <file>inbox.png</file>
+        <file>projects.png</file>
+        <file>search.png</file>
+        <file compressed="true">style.css</file>
+        <file compressed="true">style_dark.css</file>
+        <file compressed="true">style_light.css</file>
+    </gresource>
+</gresources>

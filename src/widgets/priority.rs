@@ -36,7 +36,7 @@ impl relm4::SimpleComponent for Model {
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, _sender: relm4::ComponentSender<Self>) {
+    fn update(&mut self, msg: Self::Input, _: relm4::ComponentSender<Self>) {
         match msg {
             MsgInput::More => self.show_more = true,
         }

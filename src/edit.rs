@@ -19,7 +19,6 @@ pub enum MsgOutput {
 }
 
 pub struct Model {
-    buffer: gtk::TextBuffer,
     created: relm4::Controller<crate::widgets::calendar::Model>,
     due: relm4::Controller<crate::widgets::calendar::Model>,
     finish: relm4::Controller<crate::widgets::calendar::Model>,
@@ -53,7 +52,8 @@ pub enum DateType {
 }
 
 #[relm4::component(pub)]
-impl relm4::SimpleComponent for Model {
+impl relm4::Component for Model {
+    type CommandOutput = ();
     type Init = crate::tasks::Task;
     type Input = MsgInput;
     type Output = MsgOutput;
@@ -63,8 +63,6 @@ impl relm4::SimpleComponent for Model {
         root: Self::Root,
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
-        use relm4::Component as _;
-
         let created = crate::widgets::calendar::Model::builder()
             .launch("Created")
             .detach();
@@ -119,7 +117,6 @@ impl relm4::SimpleComponent for Model {
             });
 
         let model = Self {
-            buffer: gtk::TextBuffer::new(None),
             created,
             due,
             finish,
@@ -132,22 +129,24 @@ impl relm4::SimpleComponent for Model {
 
         let widgets = view_output!();
 
-        let note = model.task.note.content().unwrap_or_default();
-        widgets.note.set_buffer(Some(&model.buffer));
-        model.buffer.set_text(&note);
-
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, sender: relm4::ComponentSender<Self>) {
+    fn update_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        msg: Self::Input,
+        sender: relm4::ComponentSender<Self>,
+        _: &Self::Root,
+    ) {
         use MsgInput::*;
 
         match msg {
             Flag(flagged) => self.task.flagged = flagged,
             Ok => {
-                let start = self.buffer.start_iter();
-                let end = self.buffer.start_iter();
-                self.task.note = self.buffer.text(&start, &end, true).to_string().into();
+                let start = widgets.buffer.start_iter();
+                let end = widgets.buffer.start_iter();
+                self.task.note = widgets.buffer.text(&start, &end, true).to_string().into();
 
                 sender
                     .output(MsgOutput::Done(Box::new(self.task.clone())))
@@ -243,6 +242,12 @@ impl relm4::SimpleComponent for Model {
                     gtk::TextView {
                         set_hexpand: true,
                         set_vexpand: true,
+                        #[wrap(Some)]
+                        #[name = "buffer"]
+                        set_buffer = &gtk::TextBuffer {
+                            #[watch]
+                            set_text?: &model.task.note.content(),
+                        },
                     },
                 },
                 gtk::ActionBar {

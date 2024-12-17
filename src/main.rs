@@ -25,8 +25,7 @@ fn main() {
 
     let config = todo_txt::Config::from_env();
 
-    let app = relm4::RelmApp::new("txt.todo.effitask")
-        .with_args(Vec::new());
+    let app = relm4::RelmApp::new("txt.todo.effitask").with_args(Vec::new());
     app.run::<application::Model>(config);
 }
 

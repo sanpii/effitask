@@ -38,34 +38,33 @@ pub enum MsgOutput {
 }
 
 pub struct Model {
-    store: gtk::TreeStore,
     filters: std::collections::BTreeMap<gtk::TreePath, String>,
     tasks: relm4::Controller<super::tasks::Model>,
-    tree_view: gtk::TreeView,
 }
 
 impl Model {
-    fn update_filters(&mut self, filters: Vec<(String, (u32, u32))>) {
-        let selection = self.tree_view.selection();
+    fn update_filters(&mut self, widgets: &ModelWidgets, filters: Vec<(String, (u32, u32))>) {
+        let selection = widgets.tree_view.selection();
         let (paths, _) = selection.selected_rows();
 
         self.filters.clear();
-        self.store.clear();
+        widgets.store.clear();
         let mut root = std::collections::HashMap::new();
 
         for filter in filters {
-            self.append(&mut root, filter);
+            self.append(widgets, &mut root, filter);
         }
 
-        self.tree_view.expand_all();
+        widgets.tree_view.expand_all();
 
         for path in paths {
-            gtk::prelude::TreeViewExt::set_cursor(&self.tree_view, &path, None, false);
+            gtk::prelude::TreeViewExt::set_cursor(&widgets.tree_view, &path, None, false);
         }
     }
 
     fn append(
         &mut self,
+        widgets: &ModelWidgets,
         root: &mut std::collections::HashMap<String, gtk::TreeIter>,
         filter: (String, (u32, u32)),
     ) {
@@ -80,25 +79,29 @@ impl Model {
         let parent = levels.join(&separator.to_string());
 
         if !parent.is_empty() && root.get(&parent).is_none() {
-            self.append(root, (parent.clone(), (0, 0)));
+            self.append(widgets, root, (parent.clone(), (0, 0)));
         }
 
-        let row = self.store.append(root.get(&parent));
+        let row = widgets.store.append(root.get(&parent));
 
-        self.store
+        widgets
+            .store
             .set_value(&row, Column::Title.into(), &title.to_value());
-        self.store
+        widgets
+            .store
             .set_value(&row, Column::Raw.into(), &filter.to_value());
-        self.store
+        widgets
+            .store
             .set_value(&row, Column::Progress.into(), &progress.to_value());
 
         let tooltip = format!("{done}/{total}");
-        self.store
+        widgets
+            .store
             .set_value(&row, Column::Tooltip.into(), &tooltip.to_value());
 
         root.insert(filter.clone(), row);
 
-        let path = self.store.path(&row);
+        let path = widgets.store.path(&row);
         self.filters.insert(path, filter);
     }
 
@@ -126,18 +129,17 @@ impl Model {
 }
 
 #[relm4::component(pub)]
-impl relm4::SimpleComponent for Model {
+impl relm4::Component for Model {
+    type CommandOutput = ();
     type Init = ();
     type Input = MsgInput;
     type Output = MsgOutput;
 
     fn init(
-        _init: Self::Init,
+        _: Self::Init,
         root: Self::Root,
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
-        use relm4::Component as _;
-
         let tasks = crate::widgets::tasks::Model::builder().launch(()).forward(
             sender.output_sender(),
             |output| match output {
@@ -156,23 +158,18 @@ impl relm4::SimpleComponent for Model {
         let model = Self {
             tasks,
             filters: std::collections::BTreeMap::new(),
-            store: gtk::TreeStore::new(&columns),
-            tree_view: gtk::TreeView::new(),
         };
 
-        let filters = &model.tree_view;
         let widgets = view_output!();
 
-        filters.set_model(Some(&model.store));
-
-        let selection = filters.selection();
+        let selection = widgets.tree_view.selection();
         selection.set_mode(gtk::SelectionMode::Multiple);
         selection.connect_changed(move |_| {
             sender.input(MsgInput::SelectionChange);
         });
 
         let column = gtk::TreeViewColumn::new();
-        filters.append_column(&column);
+        widgets.tree_view.append_column(&column);
 
         let cell = gtk::CellRendererProgress::new();
         cell.set_text_xalign(0.);
@@ -180,19 +177,25 @@ impl relm4::SimpleComponent for Model {
         column.add_attribute(&cell, "text", Column::Title.into());
         column.add_attribute(&cell, "value", Column::Progress.into());
 
-        filters.set_tooltip_column(Column::Tooltip.into());
+        widgets.tree_view.set_tooltip_column(Column::Tooltip.into());
 
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, sender: relm4::ComponentSender<Self>) {
+    fn update_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        msg: Self::Input,
+        sender: relm4::ComponentSender<Self>,
+        _: &Self::Root,
+    ) {
         use MsgInput::*;
 
         match msg {
             SelectionChange => {
                 let mut filters = Vec::new();
 
-                let (paths, _) = self.tree_view.selection().selected_rows();
+                let (paths, _) = widgets.tree_view.selection().selected_rows();
 
                 for path in paths {
                     match self.filters.get(&path) {
@@ -203,7 +206,7 @@ impl relm4::SimpleComponent for Model {
 
                 sender.output(MsgOutput::Filters(filters)).ok();
             }
-            UpdateFilters(filters) => self.update_filters(filters),
+            UpdateFilters(filters) => self.update_filters(widgets, filters),
             UpdateTasks(tasks) => self.update_tasks(tasks),
         }
     }
@@ -218,10 +221,13 @@ impl relm4::SimpleComponent for Model {
             set_start_child = &gtk::ScrolledWindow {
                 set_policy: (gtk::PolicyType::Never, gtk::PolicyType::Automatic),
 
-                #[local_ref]
-                filters -> gtk::TreeView {
+                #[name = "tree_view"]
+                gtk::TreeView {
                     set_enable_tree_lines: true,
                     set_headers_visible: false,
+                    #[wrap(Some)]
+                    #[name = "store"]
+                    set_model = &gtk::TreeStore::new(&columns),
 
                     connect_row_activated => |treeview, path, _| Self::select_range(treeview, path),
                 },

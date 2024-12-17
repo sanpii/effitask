@@ -1,4 +1,3 @@
-use gtk::glib::clone;
 use gtk::prelude::*;
 
 type ChannelData = (log::Level, String);
@@ -45,7 +44,6 @@ pub enum Msg {
 
 pub struct Model {
     count: usize,
-    list_box: gtk::ListBox,
 }
 
 impl Model {
@@ -61,24 +59,25 @@ impl Model {
         gtk::glib::ControlFlow::Continue
     }
 
-    fn add_message(&self, level: log::Level, text: &str) {
+    fn add_message(&self, widgets: &ModelWidgets, level: log::Level, text: &str) {
         let class = level.to_string();
 
         let label = gtk::Label::new(Some(text));
         label.add_css_class(&class.to_lowercase());
 
-        self.list_box.append(&label);
+        widgets.list_box.append(&label);
     }
 }
 
 #[relm4::component(pub)]
-impl relm4::SimpleComponent for Model {
+impl relm4::Component for Model {
+    type CommandOutput = ();
     type Init = ();
     type Input = Msg;
     type Output = ();
 
     fn init(
-        _init: Self::Init,
+        _: Self::Init,
         root: Self::Root,
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
@@ -88,14 +87,7 @@ impl relm4::SimpleComponent for Model {
         log::set_max_level(log::LevelFilter::Info);
         log::set_boxed_logger(Box::new(log)).unwrap_or_default();
 
-        let list_box = gtk::ListBox::new();
-        list_box.connect_row_activated(clone!(
-            #[strong]
-            sender,
-            move |_, row| sender.input(Msg::Read(row.clone()))
-        ));
-
-        let model = Self { count: 0, list_box };
+        let model = Self { count: 0 };
 
         let widgets = view_output!();
 
@@ -105,18 +97,24 @@ impl relm4::SimpleComponent for Model {
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, _sender: relm4::ComponentSender<Self>) {
+    fn update_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        msg: Self::Input,
+        _: relm4::ComponentSender<Self>,
+        _: &Self::Root,
+    ) {
         match msg {
             Msg::Add((level, text)) => {
-                self.add_message(level, &text);
+                self.add_message(widgets, level, &text);
                 self.count += 1;
             }
             Msg::Clear => {
-                self.list_box.remove_all();
+                widgets.list_box.remove_all();
                 self.count = 0;
             }
             Msg::Read(row) => {
-                self.list_box.remove(&row);
+                widgets.list_box.remove(&row);
                 self.count = self.count.saturating_sub(1);
             }
         }
@@ -141,7 +139,11 @@ impl relm4::SimpleComponent for Model {
                     gtk::ScrolledWindow {
                         set_vexpand: true,
                         set_policy: (gtk::PolicyType::Never, gtk::PolicyType::Automatic),
-                        set_child: Some(&model.list_box),
+
+                        #[name = "list_box"]
+                        gtk::ListBox {
+                            connect_row_activated[sender] => move |_, row| sender.input(Msg::Read(row.clone())),
+                        }
                     },
                     gtk::Button {
                         set_label: "Clear all",

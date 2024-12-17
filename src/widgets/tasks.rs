@@ -7,20 +7,28 @@ pub enum Msg {
 
 pub struct Model {
     children: Vec<relm4::Controller<super::task::Model>>,
-    list_box: gtk::ListBox,
 }
 
 impl Model {
-    fn update_tasks(&mut self, sender: relm4::ComponentSender<Self>, tasks: &[crate::tasks::Task]) {
+    fn update_tasks(
+        &mut self,
+        widgets: &ModelWidgets,
+        sender: relm4::ComponentSender<Self>,
+        tasks: &[crate::tasks::Task],
+    ) {
         use relm4::Component as _;
         use relm4::ComponentController as _;
 
-        self.clear();
+        self.clear(widgets);
 
         if tasks.is_empty() {
-            self.list_box.set_visible(false);
+            widgets.label.set_visible(true);
+            widgets.list_box.set_visible(false);
             return;
         }
+
+        widgets.label.set_visible(false);
+        widgets.list_box.set_visible(true);
 
         let mut sorted_tasks = tasks.to_owned();
         sorted_tasks.sort();
@@ -31,36 +39,32 @@ impl Model {
                 .launch(task.clone())
                 .forward(sender.output_sender(), std::convert::identity);
 
-            self.list_box.append(child.widget());
+            widgets.list_box.append(child.widget());
 
             self.children.push(child);
         }
     }
 
-    fn clear(&mut self) {
-        self.list_box.remove_all();
+    fn clear(&mut self, widgets: &ModelWidgets) {
+        widgets.list_box.remove_all();
         self.children = Vec::new();
     }
 }
 
 #[relm4::component(pub)]
-impl relm4::SimpleComponent for Model {
+impl relm4::Component for Model {
+    type CommandOutput = ();
     type Init = ();
     type Input = Msg;
     type Output = crate::widgets::task::MsgOutput;
 
     fn init(
-        _init: Self::Init,
+        _: Self::Init,
         root: Self::Root,
         _sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
-        let list_box = gtk::ListBox::new();
-        list_box.set_hexpand(true);
-        list_box.set_vexpand(true);
-
         let model = Self {
             children: Vec::new(),
-            list_box,
         };
 
         let widgets = view_output!();
@@ -68,25 +72,33 @@ impl relm4::SimpleComponent for Model {
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, sender: relm4::ComponentSender<Self>) {
+    fn update_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        msg: Self::Input,
+        sender: relm4::ComponentSender<Self>,
+        _: &Self::Root,
+    ) {
         use Msg::*;
 
         match msg {
-            Update(tasks) => self.update_tasks(sender, &tasks),
+            Update(tasks) => self.update_tasks(widgets, sender, &tasks),
         }
     }
 
     view! {
         gtk::ScrolledWindow {
             gtk::Box {
-                append: &model.list_box,
-
-                gtk::Label {
-                    #[watch]
-                    set_visible: model.children.is_empty(),
+                #[name = "list_box"]
+                gtk::ListBox {
                     set_hexpand: true,
                     set_vexpand: true,
+                },
+                #[name = "label"]
+                gtk::Label {
+                    set_hexpand: true,
                     set_text: "Nothing to do :)",
+                    set_vexpand: true,
                 },
             },
         },

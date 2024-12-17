@@ -29,7 +29,7 @@ impl relm4::SimpleComponent for Model {
     type Output = crate::widgets::task::MsgOutput;
 
     fn init(
-        _init: Self::Init,
+        _: Self::Init,
         root: Self::Root,
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
@@ -47,7 +47,7 @@ impl relm4::SimpleComponent for Model {
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, _sender: relm4::ComponentSender<Self>) {
+    fn update(&mut self, msg: Self::Input, _: relm4::ComponentSender<Self>) {
         match msg {
             Msg::Update => self.update_tasks(),
         }

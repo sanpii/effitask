@@ -93,7 +93,7 @@ impl relm4::SimpleComponent for Model {
     fn init(
         init: Self::Init,
         root: Self::Root,
-        _sender: relm4::ComponentSender<Self>,
+        _: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
         root.set_height_request(60);
         root.set_width_request(60);

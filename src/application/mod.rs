@@ -7,7 +7,6 @@ pub use globals::tasks::get as tasks;
 use globals::tasks::add as add_task;
 use preferences::Preferences;
 
-use gtk::glib::clone;
 use gtk::prelude::*;
 use relm4::ComponentController as _;
 
@@ -58,18 +57,14 @@ pub enum Msg {
 }
 
 pub struct Model {
-    add_popover: gtk::Popover,
     agenda: relm4::Controller<crate::agenda::Model>,
     config: todo_txt::Config,
     contexts: relm4::Controller<crate::widgets::tags::Model>,
-    defered_button: gtk::CheckButton,
-    done_button: gtk::CheckButton,
     done: relm4::Controller<crate::done::Model>,
     edit: relm4::Controller<crate::edit::Model>,
     flag: relm4::Controller<crate::flag::Model>,
     inbox: relm4::Controller<crate::inbox::Model>,
     logger: relm4::Controller<crate::logger::Model>,
-    notebook: gtk::Notebook,
     projects: relm4::Controller<crate::widgets::tags::Model>,
     search: relm4::Controller<crate::search::Model>,
     #[allow(dead_code)]
@@ -163,16 +158,16 @@ impl Model {
         Some(path)
     }
 
-    fn add(&mut self, text: &str) {
+    fn add(&mut self, widgets: &ModelWidgets, text: &str) {
         match add_task(text) {
-            Ok(_) => self.update_tasks(),
+            Ok(_) => self.update_tasks(widgets),
             Err(err) => log::error!("Unable to create task: '{err}'"),
         }
 
-        self.add_popover.popdown();
+        widgets.add_popover.popdown();
     }
 
-    fn complete(&mut self, task: &crate::tasks::Task) {
+    fn complete(&mut self, widgets: &ModelWidgets, task: &crate::tasks::Task) {
         let id = task.id;
         let mut list = tasks();
 
@@ -220,7 +215,7 @@ impl Model {
             Err(err) => log::error!("Unable to save tasks: {err}"),
         };
 
-        self.update_tasks();
+        self.update_tasks(widgets);
     }
 
     fn edit(&mut self, task: &crate::tasks::Task) {
@@ -229,7 +224,7 @@ impl Model {
         self.edit.widget().set_visible(true);
     }
 
-    fn save(&mut self, task: &crate::tasks::Task) {
+    fn save(&mut self, widgets: &ModelWidgets, task: &crate::tasks::Task) {
         let id = task.id;
         let mut list = tasks();
 
@@ -244,30 +239,30 @@ impl Model {
 
         log::info!("Task updated");
 
-        self.update_tasks();
+        self.update_tasks(widgets);
         self.edit.widget().set_visible(false);
     }
 
-    fn search(&self, query: &str) {
+    fn search(&self, widgets: &ModelWidgets, query: &str) {
         if query.is_empty() {
-            self.notebook.set_current_page(Some(Page::Inbox.into()));
+            widgets.notebook.set_current_page(Some(Page::Inbox.into()));
             self.search.widget().set_visible(false);
         } else {
             self.search.widget().set_visible(true);
-            self.notebook.set_current_page(Some(Page::Search.into()));
+            widgets.notebook.set_current_page(Some(Page::Search.into()));
         }
 
         self.search
             .emit(crate::search::MsgInput::UpdateFilter(query.to_string()));
     }
 
-    fn update_tasks(&self) {
+    fn update_tasks(&self, widgets: &ModelWidgets) {
         let list = crate::tasks::List::from_files(&self.config.todo_file, &self.config.done_file);
         globals::tasks::replace(list);
 
         globals::preferences::replace(crate::application::Preferences {
-            defered: self.defered_button.is_active(),
-            done: self.done_button.is_active(),
+            defered: widgets.defered_button.is_active(),
+            done: widgets.done_button.is_active(),
         });
 
         self.agenda.sender().emit(crate::agenda::MsgInput::Update);
@@ -307,7 +302,8 @@ impl Model {
 }
 
 #[relm4::component(pub)]
-impl relm4::SimpleComponent for Model {
+impl relm4::Component for Model {
+    type CommandOutput = ();
     type Init = todo_txt::Config;
     type Input = Msg;
     type Output = ();
@@ -317,8 +313,6 @@ impl relm4::SimpleComponent for Model {
         root: Self::Root,
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
-        use relm4::Component as _;
-
         let logger = crate::logger::Model::builder().launch(()).detach();
 
         let agenda = crate::agenda::Model::builder()
@@ -380,60 +374,46 @@ impl relm4::SimpleComponent for Model {
                 crate::widgets::task::MsgOutput::Edit(task) => Msg::Edit(task),
             });
 
-        let defered_button = gtk::CheckButton::with_label("Display defered tasks");
-        defered_button.connect_toggled(clone!(
-            #[strong]
-            sender,
-            move |_| sender.input(Msg::Refresh)
-        ));
-
-        let done_button = gtk::CheckButton::with_label("Display done tasks");
-        done_button.connect_toggled(clone!(
-            #[strong]
-            sender,
-            move |_| sender.input(Msg::Refresh)
-        ));
-
         let model = Self {
-            add_popover: gtk::Popover::new(),
             agenda,
             config: init,
             contexts,
-            defered_button,
-            done_button,
             done,
             edit,
             flag,
             inbox,
             logger,
-            notebook: gtk::Notebook::new(),
             projects,
             search,
             xdg: xdg::BaseDirectories::with_prefix(NAME.to_lowercase()).unwrap(),
         };
 
-        let add_popover = &model.add_popover;
-        let notebook = &model.notebook;
         let widgets = view_output!();
 
         model.load_style();
-        model.add_tab_widgets(notebook);
-        model.update_tasks();
+        model.add_tab_widgets(&widgets.notebook);
+        model.update_tasks(&widgets);
         model.search.widget().set_visible(false);
         model.watch(sender);
 
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, _sender: relm4::ComponentSender<Self>) {
+    fn update_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        msg: Self::Input,
+        _: relm4::ComponentSender<Self>,
+        _: &Self::Root,
+    ) {
         match msg {
-            Msg::Add(task) => self.add(&task),
-            Msg::Complete(task) => self.complete(&task),
+            Msg::Add(task) => self.add(widgets, &task),
+            Msg::Complete(task) => self.complete(widgets, &task),
             Msg::EditCancel => self.edit.widget().set_visible(false),
-            Msg::EditDone(task) => self.save(&task),
+            Msg::EditDone(task) => self.save(widgets, &task),
             Msg::Edit(task) => self.edit(&task),
-            Msg::Refresh => self.update_tasks(),
-            Msg::Search(query) => self.search(&query),
+            Msg::Refresh => self.update_tasks(widgets),
+            Msg::Search(query) => self.search(widgets, &query),
         }
     }
 
@@ -455,8 +435,8 @@ impl relm4::SimpleComponent for Model {
                         set_icon_name: "list-add",
                         set_tooltip_text: "Add".into(),
                         #[wrap(Some)]
-                        #[local_ref]
-                        set_popover = add_popover -> gtk::Popover {
+                        #[name = "add_popover"]
+                        set_popover = &gtk::Popover {
                             gtk::Box {
                                 set_orientation: gtk::Orientation::Vertical,
 
@@ -479,8 +459,17 @@ impl relm4::SimpleComponent for Model {
                         set_popover = &gtk::Popover {
                             gtk::Box {
                                 set_orientation: gtk::Orientation::Vertical,
-                                append: &model.defered_button,
-                                append: &model.done_button,
+                                #[name = "defered_button"]
+                                gtk::CheckButton {
+                                    set_label: Some("Display defered tasks"),
+
+                                    connect_toggled => Msg::Refresh,
+                                },
+                                #[name = "done_button"]
+                                gtk::CheckButton {
+                                    set_label: Some("Display done tasks"),
+                                    connect_toggled => Msg::Refresh,
+                                },
                             },
                         },
                     },
@@ -499,8 +488,8 @@ impl relm4::SimpleComponent for Model {
                     set_wide_handle: true,
 
                     #[wrap(Some)]
-                    #[local_ref]
-                    set_start_child = notebook -> gtk::Notebook {
+                    #[name = "notebook"]
+                    set_start_child = &gtk::Notebook {
                         set_tab_pos: gtk::PositionType::Left,
 
                         append_page: (model.inbox.widget(), None::<&gtk::Label>),

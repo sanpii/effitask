@@ -17,8 +17,6 @@ pub enum MsgOutput {
 
 pub struct Model {
     keywords: std::collections::BTreeMap<gtk::TreePath, (String, String)>,
-    store: gtk::ListStore,
-    tree_view: gtk::TreeView,
 }
 
 #[repr(u32)]
@@ -41,28 +39,28 @@ impl From<Column> for i32 {
 }
 
 impl Model {
-    fn add(&mut self) {
-        let iter = self.store.append();
-        let path = self.store.path(&iter);
-        let column = self.tree_view.column(Column::Name.into());
+    fn add(&mut self, widgets: &ModelWidgets) {
+        let iter = widgets.store.append();
+        let path = widgets.store.path(&iter);
+        let column = widgets.tree_view.column(Column::Name.into());
 
         self.keywords
             .insert(path.clone(), (String::new(), String::new()));
-        gtk::prelude::TreeViewExt::set_cursor(&self.tree_view, &path, column.as_ref(), true);
+        gtk::prelude::TreeViewExt::set_cursor(&widgets.tree_view, &path, column.as_ref(), true);
     }
 
-    fn delete(&mut self, sender: relm4::ComponentSender<Self>) {
-        let selection = self.tree_view.selection();
+    fn delete(&mut self, widgets: &ModelWidgets, sender: relm4::ComponentSender<Self>) {
+        let selection = widgets.tree_view.selection();
         let (rows, _) = selection.selected_rows();
         let references = rows
             .iter()
-            .map(|x| gtk::TreeRowReference::new(&self.store, x));
+            .map(|x| gtk::TreeRowReference::new(&widgets.store, x));
 
         for reference in references.flatten() {
             if let Some(path) = reference.path() {
                 self.keywords.remove(&path);
-                if let Some(iter) = self.store.iter(&path) {
-                    self.store.remove(&iter);
+                if let Some(iter) = widgets.store.iter(&path) {
+                    widgets.store.remove(&iter);
                 }
             }
         }
@@ -72,6 +70,7 @@ impl Model {
 
     fn edit(
         &mut self,
+        widgets: &ModelWidgets,
         sender: relm4::ComponentSender<Self>,
         column: Column,
         path: &gtk::TreePath,
@@ -84,8 +83,9 @@ impl Model {
             }
         }
 
-        let iter = self.store.iter(path).unwrap();
-        self.store
+        let iter = widgets.store.iter(path).unwrap();
+        widgets
+            .store
             .set_value(&iter, column.into(), &new_text.to_value());
 
         sender.output(MsgOutput::Updated(self.keywords())).ok();
@@ -95,19 +95,21 @@ impl Model {
         self.keywords.values().cloned().collect()
     }
 
-    fn set(&mut self, tags: std::collections::BTreeMap<String, String>) {
+    fn set(&mut self, widgets: &ModelWidgets, tags: std::collections::BTreeMap<String, String>) {
         self.keywords.clear();
-        self.store.clear();
+        widgets.store.clear();
 
         for (name, value) in tags {
-            let iter = self.store.append();
+            let iter = widgets.store.append();
 
-            self.store
+            widgets
+                .store
                 .set_value(&iter, Column::Name.into(), &name.to_value());
-            self.store
+            widgets
+                .store
                 .set_value(&iter, Column::Value.into(), &value.to_value());
 
-            let path = self.store.path(&iter);
+            let path = widgets.store.path(&iter);
 
             self.keywords.insert(path, (name, value));
         }
@@ -115,13 +117,14 @@ impl Model {
 }
 
 #[relm4::component(pub)]
-impl relm4::SimpleComponent for Model {
+impl relm4::Component for Model {
+    type CommandOutput = ();
     type Init = std::collections::BTreeMap<String, String>;
     type Input = MsgInput;
     type Output = MsgOutput;
 
     fn init(
-        _init: Self::Init,
+        _: Self::Init,
         root: Self::Root,
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
@@ -134,19 +137,18 @@ impl relm4::SimpleComponent for Model {
 
         let model = Self {
             keywords: std::collections::BTreeMap::new(),
-            store: gtk::ListStore::new(&columns),
-            tree_view: gtk::TreeView::new(),
         };
 
-        let tree_view = &model.tree_view;
         let widgets = view_output!();
 
-        tree_view.set_model(Some(&model.store));
-        tree_view.selection().set_mode(gtk::SelectionMode::Multiple);
+        widgets
+            .tree_view
+            .selection()
+            .set_mode(gtk::SelectionMode::Multiple);
 
         let column = gtk::TreeViewColumn::new();
         column.set_title("name");
-        tree_view.append_column(&column);
+        widgets.tree_view.append_column(&column);
 
         let cell = gtk::CellRendererText::new();
         cell.set_editable(true);
@@ -165,7 +167,7 @@ impl relm4::SimpleComponent for Model {
 
         let column = gtk::TreeViewColumn::new();
         column.set_title("value");
-        tree_view.append_column(&column);
+        widgets.tree_view.append_column(&column);
 
         let cell = gtk::CellRendererText::new();
         cell.set_editable(true);
@@ -185,16 +187,22 @@ impl relm4::SimpleComponent for Model {
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, sender: relm4::ComponentSender<Self>) {
+    fn update_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        msg: Self::Input,
+        sender: relm4::ComponentSender<Self>,
+        _: &Self::Root,
+    ) {
         use MsgInput::*;
 
         match msg {
-            Add => self.add(),
-            Delete => self.delete(sender),
+            Add => self.add(widgets),
+            Delete => self.delete(widgets, sender),
             Edit(ref column, ref path, ref new_text) => {
-                self.edit(sender, column.clone(), path, new_text)
+                self.edit(widgets, sender, column.clone(), path, new_text)
             }
-            Set(keywords) => self.set(keywords),
+            Set(keywords) => self.set(widgets, keywords),
         }
     }
 
@@ -205,11 +213,14 @@ impl relm4::SimpleComponent for Model {
                 set_height_request: 150,
                 set_policy: (gtk::PolicyType::Never, gtk::PolicyType::Automatic),
 
-                #[local_ref]
-                tree_view -> gtk::TreeView {
+                #[name = "tree_view"]
+                gtk::TreeView {
                     set_headers_visible: true,
                     set_hexpand: true,
                     set_vexpand: true,
+                    #[wrap(Some)]
+                    #[name = "store"]
+                    set_model = &gtk::ListStore::new(&columns),
                 },
             },
             gtk::ActionBar {

@@ -40,42 +40,43 @@ macro_rules! create {
 }
 
 macro_rules! update {
-    ($self:ident, $exp:ident, $task:ident, $get:ident, $list:ident, $date:ident) => {{
+    ($self:ident, $exp:expr, $task:ident, $get:ident, $list:ident, $date:ident) => {{
         use relm4::ComponentController as _;
 
         let tasks = $self.$get(&$list, $date);
 
-        $self.$exp.set_expanded(!tasks.is_empty());
-        $self.$exp.set_sensitive(!tasks.is_empty());
+        $exp.set_expanded(!tasks.is_empty());
+        $exp.set_sensitive(!tasks.is_empty());
         $self.$task.emit(crate::widgets::tasks::Msg::Update(tasks));
     }};
 }
 
 pub struct Model {
-    calendar: gtk::Calendar,
     date: chrono::NaiveDate,
-    month_exp: gtk::Expander,
     month: relm4::Controller<crate::widgets::tasks::Model>,
-    past_exp: gtk::Expander,
     past: relm4::Controller<crate::widgets::tasks::Model>,
-    today_exp: gtk::Expander,
     today: relm4::Controller<crate::widgets::tasks::Model>,
-    tomorrow_exp: gtk::Expander,
     tomorrow: relm4::Controller<crate::widgets::tasks::Model>,
-    week_exp: gtk::Expander,
     week: relm4::Controller<crate::widgets::tasks::Model>,
 }
 
 impl Model {
-    fn update_tasks(&self) {
+    fn update_tasks(&self, widgets: &ModelWidgets) {
         let list = crate::application::tasks();
-        let date = crate::date::from_glib(self.calendar.date());
+        let date = crate::date::from_glib(widgets.calendar.date());
 
-        update!(self, past_exp, past, past_tasks, list, date);
-        update!(self, today_exp, today, today_tasks, list, date);
-        update!(self, tomorrow_exp, tomorrow, tomorrow_tasks, list, date);
-        update!(self, week_exp, week, week_tasks, list, date);
-        update!(self, month_exp, month, month_tasks, list, date);
+        update!(self, widgets.past_exp, past, past_tasks, list, date);
+        update!(self, widgets.today_exp, today, today_tasks, list, date);
+        update!(
+            self,
+            widgets.tomorrow_exp,
+            tomorrow,
+            tomorrow_tasks,
+            list,
+            date
+        );
+        update!(self, widgets.week_exp, week, week_tasks, list, date);
+        update!(self, widgets.month_exp, month, month_tasks, list, date);
     }
 
     fn past_tasks(
@@ -160,13 +161,13 @@ impl Model {
         tasks
     }
 
-    fn update_marks(&self) {
+    fn update_marks(&self, widgets: &ModelWidgets) {
         use chrono::Datelike as _;
 
-        self.calendar.clear_marks();
+        widgets.calendar.clear_marks();
 
         let list = crate::application::tasks();
-        let date = self.calendar.date();
+        let date = widgets.calendar.date();
         let month = date.month() as u32;
         let year = date.year();
 
@@ -176,14 +177,15 @@ impl Model {
             };
 
             if due_date.year() == year && due_date.month() == month {
-                self.calendar.mark_day(due_date.day());
+                widgets.calendar.mark_day(due_date.day());
             }
         }
     }
 }
 
 #[relm4::component(pub)]
-impl relm4::SimpleComponent for Model {
+impl relm4::Component for Model {
+    type CommandOutput = ();
     type Init = chrono::NaiveDate;
     type Input = MsgInput;
     type Output = MsgOutput;
@@ -193,36 +195,29 @@ impl relm4::SimpleComponent for Model {
         root: Self::Root,
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
-        use relm4::Component as _;
         use relm4::ComponentController as _;
 
         let model = Self {
-            calendar: gtk::Calendar::new(),
             date: init,
             month: create!(sender),
-            month_exp: gtk::Expander::new(None),
             past: create!(sender),
-            past_exp: gtk::Expander::new(None),
             today: create!(sender),
-            today_exp: gtk::Expander::new(None),
             tomorrow: create!(sender),
-            tomorrow_exp: gtk::Expander::new(None),
             week: create!(sender),
-            week_exp: gtk::Expander::new(None),
         };
 
-        let calendar = &model.calendar;
-        let month_exp = &model.month_exp;
-        let past_exp = &model.past_exp;
-        let today_exp = &model.today_exp;
-        let tomorrow_exp = &model.tomorrow_exp;
-        let week_exp = &model.week_exp;
         let widgets = view_output!();
 
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, _: relm4::ComponentSender<Self>) {
+    fn update_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        msg: Self::Input,
+        _: relm4::ComponentSender<Self>,
+        _: &Self::Root,
+    ) {
         use MsgInput::*;
 
         match msg {
@@ -235,13 +230,13 @@ impl relm4::SimpleComponent for Model {
                 }
                 .unwrap();
 
-                self.update_marks();
+                self.update_marks(widgets);
             }
             DateSelect(date) => self.date = date,
             Update => (),
         }
 
-        self.update_tasks();
+        self.update_tasks(widgets);
     }
 
     view! {
@@ -253,8 +248,8 @@ impl relm4::SimpleComponent for Model {
                 set_orientation: gtk::Orientation::Vertical,
                 set_spacing: 5,
 
-                #[local_ref]
-                calendar -> gtk::Calendar {
+                #[name = "calendar"]
+                gtk::Calendar {
                     #[watch]
                     set_day: model.date.day() as i32,
                     #[watch]
@@ -281,28 +276,28 @@ impl relm4::SimpleComponent for Model {
                     set_orientation: gtk::Orientation::Vertical,
                     set_vexpand: true,
 
-                    #[local_ref]
-                    past_exp -> gtk::Expander {
+                    #[name = "past_exp"]
+                    gtk::Expander {
                         set_child: Some(model.past.widget()),
                         set_label: Some("Past due"),
                     },
-                    #[local_ref]
-                    today_exp -> gtk::Expander {
+                    #[name = "today_exp"]
+                    gtk::Expander {
                         set_child: Some(model.today.widget()),
                         set_label: Some("Today"),
                     },
-                    #[local_ref]
-                    tomorrow_exp -> gtk::Expander {
+                    #[name = "tomorrow_exp"]
+                    gtk::Expander {
                         set_child: Some(model.tomorrow.widget()),
                         set_label: Some("Tomorrow"),
                     },
-                    #[local_ref]
-                    week_exp -> gtk::Expander {
+                    #[name = "week_exp"]
+                    gtk::Expander {
                         set_child: Some(model.week.widget()),
                         set_label: Some("This week"),
                     },
-                    #[local_ref]
-                    month_exp -> gtk::Expander {
+                    #[name = "month_exp"]
+                    gtk::Expander {
                         set_child: Some(model.month.widget()),
                         set_label: Some("This month"),
                     },

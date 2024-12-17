@@ -3,9 +3,7 @@ use gtk::prelude::*;
 
 pub struct Model {
     date: Option<chrono::NaiveDate>,
-    entry: gtk::Entry,
     label: &'static str,
-    popover: gtk::Popover,
 }
 
 #[derive(Debug)]
@@ -27,16 +25,22 @@ impl Model {
         sender.output(MsgOutput::Updated(self.date)).ok();
     }
 
-    fn date_selected(&mut self, sender: relm4::ComponentSender<Self>, date: gtk::glib::DateTime) {
+    fn date_selected(
+        &mut self,
+        widgets: &ModelWidgets,
+        sender: relm4::ComponentSender<Self>,
+        date: gtk::glib::DateTime,
+    ) {
         self.date = Some(crate::date::from_glib(date));
 
         sender.output(MsgOutput::Updated(self.date)).ok();
-        self.popover.popdown();
+        widgets.popover.popdown();
     }
 }
 
 #[relm4::component(pub)]
-impl relm4::SimpleComponent for Model {
+impl relm4::Component for Model {
+    type CommandOutput = ();
     type Init = &'static str;
     type Input = MsgInput;
     type Output = MsgOutput;
@@ -47,25 +51,27 @@ impl relm4::SimpleComponent for Model {
         sender: relm4::ComponentSender<Self>,
     ) -> relm4::ComponentParts<Self> {
         let model = Self {
-            entry: gtk::Entry::new(),
             date: None,
             label: init,
-            popover: gtk::Popover::new(),
         };
 
-        let entry = &model.entry;
-        let popover = &model.popover;
         let widgets = view_output!();
 
         relm4::ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, sender: relm4::ComponentSender<Self>) {
+    fn update_with_view(
+        &mut self,
+        widgets: &mut Self::Widgets,
+        msg: Self::Input,
+        sender: relm4::ComponentSender<Self>,
+        _: &Self::Root,
+    ) {
         use MsgInput::*;
 
         match msg {
             Add(period) => self.add(sender, period),
-            DateSelected(date) => self.date_selected(sender, date),
+            DateSelected(date) => self.date_selected(widgets, sender, date),
             Set(date) => self.date = date,
             DateUpdated => {
                 sender.output(MsgOutput::Updated(self.date)).ok();
@@ -93,8 +99,8 @@ impl relm4::SimpleComponent for Model {
                     gtk::MenuButton {
                         set_icon_name: "x-office-calendar",
                         #[wrap(Some)]
-                        #[local_ref]
-                        set_popover = popover -> gtk::Popover {
+                        #[name = "popover"]
+                        set_popover = &gtk::Popover {
                             gtk::Calendar {
                                 #[watch]
                                 set_day?: model.date.map(|x| x.day() as i32),
@@ -109,8 +115,7 @@ impl relm4::SimpleComponent for Model {
                             },
                         },
                     },
-                    #[local_ref]
-                    entry -> gtk::Entry {
+                    gtk::Entry {
                         set_hexpand: true,
                         #[watch]
                         set_text?: &model.date.map(|x| x.format("%Y-%m-%d").to_string()),

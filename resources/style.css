@@ -6,10 +6,6 @@ notebook tabs tab:checked {
     filter: grayscale(0);
 }
 
-calendar *:active {
-    color: #3C92CA;
-}
-
 .log .count {
     padding-left: 5px;
     padding-right: 5px;

@@ -1,3 +1,11 @@
+notebook tabs tab {
+    filter: grayscale(70%);
+}
+
+notebook tabs tab:checked {
+    filter: grayscale(0);
+}
+
 calendar *:active {
     color: #3C92CA;
 }

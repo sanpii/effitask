@@ -25,7 +25,7 @@ impl Task {
             })
             .into_owned();
 
-        let regex = regex::Regex::new(r"(?P<space>^|[\s])(?P<tag>[\+@][\w\-\\]+)").unwrap();
+        let regex = regex::Regex::new(r"(?P<space>^|[\s])(?P<tag>[\+@#][\w\-\\]+)").unwrap();
         subject = regex
             .replace_all(&subject, "$space<b>$tag</b>")
             .into_owned();

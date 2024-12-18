@@ -22,7 +22,7 @@ impl Model {
             .iter()
             .filter(|x| {
                 !x.finished
-                    && x.projects().is_empty()
+                    && x.projects.is_empty()
                     && (preferences.defered
                         || x.threshold_date.is_none()
                         || x.threshold_date.unwrap() <= today)

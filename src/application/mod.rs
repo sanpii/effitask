@@ -22,6 +22,7 @@ enum Page {
     Flag,
     Done,
     Search,
+    Tags,
 }
 
 impl From<u32> for Page {
@@ -30,10 +31,11 @@ impl From<u32> for Page {
             0 => Page::Inbox,
             1 => Page::Projects,
             2 => Page::Contexts,
-            3 => Page::Agenda,
-            4 => Page::Flag,
-            5 => Page::Done,
-            6 => Page::Search,
+            3 => Page::Tags,
+            4 => Page::Agenda,
+            5 => Page::Flag,
+            6 => Page::Done,
+            7 => Page::Search,
             _ => panic!("Invalid page {n}"),
         }
     }
@@ -67,6 +69,7 @@ pub struct Model {
     logger: relm4::Controller<crate::logger::Model>,
     projects: relm4::Controller<crate::widgets::tags::Model>,
     search: relm4::Controller<crate::search::Model>,
+    tags: relm4::Controller<crate::widgets::tags::Model>,
 }
 
 impl Model {
@@ -120,6 +123,7 @@ impl Model {
             Page::Flag => "flag",
             Page::Done => "done",
             Page::Search => "search",
+            Page::Tags => "tags",
         };
 
         let image = gtk::Image::from_icon_name(title);
@@ -250,6 +254,7 @@ impl Model {
         self.flag.sender().emit(crate::flag::Msg::Update);
         self.inbox.sender().emit(crate::inbox::Msg::Update);
         self.search.sender().emit(crate::search::MsgInput::Update);
+        self.tags.sender().emit(crate::widgets::tags::MsgInput::Update);
     }
 
     fn watch(&self, sender: relm4::ComponentSender<Self>) {
@@ -348,6 +353,13 @@ impl relm4::Component for Model {
                 crate::widgets::task::MsgOutput::Edit(task) => Msg::Edit(task),
             });
 
+        let tags = crate::widgets::tags::Model::builder()
+            .launch(crate::widgets::tags::Type::Hashtags)
+            .forward(sender.input_sender(), |output| match output {
+                crate::widgets::tags::MsgOutput::Complete(task) => Msg::Complete(task),
+                crate::widgets::tags::MsgOutput::Edit(task) => Msg::Edit(task),
+            });
+
         let model = Self {
             agenda,
             config: init,
@@ -359,6 +371,7 @@ impl relm4::Component for Model {
             logger,
             projects,
             search,
+            tags,
         };
 
         let widgets = view_output!();
@@ -468,6 +481,7 @@ impl relm4::Component for Model {
                         append_page: (model.inbox.widget(), None::<&gtk::Label>),
                         append_page: (model.projects.widget(), None::<&gtk::Label>),
                         append_page: (model.contexts.widget(), None::<&gtk::Label>),
+                        append_page: (model.tags.widget(), None::<&gtk::Label>),
                         append_page: (model.agenda.widget(), None::<&gtk::Label>),
                         append_page: (model.flag.widget(), None::<&gtk::Label>),
                         append_page: (model.done.widget(), None::<&gtk::Label>),

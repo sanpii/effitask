@@ -5,6 +5,7 @@ use relm4::ComponentController as _;
 pub enum Type {
     Projects,
     Contexts,
+    Hashtags,
 }
 
 #[derive(Debug)]
@@ -32,6 +33,7 @@ impl Model {
         let tags = match self.tag {
             Type::Projects => list.projects(),
             Type::Contexts => list.contexts(),
+            Type::Hashtags => list.hashtags(),
         };
 
         let tags = tags
@@ -78,7 +80,7 @@ impl Model {
 
                 (preferences.done || !x.finished)
                     && !tags.is_empty()
-                    && Self::has_filter(tags, filters)
+                    && Self::has_filter(&tags, filters)
                     && (preferences.defered
                         || x.threshold_date.is_none()
                         || x.threshold_date.unwrap() <= today)
@@ -92,8 +94,9 @@ impl Model {
 
     fn tags<'a>(&self, task: &'a crate::tasks::Task) -> &'a [String] {
         match self.tag {
-            Type::Projects => task.projects(),
-            Type::Contexts => task.contexts(),
+            Type::Projects => &task.projects,
+            Type::Contexts => &task.contexts,
+            Type::Hashtags => &task.hashtags,
         }
     }
 

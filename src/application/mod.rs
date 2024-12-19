@@ -258,7 +258,9 @@ impl Model {
         self.flag.sender().emit(crate::flag::Msg::Update);
         self.inbox.sender().emit(crate::inbox::Msg::Update);
         self.search.sender().emit(crate::search::MsgInput::Update);
-        self.tags.sender().emit(crate::widgets::tags::MsgInput::Update);
+        self.tags
+            .sender()
+            .emit(crate::widgets::tags::MsgInput::Update);
 
         log::info!("Tasks reloaded");
     }
@@ -299,8 +301,10 @@ impl Model {
         for (trigger, msg) in SHORTCUTS {
             let trigger = gtk::ShortcutTrigger::parse_string(trigger);
             let callback = gtk::CallbackAction::new(gtk::glib::clone!(
-                #[strong] sender,
-                #[strong] msg,
+                #[strong]
+                sender,
+                #[strong]
+                msg,
                 move |_, _| {
                     sender.input(msg.clone());
                     gtk::glib::Propagation::Stop
@@ -442,7 +446,7 @@ impl relm4::Component for Model {
             Msg::Edit(task) => self.edit(&task),
             Msg::Find => {
                 widgets.search.grab_focus();
-            },
+            }
             Msg::Help => self.shortcuts.present(),
             Msg::Refresh => self.update_tasks(widgets),
             Msg::Search(query) => self.search(widgets, &query),

@@ -6,7 +6,7 @@ stages:
 
 before_script:
     - apt update -yqq
-    - apt install -yqq --no-install-recommends libgtk-3-dev
+    - apt install -yqq --no-install-recommends libgtk-4-dev
 
 lint:fmt:
     stage: lint

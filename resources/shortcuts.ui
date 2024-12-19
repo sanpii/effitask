@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <object class="GtkShortcutsWindow" id="shortcuts">
+        <property name="modal">1</property>
+        <child>
+            <object class="GtkShortcutsSection">
+                <property name="section-name">shortcuts</property>
+                <child>
+                    <object class="GtkShortcutsGroup">
+                        <property name="title" translatable="yes">General</property>
+                        <child>
+                            <object class="GtkShortcutsShortcut">
+                                <property name="accelerator">&lt;ctrl&gt;A</property>
+                                <property name="title" translatable="yes">New task</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkShortcutsShortcut">
+                                <property name="accelerator">&lt;ctrl&gt;F F3</property>
+                                <property name="title" translatable="yes">Search</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkShortcutsShortcut">
+                                <property name="accelerator">&lt;ctrl&gt;R F5</property>
+                                <property name="title" translatable="yes">Refresh tasks</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </object>
+</interface>

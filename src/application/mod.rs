@@ -47,13 +47,16 @@ impl From<Page> for u32 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Msg {
+    Adding,
     Add(String),
     Complete(Box<crate::tasks::Task>),
     Edit(Box<crate::tasks::Task>),
     EditCancel,
     EditDone(Box<crate::tasks::Task>),
+    Find,
+    Help,
     Refresh,
     Search(String),
 }
@@ -68,6 +71,7 @@ pub struct Model {
     inbox: relm4::Controller<crate::inbox::Model>,
     logger: relm4::Controller<crate::logger::Model>,
     projects: relm4::Controller<crate::widgets::tags::Model>,
+    shortcuts: gtk::ShortcutsWindow,
     search: relm4::Controller<crate::search::Model>,
     tags: relm4::Controller<crate::widgets::tags::Model>,
 }
@@ -255,6 +259,8 @@ impl Model {
         self.inbox.sender().emit(crate::inbox::Msg::Update);
         self.search.sender().emit(crate::search::MsgInput::Update);
         self.tags.sender().emit(crate::widgets::tags::MsgInput::Update);
+
+        log::info!("Tasks reloaded");
     }
 
     fn watch(&self, sender: relm4::ComponentSender<Self>) {
@@ -263,7 +269,6 @@ impl Model {
         let mut watcher = notify::recommended_watcher(move |res| match res {
             Ok(_) => {
                 sender.input(Msg::Refresh);
-                log::info!("Tasks reloaded");
             }
             Err(e) => log::warn!("watch error: {e:?}"),
         })
@@ -277,6 +282,36 @@ impl Model {
         ) {
             log::warn!("Unable to setup hot reload: {err}");
         }
+    }
+
+    fn shortcuts(window: &gtk::ApplicationWindow, sender: relm4::ComponentSender<Self>) {
+        static SHORTCUTS: &[(&str, Msg)] = &[
+            ("<Control>A", Msg::Adding),
+            ("<Control>F", Msg::Find),
+            ("F3", Msg::Find),
+            ("<Control>R", Msg::Refresh),
+            ("F5", Msg::Refresh),
+        ];
+
+        let controller = gtk::ShortcutController::new();
+        controller.set_scope(gtk::ShortcutScope::Global);
+
+        for (trigger, msg) in SHORTCUTS {
+            let trigger = gtk::ShortcutTrigger::parse_string(trigger);
+            let callback = gtk::CallbackAction::new(gtk::glib::clone!(
+                #[strong] sender,
+                #[strong] msg,
+                move |_, _| {
+                    sender.input(msg.clone());
+                    gtk::glib::Propagation::Stop
+                }
+            ));
+
+            let shortcut = gtk::Shortcut::new(trigger, Some(callback));
+            controller.add_shortcut(shortcut);
+        }
+
+        window.add_controller(controller);
     }
 }
 
@@ -360,6 +395,9 @@ impl relm4::Component for Model {
                 crate::widgets::tags::MsgOutput::Edit(task) => Msg::Edit(task),
             });
 
+        let builder = gtk::Builder::from_resource("/txt/todo/effitask/shortcuts.ui");
+        let shortcuts = builder.object("shortcuts").unwrap();
+
         let model = Self {
             agenda,
             config: init,
@@ -371,6 +409,7 @@ impl relm4::Component for Model {
             logger,
             projects,
             search,
+            shortcuts,
             tags,
         };
 
@@ -380,7 +419,9 @@ impl relm4::Component for Model {
         model.add_tab_widgets(&widgets.notebook);
         model.update_tasks(&widgets);
         model.search.widget().set_visible(false);
-        model.watch(sender);
+        model.watch(sender.clone());
+
+        Self::shortcuts(&root, sender);
 
         relm4::ComponentParts { model, widgets }
     }
@@ -394,10 +435,15 @@ impl relm4::Component for Model {
     ) {
         match msg {
             Msg::Add(task) => self.add(widgets, &task),
+            Msg::Adding => widgets.add_popover.popup(),
             Msg::Complete(task) => self.complete(widgets, &task),
             Msg::EditCancel => self.edit.widget().set_visible(false),
             Msg::EditDone(task) => self.save(widgets, &task),
             Msg::Edit(task) => self.edit(&task),
+            Msg::Find => {
+                widgets.search.grab_focus();
+            },
+            Msg::Help => self.shortcuts.present(),
             Msg::Refresh => self.update_tasks(widgets),
             Msg::Search(query) => self.search(widgets, &query),
         }
@@ -459,8 +505,15 @@ impl relm4::Component for Model {
                             },
                         },
                     },
+                    pack_start = &gtk::Button {
+                        set_icon_name: "help-about",
+                        set_tooltip_text: "Help".into(),
+
+                        connect_clicked => Msg::Help,
+                    },
 
                     pack_end = model.logger.widget(),
+                    #[name = "search"]
                     pack_end = &gtk::SearchEntry {
                         connect_search_changed[sender] => move |this| {
                             sender.input(Msg::Search(this.text().to_string()));

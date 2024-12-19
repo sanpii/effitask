@@ -12,5 +12,6 @@
         <file compressed="true">style.css</file>
         <file compressed="true">style_dark.css</file>
         <file compressed="true">style_light.css</file>
+        <file compressed="true" preprocess="xml-stripblanks">shortcuts.ui</file>
     </gresource>
 </gresources>

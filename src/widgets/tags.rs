@@ -80,7 +80,7 @@ impl Model {
 
                 (preferences.done || !x.finished)
                     && !tags.is_empty()
-                    && Self::has_filter(&tags, filters)
+                    && Self::has_filter(tags, filters)
                     && (preferences.defered
                         || x.threshold_date.is_none()
                         || x.threshold_date.unwrap() <= today)
